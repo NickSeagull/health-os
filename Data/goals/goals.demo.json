@@ -1,0 +1,132 @@
+{
+  "version": 2,
+  "okr_ref": "O5",
+  "phases": [
+    {
+      "id": "phase_1",
+      "name": "Срочное",
+      "period": "2026-Q3 (июль — сентябрь)",
+      "priority": "high",
+      "directions": ["KR5.0"]
+    },
+    {
+      "id": "phase_2",
+      "name": "Плановое",
+      "period": "2026-Q4 (октябрь — декабрь)",
+      "priority": "medium",
+      "directions": ["KR5.4"]
+    }
+  ],
+  "directions": [
+    {
+      "area": "Общее самочувствие",
+      "kr": "KR5.0",
+      "phase": "phase_1",
+      "status": "investigating",
+      "goal": "Понять причину сниженной энергии во второй половине дня",
+      "last_activity": "2026-06-25",
+      "cost_estimate_rub": 3700,
+      "cost_actual_rub": 2400,
+      "milestones": [
+        {
+          "id": "kr5.0_m1",
+          "title": "Приём терапевта по месту жительства",
+          "type": "visit",
+          "status": "completed",
+          "deadline": "2026-06-30",
+          "oms_available": true,
+          "cost_estimate_rub": 0,
+          "cost_actual_rub": 0,
+          "todoist_task_id": null,
+          "depends_on": [],
+          "notes": "Приём состоялся 2026-06-25"
+        },
+        {
+          "id": "kr5.0_m2",
+          "title": "Базовая панель: ОАК, витамины, биохимия",
+          "type": "lab",
+          "status": "completed",
+          "deadline": "2026-06-20",
+          "oms_available": false,
+          "cost_estimate_rub": 2500,
+          "cost_actual_rub": 2400,
+          "todoist_task_id": null,
+          "depends_on": [],
+          "notes": "Единственное отклонение — витамин D"
+        },
+        {
+          "id": "kr5.0_m3",
+          "title": "Контроль 25(OH)D через 3 месяца",
+          "type": "lab",
+          "status": "not_started",
+          "deadline": "2026-09-30",
+          "oms_available": false,
+          "cost_estimate_rub": 1200,
+          "cost_actual_rub": null,
+          "todoist_task_id": null,
+          "depends_on": ["kr5.0_m2"],
+          "notes": "На фоне приёма витамина D3 2000 МЕ"
+        }
+      ],
+      "related_visits": ["2026-06-25_therapist.md"],
+      "related_labs": ["2026-06-18_cbc-vitamins.json"]
+    },
+    {
+      "area": "Стоматология",
+      "kr": "KR5.4",
+      "phase": "phase_2",
+      "status": "in_progress",
+      "goal": "Плановое наблюдение, гигиена раз в полгода",
+      "last_activity": "2026-05-20",
+      "cost_estimate_rub": 7000,
+      "cost_actual_rub": 5000,
+      "milestones": [
+        {
+          "id": "kr5.4_m1",
+          "title": "Профессиональная гигиена полости рта",
+          "type": "procedure",
+          "status": "completed",
+          "deadline": "2026-05-31",
+          "oms_available": false,
+          "cost_estimate_rub": 5000,
+          "cost_actual_rub": 5000,
+          "todoist_task_id": null,
+          "depends_on": [],
+          "notes": ""
+        },
+        {
+          "id": "kr5.4_m2",
+          "title": "Плановый осмотр и обновление карты зубов",
+          "type": "visit",
+          "status": "not_started",
+          "deadline": "2026-11-30",
+          "oms_available": false,
+          "cost_estimate_rub": 2000,
+          "cost_actual_rub": null,
+          "todoist_task_id": null,
+          "depends_on": ["kr5.4_m1"],
+          "notes": "Внести в карту статус зубов, сейчас известны только три"
+        }
+      ],
+      "related_visits": [],
+      "related_labs": []
+    }
+  ],
+  "fitness_target": {
+    "workouts_per_month": 12,
+    "target_weight_kg": null,
+    "target_body_fat_pct": null,
+    "current_mode": "maintenance",
+    "training_type": "general-fitness",
+    "training_frequency": "~8-10/month"
+  },
+  "cost_summary": {
+    "total_estimate_rub": 10700,
+    "total_actual_rub": 7400,
+    "by_phase": {
+      "phase_1": { "estimate": 3700, "actual": 2400 },
+      "phase_2": { "estimate": 7000, "actual": 5000 }
+    },
+    "oms_savings_estimate_rub": null
+  }
+}

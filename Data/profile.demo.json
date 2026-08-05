@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "basic": {
+    "full_name": "Демо Пользователь",
+    "date_of_birth": "1992-04-12",
+    "sex": "male",
+    "gender_identity": null,
+    "hormone_therapy": null,
+    "blood_type": "A(II) Rh+",
+    "height_cm": 178,
+    "birth_weight_g": 3400,
+    "birth_height_cm": 52,
+    "birth_head_cm": 35,
+    "birth_place": "Ваш город",
+    "birth_type": "естественные роды",
+    "emergency_contact": {
+      "name": "Имя Фамилия",
+      "phone": "+7 (900) 000-00-00",
+      "relation": "близкий человек"
+    }
+  },
+  "allergies": [
+    {
+      "allergen": "Пыльца берёзы",
+      "type": "сезонная",
+      "severity": "mild",
+      "reaction": "Заложенность носа, слезотечение в апреле — мае",
+      "notes": "Антигистаминные по потребности"
+    }
+  ],
+  "chronic_conditions": [],
+  "family_history": [
+    {
+      "relative": "отец",
+      "name": "—",
+      "age_at_birth": 29,
+      "condition": "Артериальная гипертензия после 60 лет",
+      "notes": "Контролируется препаратами"
+    }
+  ],
+  "current_complaints": [
+    {
+      "area": "Общее самочувствие",
+      "description": "Снижение энергии во второй половине дня",
+      "since": "2026-03",
+      "status": "investigating",
+      "priority": "medium",
+      "notes": "Началось зимой, к лету стало заметно меньше"
+    }
+  ],
+  "lifestyle": {
+    "exercise": {
+      "type": "зал + бег",
+      "frequency": "2–3 раза в неделю",
+      "notes": "Силовые в зале, лёгкий бег на выходных"
+    },
+    "smoking": {
+      "cigarettes": false,
+      "hookah": false,
+      "notes": "Не курит"
+    },
+    "alcohol": "редко, 1–2 раза в месяц",
+    "sleep": {
+      "target_bedtime": "23:30",
+      "target_wakeup": "07:30",
+      "duration_hours": 7.5,
+      "notes": "Просыпается до будильника примерно через день"
+    },
+    "nutrition": {
+      "tracking": false,
+      "current_phase": "поддержание",
+      "history": "Осенью 2025 был период набора массы, с весны — поддержание",
+      "standard_meal": "Три приёма пищи, перекус после тренировки",
+      "notes": "Овощи и белок почти каждый день, фастфуд редко"
+    },
+    "work": "офисная работа за компьютером, полный день",
+    "caffeine": {
+      "coffee_cups_per_day": 2,
+      "energy_drinks": "нет",
+      "tea": "1 чашка чёрного чая вечером",
+      "last_intake_time": "16:00",
+      "notes": "Второй кофе обычно около полудня"
+    },
+    "hydration": {
+      "water_liters_per_day": 1.8,
+      "notes": "В тренировочные дни больше"
+    },
+    "screen_and_light": {
+      "screen_hours_per_day": 9,
+      "evening_screen_cutoff": "23:00",
+      "morning_daylight_minutes": 15,
+      "notes": "Утренний свет — только дорога до работы"
+    },
+    "sleep_regularity": {
+      "actual_bedtime_weekday": "23:45",
+      "actual_bedtime_weekend": "01:00",
+      "variability_notes": "Разброс отбоя между буднями и выходными около 1 ч 15 мин"
+    },
+    "_needs_input": []
+  }
+}

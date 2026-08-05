@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "updated": null,
+  "purpose": "Внешний контекст жизни: география, климат, жильё, работа, стресс. Читается всеми AI-специалистами до того, как искать редкую патологию — среда и режим объясняют находку чаще и дешевле.",
+  "location": {
+    "city": "",
+    "district": "",
+    "street": "",
+    "nearest_metro": "",
+    "country": "",
+    "latitude": null,
+    "longitude": null,
+    "since": null,
+    "previous_locations": []
+  },
+  "healthcare_access": {
+    "insurance": "",
+    "dms": null,
+    "dms_details": null,
+    "travel_readiness": null,
+    "max_travel_time_min": null,
+    "preferred_transport": null,
+    "notes": null
+  },
+  "climate": {
+    "type": "",
+    "derived_facts": [],
+    "seasonal_pattern_observed": null
+  },
+  "air_and_water": {
+    "air_quality": null,
+    "traffic_proximity": null,
+    "green_space_nearby": null,
+    "tap_water": null,
+    "water_filter": null,
+    "notes": null
+  },
+  "housing": {
+    "type": null,
+    "floor": null,
+    "windows_orientation": null,
+    "heating": null,
+    "humidity_winter": null,
+    "noise": null,
+    "pets": null,
+    "mold_or_damp": null,
+    "notes": null
+  },
+  "work": {
+    "field": "",
+    "posture": "",
+    "schedule": null,
+    "screen_hours_per_day": null,
+    "remote_or_office": null,
+    "cognitive_load": null,
+    "deadline_pressure": null,
+    "commute": {
+      "mode": null,
+      "duration_min": null,
+      "notes": null
+    },
+    "health_implications": []
+  },
+  "circadian_context": {
+    "chronotype": null,
+    "timezone": null,
+    "daylight_exposure_morning_min": null,
+    "evening_light": null,
+    "shift_work": null,
+    "travel_across_timezones": null,
+    "notes": null
+  },
+  "stress_context": {
+    "main_stressors": [],
+    "financial_stress": null,
+    "work_stress_level": null,
+    "social_support": {
+      "family": null,
+      "friends": null,
+      "partner": null,
+      "notes": null
+    },
+    "life_events_recent": [],
+    "chronology_anchors": []
+  },
+  "_needs_input": [
+    "location.city / country — укажите свой город и страну",
+    "location.latitude и location.longitude — заполните под свой город. Широта не подставлена намеренно: от неё зависят выводы по длине светового дня, сезонному синтезу витамина D и сезонному аффективному паттерну. Значения берутся из любой карты по названию города",
+    "healthcare_access.insurance — какая страховка действует и есть ли ДМС",
+    "climate.type и climate.derived_facts — тип климата и следствия из него",
+    "air_and_water — качество воздуха и воды по месту жительства",
+    "housing — тип жилья, отопление, влажность зимой, животные, сырость",
+    "work — сфера, поза, экранные часы, нагрузка, дорога",
+    "circadian_context — хронотип, часовой пояс, утренний свет, сменный график",
+    "stress_context.chronology_anchors — год, возраст и событие: переезды, смены работы, потери, операции. Нужны, чтобы привязать начало симптомов к событиям жизни"
+  ]
+}

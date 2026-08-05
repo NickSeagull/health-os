@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "dentist_id": "",
+  "next_visit": "2026-11-20",
+  "teeth": {
+    "18": {
+      "status": "extracted",
+      "notes": "Удалён зуб мудрости, 2024"
+    },
+    "28": {
+      "status": "extracted",
+      "notes": "Удалён зуб мудрости, 2024"
+    },
+    "36": {
+      "status": "filled",
+      "notes": "Композитная пломба, 2023"
+    }
+  },
+  "summary": {
+    "total": 32,
+    "healthy": 0,
+    "filled": 1,
+    "crowned": 0,
+    "implant": 0,
+    "extracted": 2,
+    "needs_treatment": 0,
+    "root_canal": 0
+  },
+  "imaging": [],
+  "notes": "Карта разрежена: ключи есть только у зубов с известным статусом. Статус неизвестен: 29 — их нужно внести после ближайшего осмотра."
+}

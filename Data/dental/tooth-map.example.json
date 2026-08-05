@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "dentist_id": "",
+  "next_visit": null,
+  "teeth": {},
+  "summary": {
+    "total": 32,
+    "healthy": 0,
+    "filled": 0,
+    "crowned": 0,
+    "implant": 0,
+    "extracted": 0,
+    "needs_treatment": 0,
+    "root_canal": 0
+  },
+  "imaging": [],
+  "notes": ""
+}

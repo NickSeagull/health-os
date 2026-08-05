@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "basic": {
+    "full_name": "",
+    "date_of_birth": null,
+    "sex": null,
+    "gender_identity": null,
+    "hormone_therapy": null,
+    "blood_type": "",
+    "height_cm": null,
+    "birth_weight_g": null,
+    "birth_height_cm": null,
+    "birth_head_cm": null,
+    "birth_place": "",
+    "birth_type": "",
+    "emergency_contact": {
+      "name": "",
+      "phone": "",
+      "relation": ""
+    }
+  },
+  "allergies": [],
+  "chronic_conditions": [],
+  "family_history": [],
+  "current_complaints": [],
+  "lifestyle": {
+    "exercise": {
+      "type": "",
+      "frequency": "",
+      "notes": ""
+    },
+    "smoking": {
+      "cigarettes": false,
+      "hookah": false,
+      "notes": ""
+    },
+    "alcohol": "",
+    "sleep": {
+      "target_bedtime": null,
+      "target_wakeup": null,
+      "duration_hours": null,
+      "notes": ""
+    },
+    "nutrition": {
+      "tracking": false,
+      "current_phase": "",
+      "history": "",
+      "standard_meal": "",
+      "notes": ""
+    },
+    "work": "",
+    "caffeine": {
+      "coffee_cups_per_day": null,
+      "energy_drinks": null,
+      "tea": null,
+      "last_intake_time": null,
+      "notes": ""
+    },
+    "hydration": {
+      "water_liters_per_day": null,
+      "notes": ""
+    },
+    "screen_and_light": {
+      "screen_hours_per_day": null,
+      "evening_screen_cutoff": null,
+      "morning_daylight_minutes": null,
+      "notes": ""
+    },
+    "sleep_regularity": {
+      "actual_bedtime_weekday": null,
+      "actual_bedtime_weekend": null,
+      "variability_notes": ""
+    },
+    "_needs_input": [
+      "basic — заполните имя, дату рождения, рост и группу крови",
+      "lifestyle.caffeine — кофе, чай, энергетики и время последнего приёма",
+      "lifestyle.hydration — сколько воды в день",
+      "lifestyle.screen_and_light — экранное время и утренний дневной свет",
+      "lifestyle.sleep_regularity — фактическое время отбоя в будни и выходные"
+    ]
+  }
+}

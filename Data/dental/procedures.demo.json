@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "procedures": [
+    {
+      "date": "2023-11-14",
+      "teeth": ["36"],
+      "type": "filling",
+      "description": "Лечение кариеса, композитная пломба",
+      "doctor_id": null,
+      "notes": ""
+    },
+    {
+      "date": "2024-02-08",
+      "teeth": ["18", "28"],
+      "type": "extraction",
+      "description": "Удаление верхних зубов мудрости",
+      "doctor_id": null,
+      "notes": "Плановое, без осложнений"
+    },
+    {
+      "date": "2026-05-20",
+      "teeth": [],
+      "type": "cleaning",
+      "description": "Профессиональная гигиена полости рта",
+      "doctor_id": null,
+      "notes": "Раз в полгода"
+    }
+  ]
+}

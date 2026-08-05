@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "date": null,
+  "analysis_date": null,
+  "type": "",
+  "laboratory": "",
+  "order_number": null,
+  "pdf_path": null,
+  "summary": {
+    "total": 0,
+    "normal": 0,
+    "low": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "notes": "",
+  "panels": [
+    {
+      "panel": null,
+      "markers": []
+    }
+  ],
+  "deviations": [],
+  "recommendations": []
+}

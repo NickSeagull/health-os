@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "date": "2025-09-12",
+  "analysis_date": "2025-09-13",
+  "type": "ОАК + витамины + базовая биохимия",
+  "laboratory": "Демо-лаборатория",
+  "order_number": "0000000",
+  "pdf_path": null,
+  "summary": {
+    "total": 12,
+    "normal": 12,
+    "low": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "notes": "Демо-данные. Синтетический набор.",
+  "panels": [
+    {
+      "panel": "Общий анализ крови",
+      "markers": [
+        {
+          "name": "Гемоглобин",
+          "value": 152,
+          "unit": "г/л",
+          "reference_min": 132,
+          "reference_max": 172,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Эритроциты",
+          "value": 4.95,
+          "unit": "×10¹²/л",
+          "reference_min": 4.3,
+          "reference_max": 5.7,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Гематокрит",
+          "value": 45.2,
+          "unit": "%",
+          "reference_min": 39,
+          "reference_max": 49,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Лейкоциты",
+          "value": 5.8,
+          "unit": "×10⁹/л",
+          "reference_min": 4.0,
+          "reference_max": 9.0,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Тромбоциты",
+          "value": 263,
+          "unit": "×10⁹/л",
+          "reference_min": 150,
+          "reference_max": 400,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "СОЭ",
+          "value": 4,
+          "unit": "мм/ч",
+          "reference_min": 2,
+          "reference_max": 15,
+          "status": "normal",
+          "flag": null
+        }
+      ],
+      "name": "Общий анализ крови"
+    },
+    {
+      "panel": "Витамины, железо и базовая биохимия",
+      "markers": [
+        {
+          "name": "Витамин D (25-OH)",
+          "value": 33,
+          "unit": "нг/мл",
+          "reference_min": 30,
+          "reference_max": 100,
+          "status": "normal",
+          "flag": null,
+          "note": "Лёгкая недостаточность. До выраженного дефицита (< 20 нг/мл) не доходит"
+        },
+        {
+          "name": "Витамин B12",
+          "value": 455,
+          "unit": "пг/мл",
+          "reference_min": 191,
+          "reference_max": 663,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Ферритин",
+          "value": 118,
+          "unit": "мкг/л",
+          "reference_min": 30,
+          "reference_max": 400,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Глюкоза",
+          "value": 5.0,
+          "unit": "ммоль/л",
+          "reference_min": 4.1,
+          "reference_max": 5.9,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "Холестерин общий",
+          "value": 4.4,
+          "unit": "ммоль/л",
+          "reference_min": 3.0,
+          "reference_max": 5.2,
+          "status": "normal",
+          "flag": null
+        },
+        {
+          "name": "ТТГ",
+          "value": 1.62,
+          "unit": "мМЕ/л",
+          "reference_min": 0.4,
+          "reference_max": 4.0,
+          "status": "normal",
+          "flag": null
+        }
+      ],
+      "name": "Биохимия и витамины"
+    }
+  ],
+  "deviations": [],
+  "recommendations": [
+    "Все маркеры в референсе. Витамин D у нижней границы — стоит следить в динамике"
+  ]
+}

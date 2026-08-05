@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "sessions": [
+    {
+      "date": "2026-07-08",
+      "scope": "question",
+      "specialists": ["endocrinologist", "hematologist"],
+      "question": "Что может объяснять снижение энергии во второй половине дня при анализах в норме?",
+      "file": "2026-07-08_question-energy.md",
+      "rounds": 3,
+      "disputes_total": 2,
+      "disputes_unresolved": 0,
+      "critical_count": 0,
+      "high_count": 0,
+      "medium_count": 2
+    }
+  ]
+}

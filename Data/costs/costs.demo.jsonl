@@ -1,0 +1,3 @@
+{"ts":"2026-05-20","kr":"KR5.4","type":"dental","description":"Профессиональная гигиена полости рта","payment":"private","cost_rub":5000,"clinic":"Демо-стоматология","visit_ref":null}
+{"ts":"2026-06-18","kr":"KR5.0","type":"lab","description":"ОАК + витамины + базовая биохимия, 12 маркеров","payment":"private","cost_rub":2400,"clinic":"Демо-лаборатория","visit_ref":"2026-06-18_cbc-vitamins.json"}
+{"ts":"2026-06-25","kr":"KR5.0","type":"visit","description":"Терапевт — первичный приём","payment":"oms","cost_rub":0,"clinic":"Поликлиника по месту жительства","visit_ref":"2026-06-25_therapist.md"}
