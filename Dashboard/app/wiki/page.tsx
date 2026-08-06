@@ -3,7 +3,7 @@ import { TYPE_LABEL } from "@/lib/types/wiki";
 import type { WikiIssue } from "@/lib/types/wiki";
 import { WikiGraph } from "@/components/wiki/wiki-graph";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Unlink, CircleOff, Clock } from "lucide-react";
+import { AlertTriangle, Unlink, CircleOff, Clock, FileWarning } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +25,11 @@ const ISSUE_META: Record<
     label: "Устаревшее",
     hint: "Источник обновился позже страницы — вывод остался от прошлых данных",
     icon: Clock,
+  },
+  "broken-frontmatter": {
+    label: "Метаданные не разбираются",
+    hint: "Frontmatter страницы сломан — чаще всего незакавыченное двоеточие в значении. Заголовок, статус и источники теряются, и страница выглядит так, будто их просто нет",
+    icon: FileWarning,
   },
   "no-source": {
     label: "Без источника",

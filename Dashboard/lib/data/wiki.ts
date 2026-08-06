@@ -42,12 +42,17 @@ function readDir(base: string, type: WikiType, shared: boolean): WikiPage[] {
     }
     let fm: Record<string, unknown> = {};
     let body = raw;
+    let broken: string | null = null;
     try {
       const parsed = matter(raw);
       fm = parsed.data as Record<string, unknown>;
       body = parsed.content;
-    } catch {
-      /* страница без разбираемого frontmatter всё равно попадает в граф */
+    } catch (e) {
+      // Страница попадает в граф и без разбираемого frontmatter, но молчать
+      // об этом нельзя: без метаданных она теряет заголовок, статус и
+      // источники — и выглядит как страница, у которой их просто нет.
+      // Частая причина — незакавыченное двоеточие в значении YAML
+      broken = e instanceof Error ? e.message.split("\n")[0] : "не разбирается";
     }
 
     const slug = name.replace(/\.md$/, "");
@@ -71,6 +76,7 @@ function readDir(base: string, type: WikiType, shared: boolean): WikiPage[] {
       links: [...links],
       body,
       shared,
+      broken,
     });
   }
   return pages;
@@ -140,6 +146,13 @@ export function readWikiGraph(): WikiGraph {
   const dataRootShared = path.dirname(sharedRoot);
 
   for (const p of pages) {
+    if (p.broken) {
+      issues.push({
+        kind: "broken-frontmatter",
+        page: p.id,
+        detail: `метаданные не разбираются (${p.broken}) — заголовок, статус и источники потеряны`,
+      });
+    }
     if (!inbound.get(p.id) && p.type !== "synthesis") {
       issues.push({
         kind: "orphan",

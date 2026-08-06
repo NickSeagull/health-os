@@ -45,12 +45,14 @@ export type WikiPage = {
   links: string[]; // исходящие, нормализованные
   body: string;
   shared: boolean;
+  /** Сообщение об ошибке разбора frontmatter, если он не разобрался. */
+  broken: string | null;
 };
 
 export type WikiEdge = { from: string; to: string };
 
 export type WikiIssue = {
-  kind: "orphan" | "dead-link" | "stale" | "no-source";
+  kind: "orphan" | "dead-link" | "stale" | "no-source" | "broken-frontmatter";
   page: string;
   detail: string;
 };
