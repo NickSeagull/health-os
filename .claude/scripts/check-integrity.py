@@ -24,7 +24,12 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "Data"
+DATA_ROOT = ROOT / "Data"
+PROFILES = DATA_ROOT / "profiles"
+
+# Текущий проверяемый профиль. Переназначается в main() на каждой итерации:
+# проверки написаны против одного набора данных и не знают о профилях.
+DATA = DATA_ROOT
 VERBOSE = "-v" in sys.argv or "--verbose" in sys.argv
 
 OK, WARN, SKIP = "✅", "⚠️ ", "·"
@@ -270,28 +275,145 @@ def check_file_refs():
 
 
 # ── main ───────────────────────────────────────────────────────────
+
+# ── 12. Структура профилей ─────────────────────────────────────────
+def check_profiles_structure():
+    """Каждый профиль — каталог с profile.json, где есть дата рождения и пол.
+
+    Без даты рождения не работают ни возрастные референсы, ни скрининг,
+    ни определение педиатрического режима: система молча начнёт читать
+    детские анализы по взрослым нормам.
+    """
+    if not PROFILES.exists():
+        report(None, "Структура профилей")
+        return
+    dirs = [d for d in sorted(PROFILES.iterdir()) if d.is_dir()]
+    if not dirs:
+        report(None, "Структура профилей")
+        return
+    bad = []
+    for d in dirs:
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,31}", d.name):
+            bad.append(f"{d.name}: недопустимый идентификатор профиля")
+            continue
+        pf = d / "profile.json"
+        if not pf.exists():
+            bad.append(f"{d.name}: нет profile.json")
+            continue
+        data = load_json(pf)
+        if data is None:
+            bad.append(f"{d.name}/profile.json: не разбирается")
+            continue
+        basic = data.get("basic") or {}
+        if not basic.get("date_of_birth"):
+            bad.append(f"{d.name}: не заполнена date_of_birth — возрастные референсы недоступны")
+        if not basic.get("sex"):
+            bad.append(f"{d.name}: не заполнен sex — половые различия не учитываются")
+        if basic.get("relationship") not in (None, "self") and not (data.get("consent") or {}).get("basis"):
+            bad.append(f"{d.name}: профиль другого человека без заполненного consent")
+    report(not bad, f"Структура профилей ({len(dirs)})", bad)
+
+
+# ── 13. Указатель активного профиля ────────────────────────────────
+def check_active_profile():
+    """Указатель существует, разбирается и ведёт на существующий профиль.
+
+    Сломанный указатель опаснее отсутствующего: система может продолжить
+    работу «по умолчанию» и записать данные не тому человеку.
+    """
+    ptr = PROFILES / "_active.json"
+    if not PROFILES.exists() or not any(d.is_dir() for d in PROFILES.iterdir()):
+        report(None, "Указатель активного профиля")
+        return
+    if not ptr.exists():
+        report(False, "Указатель активного профиля", ["Data/profiles/_active.json отсутствует"])
+        return
+    data = load_json(ptr)
+    if data is None:
+        report(False, "Указатель активного профиля", ["_active.json не разбирается"])
+        return
+    active = data.get("active")
+    problems_local = []
+    if not active:
+        problems_local.append("поле active пустое")
+    elif not (PROFILES / active).is_dir():
+        problems_local.append(f"active = «{active}», но такого профиля нет")
+    report(not problems_local, "Указатель активного профиля", problems_local)
+
+
+# ── 14. Данные вне профиля ─────────────────────────────────────────
+def check_no_stray_data():
+    """Данные пациента, лежащие в Data/ мимо профиля.
+
+    Ровно то, что произойдёт, если агент запишет файл по короткому пути
+    буквально, не применив правило разрешения из profile-resolution.md.
+    Такой файл невидим для дашборда и выпадает из всех индексов.
+    """
+    if not DATA_ROOT.exists():
+        report(None, "Нет данных вне профилей")
+        return
+    allowed_dirs = {"profiles", "wiki", "specialists"}
+    allowed_files = {"README.md"}
+    stray = []
+    for pth in sorted(DATA_ROOT.rglob("*")):
+        if pth.is_dir() or pth.name == ".gitkeep" or pth.name.startswith("."):
+            continue
+        rel = pth.relative_to(DATA_ROOT)
+        if rel.parts[0] in allowed_dirs or rel.name in allowed_files:
+            continue
+        if any(s in pth.name for s in (".example.", ".demo.", ".reference.")):
+            continue
+        if rel.name == "_marker-aliases.json":
+            continue
+        stray.append(f"Data/{rel} — данные вне профиля, применить правило из profile-resolution.md")
+    report(not stray, "Нет данных вне профилей", stray)
+
+
 def main() -> int:
     print()
     print("Health-OS — проверка целостности данных")
     print("═" * 47)
     print()
 
-    check_json_valid()
-    check_version_field()
-    check_index_complete(
-        DATA / "labs" / "_index.json", "analyses", DATA / "labs", {".json"}, "Индекс анализов полон"
+    global DATA
+
+    check_profiles_structure()
+    check_active_profile()
+    check_no_stray_data()
+
+    profiles = (
+        [d for d in sorted(PROFILES.iterdir()) if d.is_dir()]
+        if PROFILES.exists() else []
     )
-    check_index_complete(
-        DATA / "doctors" / "visits" / "_index.json", "visits",
-        DATA / "doctors" / "visits", {".json", ".md"}, "Индекс визитов полон"
-    )
-    check_csv()
-    check_dates()
-    check_markers_reachable()
-    check_tooth_map()
-    check_goals_cost()
-    check_visit_format()
-    check_file_refs()
+    if not profiles:
+        print()
+        print("  · Профилей нет — проверять нечего. Запустите ./setup.sh")
+        profiles = []
+
+    for pdir in profiles:
+        DATA = pdir
+        name = pdir.name
+        data = load_json(pdir / "profile.json") or {}
+        display = ((data.get("basic") or {}).get("display_name") or name)
+        print()
+        print(f"  ─── профиль: {display} ({name}) ───")
+
+        check_json_valid()
+        check_version_field()
+        check_index_complete(
+            DATA / "labs" / "_index.json", "analyses", DATA / "labs", {".json"}, "Индекс анализов полон"
+        )
+        check_index_complete(
+            DATA / "doctors" / "visits" / "_index.json", "visits",
+            DATA / "doctors" / "visits", {".json", ".md"}, "Индекс визитов полон"
+        )
+        check_csv()
+        check_dates()
+        check_markers_reachable()
+        check_tooth_map()
+        check_goals_cost()
+        check_visit_format()
+        check_file_refs()
 
     print()
     print("═" * 47)

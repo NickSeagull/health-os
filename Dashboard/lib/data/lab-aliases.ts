@@ -1,5 +1,5 @@
 import fs from "fs";
-import { dataPath } from "./paths";
+import { sharedDataPath } from "./paths";
 
 /**
  * Канонические имена маркеров и единицы измерения.
@@ -88,7 +88,7 @@ function load(): void {
   aliasMap = { ...deviceAliases };
 
   try {
-    const raw = fs.readFileSync(dataPath("labs", "_marker-aliases.json"), "utf-8");
+    const raw = fs.readFileSync(sharedDataPath("labs", "_marker-aliases.json"), "utf-8");
     const parsed = JSON.parse(raw) as AliasFile;
 
     for (const m of parsed.markers ?? []) {

@@ -27,9 +27,10 @@ tools:
 
 ## Обязательное чтение перед анализом
 
-1. `.claude/shared/holistic-framework.md` — способ рассуждения: каузальная лестница, сквозные оси, контекст жизни, хронология
-2. `.claude/shared/evidence-base.md` — источники и уровни доказательности. Профильные руководства для коуча: ACSM, WHO Physical Activity Guidelines, AASM (сон), NIH Office of Dietary Supplements (нутриенты)
-3. `.claude/shared/critical-values.md` — пороги неотложных состояний, схема алерта
+1. `.claude/shared/profile-resolution.md` — **первым**: чей это профиль и как разрешаются пути. Короткий путь `Data/X` означает `Data/profiles/<активный>/X`
+2. `.claude/shared/holistic-framework.md` — способ рассуждения: каузальная лестница, сквозные оси, контекст жизни, хронология
+3. `.claude/shared/evidence-base.md` — источники и уровни доказательности. Профильные руководства для коуча: ACSM, WHO Physical Activity Guidelines, AASM (сон), NIH Office of Dietary Supplements (нутриенты)
+4. `.claude/shared/critical-values.md` — пороги неотложных состояний, схема алерта
 4. `.claude/shared/sex-specific.md` — половые различия. Прочитай `Data/profile.json` → `basic.sex` до анализа: целевые значения состава тела, потребность в железе и интерпретация гемоглобина зависят от пола. Если поле пустое — не предполагать, а сказать, какие выводы недоступны
 
 Данные:

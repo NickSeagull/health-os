@@ -106,38 +106,60 @@ echo "Разворачиваю файлы данных"
 # Смешивать режимы нельзя: демо-файлы лягут поверх пустых, а индексы останутся
 # от чистой установки — получится рассогласованное состояние, которое падает
 # на проверке целостности. Проверяем до первого копирования.
-EXISTING=$(find Data -type f \( -name "*.json" -o -name "*.csv" -o -name "*.jsonl" -o -name "*.md" \) \
-  ! -name "*.example.*" ! -name "*.demo.*" ! -name "*.reference.*" \
-  ! -name "_marker-aliases.json" ! -name "README.md" ! -path "*specialists*" 2>/dev/null | wc -l | tr -d ' ')
+EXISTING=$(find Data/profiles -type f \( -name "*.json" -o -name "*.csv" -o -name "*.jsonl" -o -name "*.md" \) \
+  ! -name "*.example.*" ! -name "*.demo.*" ! -name "*.reference.*" 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$EXISTING" -gt 0 ] && [ "$MODE" = "demo" ]; then
   echo
-  err "В Data/ уже есть $EXISTING файлов, развёрнутых ранее."
+  err "В Data/profiles/ уже есть $EXISTING файлов, развёрнутых ранее."
   err "Накладывать демо-набор поверх них нельзя — индексы разойдутся с файлами."
   echo
   echo "  Если это ваши данные — не запускайте --demo, вы их перезапишете."
   echo "  Если это прошлая установка и её не жаль, очистите каталог:"
   echo
-  echo "    find Data -type f ! -name '.gitkeep' ! -name 'README.md' \\"
-  echo "      ! -name '_marker-aliases.json' ! -path '*specialists*' \\"
-  echo "      ! -name '*.example.*' ! -name '*.demo.*' ! -name '*.reference.*' -delete"
+  echo "    rm -rf Data/profiles/*/ && rm -f Data/profiles/_active.json"
   echo
   echo "  Затем запустите ./setup.sh --demo снова."
   echo
   exit 1
 fi
 
+# Данные раскладываются по профилям: Data/profiles/<id>/. Первый профиль —
+# владелец установки. Шаблоны при этом остаются на месте, в Data/: они общие
+# и служат источником для каждого нового профиля.
+PROFILE="${PROFILE:-owner}"
+PROFILE_DIR="Data/profiles/$PROFILE"
+
+mkdir -p "$PROFILE_DIR"/{context,labs/pdfs,doctors/visits,doctors/prep,dental,\
+medications,mental,goals,costs,traction,consilium,history,wiki/condition,\
+wiki/hypothesis,wiki/symptom,wiki/synthesis} 2>/dev/null
+mkdir -p Data/wiki/source Data/wiki/marker 2>/dev/null
+
+# Куда разворачивается шаблон. Всё, что лежит в Data/profiles/, — служебное
+# (указатель активного профиля) и остаётся на своём уровне. Остальное уходит
+# внутрь профиля: Data/labs/_index.example.json → Data/profiles/owner/labs/_index.json
+target_for() {
+  local tpl="$1" suffix="$2" ext="$3"
+  local rel="${tpl#Data/}"
+  local stem="${rel%$suffix}"
+  case "$rel" in
+    profiles/*) printf 'Data/%s.%s' "$stem" "$ext" ;;
+    *)          printf '%s/%s.%s' "$PROFILE_DIR" "$stem" "$ext" ;;
+  esac
+}
+
 SUFFIX=".example.json"
 [ "$MODE" = "demo" ] && SUFFIX=".demo.json"
 
 CREATED=0; KEPT=0
 while IFS= read -r -d '' tpl; do
-  target="${tpl%$SUFFIX}.json"
+  target="$(target_for "$tpl" "$SUFFIX" json)"
   base="$(basename "$target")"
   if [ -e "$target" ]; then
     skip "$base — уже есть, не трогаю"
     KEPT=$((KEPT+1))
   else
+    mkdir -p "$(dirname "$target")"
     cp "$tpl" "$target"
     ok "$base"
     CREATED=$((CREATED+1))
@@ -148,10 +170,10 @@ done < <(find Data -name "*$SUFFIX" -print0 2>/dev/null)
 for ext in csv jsonl md; do
   pat=".example.$ext"; [ "$MODE" = "demo" ] && pat=".demo.$ext"
   while IFS= read -r -d '' tpl; do
-    target="${tpl%$pat}.$ext"
+    target="$(target_for "$tpl" "$pat" "$ext")"
     base="$(basename "$target")"
     if [ -e "$target" ]; then skip "$base — уже есть"; KEPT=$((KEPT+1))
-    else cp "$tpl" "$target"; ok "$base"; CREATED=$((CREATED+1)); fi
+    else mkdir -p "$(dirname "$target")"; cp "$tpl" "$target"; ok "$base"; CREATED=$((CREATED+1)); fi
   done < <(find Data -name "*$pat" -print0 2>/dev/null)
 done
 
@@ -160,7 +182,7 @@ done
 # получает актуальный год. Без этого дашборд, ищущий файл по маске \d{4}.json,
 # целей просто не находит.
 YEAR="$(date +%Y)"
-for pair in "Data/goals/goals.json:Data/goals/$YEAR.json" "Data/costs/costs.jsonl:Data/costs/$YEAR.jsonl"; do
+for pair in "$PROFILE_DIR/goals/goals.json:$PROFILE_DIR/goals/$YEAR.json" "$PROFILE_DIR/costs/costs.jsonl:$PROFILE_DIR/costs/$YEAR.jsonl"; do
   src="${pair%%:*}"; dst="${pair##*:}"
   if [ -f "$src" ] && [ ! -e "$dst" ]; then
     mv "$src" "$dst"

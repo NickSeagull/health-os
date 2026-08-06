@@ -2,7 +2,7 @@ import { dataPath } from "./paths";
 import { safeReadCsv, safeAppendCsv } from "./utils";
 import type { BodyMetric } from "@/lib/types/body-metric";
 
-const CSV_PATH = dataPath("body-metrics.csv");
+const CSV_PATH = () => dataPath("body-metrics.csv");
 
 const CSV_HEADERS = [
   "date",
@@ -19,9 +19,9 @@ const CSV_HEADERS = [
 ];
 
 export async function readBodyMetrics(): Promise<BodyMetric[]> {
-  return safeReadCsv<BodyMetric>(CSV_PATH);
+  return safeReadCsv<BodyMetric>(CSV_PATH());
 }
 
 export async function appendBodyMetric(row: BodyMetric): Promise<void> {
-  await safeAppendCsv(CSV_PATH, row as unknown as Record<string, unknown>, CSV_HEADERS);
+  await safeAppendCsv(CSV_PATH(), row as unknown as Record<string, unknown>, CSV_HEADERS);
 }

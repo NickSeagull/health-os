@@ -3,17 +3,17 @@ import { dataPath } from "./paths";
 import { safeReadJson, safeReadFile, safeWriteJson, safeWriteFile, resolveWithin } from "./utils";
 import type { VisitIndex, VisitDetailJson, VisitDetailMd } from "@/lib/types/visit";
 
-const VISITS_DIR = dataPath("doctors", "visits");
-const INDEX_PATH = path.join(VISITS_DIR, "_index.json");
+const VISITS_DIR = () => dataPath("doctors", "visits");
+const INDEX_PATH = () => path.join(VISITS_DIR(), "_index.json");
 
 export async function readVisitIndex(): Promise<VisitIndex | null> {
-  return safeReadJson<VisitIndex>(INDEX_PATH);
+  return safeReadJson<VisitIndex>(INDEX_PATH());
 }
 
 export async function readVisitDetailJson(filename: string): Promise<VisitDetailJson | null> {
   let target: string;
   try {
-    target = resolveWithin(VISITS_DIR, filename, [".json"]);
+    target = resolveWithin(VISITS_DIR(), filename, [".json"]);
   } catch {
     return null;
   }
@@ -23,7 +23,7 @@ export async function readVisitDetailJson(filename: string): Promise<VisitDetail
 export async function readVisitDetailMd(filename: string): Promise<VisitDetailMd | null> {
   let target: string;
   try {
-    target = resolveWithin(VISITS_DIR, filename, [".md"]);
+    target = resolveWithin(VISITS_DIR(), filename, [".md"]);
   } catch {
     return null;
   }
@@ -51,7 +51,7 @@ export async function writeVisitDetailJson(
   data: VisitDetailJson
 ): Promise<void> {
   // Ошибка намеренно пробрасывается: запись за пределы каталога должна падать громко
-  const target = resolveWithin(VISITS_DIR, filename, [".json"]);
+  const target = resolveWithin(VISITS_DIR(), filename, [".json"]);
   await safeWriteJson(target, data);
 }
 
@@ -59,10 +59,10 @@ export async function writeVisitDetailMd(
   filename: string,
   content: string
 ): Promise<void> {
-  const target = resolveWithin(VISITS_DIR, filename, [".md"]);
+  const target = resolveWithin(VISITS_DIR(), filename, [".md"]);
   await safeWriteFile(target, content);
 }
 
 export async function writeVisitIndex(data: VisitIndex): Promise<void> {
-  await safeWriteJson(INDEX_PATH, data);
+  await safeWriteJson(INDEX_PATH(), data);
 }

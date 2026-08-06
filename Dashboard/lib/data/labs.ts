@@ -6,17 +6,17 @@ import type { LabIndex, LabFileData, InBodyData, MarkerTrendPoint } from "@/lib/
 import { resolveAlias, getCanonicalUnit, isUnitMismatch } from "./lab-aliases";
 import { collectMarkers } from "@/lib/lab-markers";
 
-const LABS_DIR = dataPath("labs");
-const INDEX_PATH = path.join(LABS_DIR, "_index.json");
+const LABS_DIR = () => dataPath("labs");
+const INDEX_PATH = () => path.join(LABS_DIR(), "_index.json");
 
 export async function readLabIndex(): Promise<LabIndex | null> {
-  return safeReadJson<LabIndex>(INDEX_PATH);
+  return safeReadJson<LabIndex>(INDEX_PATH());
 }
 
 export async function readLabFile(filename: string): Promise<LabFileData | null> {
   let target: string;
   try {
-    target = resolveWithin(LABS_DIR, filename, [".json"]);
+    target = resolveWithin(LABS_DIR(), filename, [".json"]);
   } catch {
     return null;
   }
@@ -26,7 +26,7 @@ export async function readLabFile(filename: string): Promise<LabFileData | null>
 export async function readInBodyFile(filename: string): Promise<InBodyData | null> {
   let target: string;
   try {
-    target = resolveWithin(LABS_DIR, filename, [".json"]);
+    target = resolveWithin(LABS_DIR(), filename, [".json"]);
   } catch {
     return null;
   }
@@ -35,7 +35,7 @@ export async function readInBodyFile(filename: string): Promise<InBodyData | nul
 
 export async function writeLabFile(filename: string, data: LabFileData): Promise<void> {
   // Ошибка намеренно пробрасывается: запись за пределы каталога должна падать громко
-  const target = resolveWithin(LABS_DIR, filename, [".json"]);
+  const target = resolveWithin(LABS_DIR(), filename, [".json"]);
   await safeWriteJson(target, data);
 }
 
@@ -114,7 +114,7 @@ export async function listInBodyFiles(): Promise<InBodyData[]> {
 
 export async function getAllLabFiles(): Promise<string[]> {
   try {
-    const files = await fs.readdir(LABS_DIR);
+    const files = await fs.readdir(LABS_DIR());
     return files.filter((f) => f.endsWith(".json") && f !== "_index.json");
   } catch {
     return [];

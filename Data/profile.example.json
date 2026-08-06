@@ -2,6 +2,8 @@
   "version": 1,
   "basic": {
     "full_name": "",
+    "display_name": "",
+    "relationship": "self",
     "date_of_birth": null,
     "sex": null,
     "gender_identity": null,
@@ -18,6 +20,11 @@
       "phone": "",
       "relation": ""
     }
+  },
+  "consent": {
+    "basis": "self",
+    "recorded_at": null,
+    "note": ""
   },
   "allergies": [],
   "chronic_conditions": [],

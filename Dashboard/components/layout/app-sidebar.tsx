@@ -29,6 +29,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./theme-toggle";
+import { ProfileSwitcher } from "./profile-switcher";
 
 const navItems = [
   { title: "Обзор", href: "/", icon: LayoutDashboard },
@@ -50,13 +51,14 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="px-4 py-3">
+      <SidebarHeader className="gap-2 px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-bold">
             H
           </div>
           <span className="font-semibold tracking-tight">Health OS</span>
         </Link>
+        <ProfileSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

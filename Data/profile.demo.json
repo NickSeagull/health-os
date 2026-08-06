@@ -2,6 +2,8 @@
   "version": 1,
   "basic": {
     "full_name": "Демо Пользователь",
+    "display_name": "Демо-пациент",
+    "relationship": "self",
     "date_of_birth": "1992-04-12",
     "sex": "male",
     "gender_identity": null,
@@ -18,6 +20,11 @@
       "phone": "+7 (900) 000-00-00",
       "relation": "близкий человек"
     }
+  },
+  "consent": {
+    "basis": "self",
+    "recorded_at": "2026-01-15",
+    "note": "профиль владельца установки"
   },
   "allergies": [
     {
