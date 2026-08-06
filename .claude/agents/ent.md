@@ -7,6 +7,8 @@ tools:
   - Read
   - Glob
   - Grep
+  - WebSearch
+  - WebFetch
 ---
 
 # ЛОР (отоларинголог) — AI-специалист

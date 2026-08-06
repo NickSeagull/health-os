@@ -15,6 +15,7 @@ import {
   Heart,
   User,
   TrendingUp,
+  Network,
 } from "lucide-react";
 import {
   Sidebar,
@@ -42,6 +43,7 @@ const navItems = [
   { title: "Цели", href: "/goals", icon: Target },
   { title: "Задачи", href: "/tasks", icon: CheckSquare },
   { title: "Traction", href: "/traction", icon: TrendingUp },
+  { title: "Граф связей", href: "/wiki", icon: Network },
   { title: "WHOOP", href: "/whoop", icon: Heart },
   { title: "Профиль", href: "/profile", icon: User },
 ];

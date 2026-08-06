@@ -143,8 +143,13 @@ target_for() {
   local rel="${tpl#Data/}"
   local stem="${rel%$suffix}"
   case "$rel" in
-    profiles/*) printf 'Data/%s.%s' "$stem" "$ext" ;;
-    *)          printf '%s/%s.%s' "$PROFILE_DIR" "$stem" "$ext" ;;
+    # Служебное: указатель активного профиля лежит над профилями
+    profiles/*)              printf 'Data/%s.%s' "$stem" "$ext" ;;
+    # Общая wiki: литература и справка по маркерам одинаковы для всех людей,
+    # дублировать их по профилям бессмысленно
+    wiki/source/*|wiki/marker/*) printf 'Data/%s.%s' "$stem" "$ext" ;;
+    # Личная wiki и все остальные данные — внутрь профиля
+    *)                       printf '%s/%s.%s' "$PROFILE_DIR" "$stem" "$ext" ;;
   esac
 }
 
