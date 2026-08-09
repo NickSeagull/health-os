@@ -1,16 +1,59 @@
 {
   "permissions": {
     "allow": [
-      "Bash",
       "Read",
-      "Write",
-      "Edit",
       "Glob",
       "Grep",
-      "WebFetch",
+      "Edit(/Data/**)",
+      "Edit(/Cache/**)",
+      "Edit(/Archive/**)",
+      "Edit(/Inbox/**)",
+      "Edit(/Goals/**)",
+      "Edit(/MEMORY.md)",
+      "WebFetch(domain:cochranelibrary.com)",
+      "WebFetch(domain:*.cochranelibrary.com)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:ncbi.nlm.nih.gov)",
+      "WebFetch(domain:*.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:nice.org.uk)",
+      "WebFetch(domain:*.nice.org.uk)",
+      "WebFetch(domain:uspreventiveservicestaskforce.org)",
+      "WebFetch(domain:*.uspreventiveservicestaskforce.org)",
+      "WebFetch(domain:who.int)",
+      "WebFetch(domain:*.who.int)",
+      "WebFetch(domain:cdc.gov)",
+      "WebFetch(domain:*.cdc.gov)",
+      "WebFetch(domain:nih.gov)",
+      "WebFetch(domain:*.nih.gov)",
+      "WebFetch(domain:ema.europa.eu)",
+      "WebFetch(domain:*.ema.europa.eu)",
+      "WebFetch(domain:fda.gov)",
+      "WebFetch(domain:*.fda.gov)"
+    ],
+    "ask": [
+      "Bash",
       "WebSearch"
     ],
-    "deny": []
+    "deny": [
+      "Edit(/.claude/**)",
+      "Edit(/.git/**)",
+      "Edit(/.gitignore)",
+      "Read(~/.claude/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(/.mcp.json)",
+      "Read(**/.env*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(nc:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(rsync:*)",
+      "Bash(git push:*)",
+      "Bash(git remote add:*)",
+      "Bash(git remote set-url:*)"
+    ]
   },
   "hooks": {
     "Stop": [
