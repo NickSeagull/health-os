@@ -19,9 +19,10 @@
   <a href="https://github.com/alxyrgin">@alxyrgin</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <img src="docs/img/glake-logo.png" width="18" align="top">&nbsp;
-  <a href="https://glake.ai/?utm_source=github&utm_medium=readme&utm_campaign=health-os">Glake</a>
+  <a href="https://glake.ai/?utm_source=github&utm_medium=readme&utm_campaign=health-os">При&nbsp;поддержке&nbsp;Glake&nbsp;AI</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://t.me/+oYugtGxjawYxZmVi">Telegram-блог</a>
+  <img src="docs/img/telegram.png" width="18" align="top">&nbsp;
+  <a href="https://t.me/+oYugtGxjawYxZmVi">Подписаться&nbsp;на&nbsp;Telegram</a>
 </p>
 
 ---
@@ -305,12 +306,12 @@ cd Dashboard && npm install && npm run dev
 
 **Александр Ярыгин** — [@alxyrgin](https://github.com/alxyrgin)
 
-Основатель <img src="docs/img/glake-logo.png" width="14" align="top"> [**Glake**](https://glake.ai/?utm_source=github&utm_medium=readme_footer&utm_campaign=health-os) — команды, которая занимается ИИ-решениями для бизнеса.
+При поддержке <img src="docs/img/glake-logo.png" width="14" align="top"> [**Glake AI**](https://glake.ai/?utm_source=github&utm_medium=readme_footer&utm_campaign=health-os) — команды, которая занимается ИИ-решениями для бизнеса.
 
 Health-OS вырос из личной задачи: собрать разрозненную медкарту в одно место и заставить систему рассуждать о ней целиком, а не по кусочкам. Проект сделан для себя и открыт как есть.
 
 📺 [Полный разбор системы на YouTube](https://youtu.be/sA1rrgo8x64) — как устроена и почему именно так
-✍️ [Telegram-блог](https://t.me/+oYugtGxjawYxZmVi) — про ИИ, продукт и разработку
+<img src="docs/img/telegram.png" width="14" align="top"> [Подписаться на Telegram](https://t.me/+oYugtGxjawYxZmVi) — про ИИ, продукт и разработку
 
 </td>
 </tr>

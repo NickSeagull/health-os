@@ -280,6 +280,6 @@ echo
 echo "─────────────────────────────────────────────────"
 echo "  Разбор системы:  https://youtu.be/sA1rrgo8x64"
 echo "  Автор:           Александр Ярыгин, @alxyrgin"
-echo "  Блог:            https://t.me/+oYugtGxjawYxZmVi"
-echo "  Glake:           https://glake.ai/?utm_source=cli&utm_medium=setup&utm_campaign=health-os"
+echo "  Telegram:        https://t.me/+oYugtGxjawYxZmVi"
+echo "  При поддержке Glake AI:  https://glake.ai/?utm_source=cli&utm_medium=setup&utm_campaign=health-os"
 echo

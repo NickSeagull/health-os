@@ -33,9 +33,27 @@ export function AuthorBadge() {
           className="rounded-[3px]"
         />
         <span>
-          Александр Ярыгин · <span className="font-medium">Glake</span>
+          При поддержке <span className="font-medium">Glake AI</span>
         </span>
       </a>
+      <a
+        href="https://t.me/+oYugtGxjawYxZmVi"
+        target="_blank"
+        rel="noreferrer noopener"
+        className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <img
+          src="/telegram.png"
+          alt=""
+          width={14}
+          height={14}
+          className="rounded-full"
+        />
+        <span>Подписаться на Telegram</span>
+      </a>
+      <span className="pt-0.5 text-muted-foreground/70">
+        Александр Ярыгин
+      </span>
     </div>
   );
 }
