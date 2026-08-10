@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./theme-toggle";
 import { ProfileSwitcher } from "./profile-switcher";
+import { AuthorBadge } from "./author-badge";
 
 const navItems = [
   { title: "Обзор", href: "/", icon: LayoutDashboard },
@@ -87,8 +88,9 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="px-4 py-3">
+      <SidebarFooter className="gap-3 px-4 py-3">
         <ThemeToggle />
+        <AuthorBadge />
       </SidebarFooter>
     </Sidebar>
   );

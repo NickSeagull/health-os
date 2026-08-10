@@ -2,9 +2,27 @@
 
 Персональная система управления здоровьем на базе Claude Code. Медкарта, анализы, визиты, лекарства и цели живут локальными файлами, а разбираются консилиумом AI-специалистов, который умеет спорить сам с собой.
 
-![Дашборд Health-OS на демонстрационных данных](docs/img/dashboard-overview.png)
+<p align="center">
+  <a href="https://youtu.be/sA1rrgo8x64">
+    <img src="https://img.youtube.com/vi/sA1rrgo8x64/maxresdefault.jpg" width="760" alt="Полный разбор Health-OS — видео на YouTube">
+  </a>
+</p>
 
-<p align="center"><sub>Дашборд на демо-наборе. Все данные вымышлены — реальных сведений о здоровье на снимке нет.</sub></p>
+<p align="center">
+  <a href="https://youtu.be/sA1rrgo8x64"><strong>▶&nbsp;&nbsp;Полный разбор системы на YouTube</strong></a><br>
+  <sub>Как устроена, что умеет и почему сделана именно так</sub>
+</p>
+
+<p align="center">
+  <img src="docs/img/author-avatar.png" width="22" align="top">&nbsp;
+  <strong>Александр Ярыгин</strong>&nbsp;
+  <a href="https://github.com/alxyrgin">@alxyrgin</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <img src="docs/img/glake-logo.png" width="18" align="top">&nbsp;
+  <a href="https://glake.ai/?utm_source=github&utm_medium=readme&utm_campaign=health-os">Glake</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://t.me/+oYugtGxjawYxZmVi">Telegram-блог</a>
+</p>
 
 ---
 
@@ -27,6 +45,12 @@
 > Полные условия — **[DISCLAIMER.md](DISCLAIMER.md)**. Установка означает согласие с ними.
 >
 > 🚨 **При признаках неотложного состояния обращайтесь в скорую помощь.** Программа не является системой мониторинга и не способна вызвать помощь.
+
+---
+
+![Дашборд Health-OS на демонстрационных данных](docs/img/dashboard-overview.png)
+
+<p align="center"><sub>Дашборд на демо-наборе. Все данные вымышлены — реальных сведений о здоровье на снимке нет.</sub></p>
 
 ---
 
@@ -267,6 +291,32 @@ cd Dashboard && npm install && npm run dev
 - **Качество выводов зависит от полноты данных.** Пустая медкарта даст пустой анализ
 - **Проект ориентирован на российский контекст** в части ОМС, лабораторий и маршрутизации, но клиническая часть универсальна
 - **Это персональный инструмент**, а не медицинская информационная система: нет многопользовательского режима, аудита доступа и сертификации
+
+---
+
+## Автор
+
+<table>
+<tr>
+<td width="90" align="center" valign="top">
+  <img src="docs/img/author-avatar.png" width="72">
+</td>
+<td valign="top">
+
+**Александр Ярыгин** — [@alxyrgin](https://github.com/alxyrgin)
+
+Основатель <img src="docs/img/glake-logo.png" width="14" align="top"> [**Glake**](https://glake.ai/?utm_source=github&utm_medium=readme_footer&utm_campaign=health-os) — команды, которая занимается ИИ-решениями для бизнеса.
+
+Health-OS вырос из личной задачи: собрать разрозненную медкарту в одно место и заставить систему рассуждать о ней целиком, а не по кусочкам. Проект сделан для себя и открыт как есть.
+
+📺 [Полный разбор системы на YouTube](https://youtu.be/sA1rrgo8x64) — как устроена и почему именно так
+✍️ [Telegram-блог](https://t.me/+oYugtGxjawYxZmVi) — про ИИ, продукт и разработку
+
+</td>
+</tr>
+</table>
+
+Проект остаётся некоммерческим: он бесплатен, не содержит рекламы, не продаёт услуг и не собирает ваши данные. Ссылки выше — указание авторства, а не предложение чего-либо купить.
 
 ---
 
