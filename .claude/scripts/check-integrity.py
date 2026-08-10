@@ -369,6 +369,33 @@ def check_no_stray_data():
     report(not stray, "Нет данных вне профилей", stray)
 
 
+# ── 15. Конфликтные копии файлов ───────────────────────────────────
+def check_no_conflict_copies():
+    """Дубликаты вида «settings 2.json», которые создают облачные диски.
+
+    Опасны не тем, что занимают место: рядом с настоящим файлом появляется
+    второй, похожий, и различаются они содержимым, а не именем. Однажды
+    такая копия устаревших прав доступа уже попала в публичный репозиторий
+    и выглядела там как второй источник правды.
+    """
+    import re as _re
+    pattern = _re.compile(r"^(.*) (\d+)(\.[^.]+)$")
+    found = []
+    for base in (ROOT / ".claude", DATA_ROOT, ROOT / "docs"):
+        if not base.exists():
+            continue
+        for pth in sorted(base.rglob("*")):
+            if pth.is_dir():
+                continue
+            m = pattern.match(pth.name)
+            if not m:
+                continue
+            original = pth.with_name(m.group(1) + m.group(3))
+            hint = " — рядом есть оригинал" if original.exists() else ""
+            found.append(f"{pth.relative_to(ROOT)}{hint}")
+    report(not found, "Нет конфликтных копий файлов", found)
+
+
 def main() -> int:
     print()
     print("Health-OS — проверка целостности данных")
@@ -380,6 +407,7 @@ def main() -> int:
     check_profiles_structure()
     check_active_profile()
     check_no_stray_data()
+    check_no_conflict_copies()
 
     profiles = (
         [d for d in sorted(PROFILES.iterdir()) if d.is_dir()]
