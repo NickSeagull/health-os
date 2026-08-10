@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://youtu.be/sA1rrgo8x64"><strong>▶&nbsp;&nbsp;Полный разбор системы на YouTube</strong></a><br>
+  <a href="https://youtu.be/sA1rrgo8x64"><img src="docs/img/youtube.png" width="22" align="top">&nbsp;&nbsp;<strong>Полный разбор системы на YouTube</strong></a><br>
   <sub>Как устроена, что умеет и почему сделана именно так</sub>
 </p>
 
@@ -310,7 +310,7 @@ cd Dashboard && npm install && npm run dev
 
 Health-OS вырос из личной задачи: собрать разрозненную медкарту в одно место и заставить систему рассуждать о ней целиком, а не по кусочкам. Проект сделан для себя и открыт как есть.
 
-📺 [Полный разбор системы на YouTube](https://youtu.be/sA1rrgo8x64) — как устроена и почему именно так
+<img src="docs/img/youtube.png" width="14" align="top"> [Полный разбор системы на YouTube](https://youtu.be/sA1rrgo8x64) — как устроена и почему именно так
 <img src="docs/img/telegram.png" width="14" align="top"> [Подписаться на Telegram](https://t.me/+oYugtGxjawYxZmVi) — про ИИ, продукт и разработку
 
 </td>

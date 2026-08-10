@@ -14,7 +14,13 @@ export function AuthorBadge() {
         rel="noreferrer noopener"
         className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
       >
-        <span aria-hidden>▶</span>
+        <img
+          src="/youtube.png"
+          alt=""
+          width={14}
+          height={14}
+          className="rounded-[3px]"
+        />
         <span>Разбор системы</span>
       </a>
       <a
