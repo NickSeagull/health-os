@@ -34,16 +34,16 @@ export async function readInBodyFile(filename: string): Promise<InBodyData | nul
 }
 
 export async function writeLabFile(filename: string, data: LabFileData): Promise<void> {
-  // Ошибка намеренно пробрасывается: запись за пределы каталога должна падать громко
+  // Deliberately propagate this error: writes outside the directory must fail loudly.
   const target = resolveWithin(LABS_DIR(), filename, [".json"]);
   await safeWriteJson(target, data);
 }
 
-// Реализация вынесена в lib/lab-markers.ts, чтобы её могли импортировать
-// и клиентские компоненты: этот модуль тянет fs и в браузер не собирается.
+// The implementation lives in lib/lab-markers.ts so client components can import it:
+// this module pulls in fs and cannot be bundled for the browser.
 export { collectMarkers };
 
-/** В части файлов лаборатория лежит в `lab`, в части — в `laboratory` */
+/** Some files store the laboratory under `lab`, others under `laboratory`. */
 function labName(lab: LabFileData): string {
   return lab.lab ?? lab.laboratory ?? "";
 }
@@ -88,8 +88,8 @@ export async function aggregateMarker(markerName: string): Promise<MarkerTrendPo
         reference_min: m.reference_min,
         reference_max: m.reference_max,
         lab: labName(lab),
-        // Помечаем точки в неканонической единице: без этого тренд
-        // 17.33 нмоль/л → 6.5 нг/мл читается как обвал втрое, хотя это рост
+        // Mark points with a non-canonical unit: without this, a trend from
+        // 17.33 nmol/L → 6.5 ng/mL looks like a threefold collapse instead of an increase.
         unitMismatch: isUnitMismatch(canonical, m.unit, canonicalUnit),
       });
     }

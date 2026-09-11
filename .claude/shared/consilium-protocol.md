@@ -1,222 +1,221 @@
-# Протокол консилиума
+# Protocol of the consultation
 
-> Обязателен для скилла `/consilium` и для всех специалистов, участвующих в многораундовом разборе.
-
----
-
-## Зачем этот документ
-
-Параллельный запуск специалистов сам по себе консилиумом не является. Двенадцать независимых монологов, сшитых оркестратором, дают набор мнений, а не разбор: никто ничего не проверил, никто ни с кем не спорил, слабая гипотеза выглядит ровно так же убедительно, как сильная.
-
-Настоящий консилиум — это спор. Специалисты обязаны оппонировать друг другу, выдвигать конкурирующие объяснения и приходить к позиции, устоявшей под критикой. Разногласие, которое не удалось разрешить, — легитимный и ценный результат. Искусственное согласие — брак.
+> Mandatory for the `/consilium` skill and for all specialists participating in a multi-round analysis.
 
 ---
 
-## Блок 0. Чего этот консилиум не даёт
+## Why this document
 
-Прежде чем описывать протокол — честно о его границах, потому что название
-обещает больше, чем механизм может дать.
+The parallel launch of specialists is not a consultation in itself. Twelve independent monologues stitched together by an orchestrator provide a set of opinions, not an analysis: no one checked anything, no one argued with anyone, a weak hypothesis looks exactly as convincing as a strong one.
 
-**Пятнадцать агентов — это не пятнадцать независимых врачей.** Все они
-работают на одной языковой модели. Их ошибки **коррелированы**: если модель
-систематически переоценивает какую-то связь, она переоценит её и в роли
-кардиолога, и в роли невролога, и в роли адвоката дьявола. Консенсус, к
-которому они придут, не является независимым подтверждением — это одно
-суждение, произнесённое пятнадцать раз разными словами.
-
-Что протокол **действительно** даёт:
-
-- разные углы зрения на одни данные — специальности задают разные вопросы
-  к одному и тому же файлу
-- проверку на внутреннюю противоречивость: заключение, которое не выдержало
-  критики по существу, отсеивается
-- расширение множества гипотез — их станет больше, и слабые получат
-  возражение
-- явную фиксацию того, что осталось неразрешённым
-
-Чего он **не** даёт:
-
-- независимого подтверждения диагноза
-- клинической валидации — у системы нет ни тестового набора с эталонными
-  диагнозами, ни измеренной чувствительности и специфичности
-- замены врачебного суждения
-
-**Практический вывод.** Согласие всех специалистов означает лишь, что
-модель последовательна, а не что вывод верен. Ценность отчёта — в разделах
-«Неразрешённые разногласия» и «Пробелы в данных»: там написано, чего
-система не знает, и это самая надёжная её часть.
-
-ВОЗ рекомендует применять такие модели как дополнение под человеческим
-контролем и отдельно предупреждает об авторитетно звучащих, но неверных
-медицинских выводах [WHO, руководство по этике и управлению LMM, 2024,
-уровень A].
+A real consultation is a debate. Experts must challenge one another, put forward competing explanations, and arrive at a position that withstands criticism. An unresolved disagreement is a legitimate and valuable outcome. Artificial consensus is a defect.
 
 ---
 
-## Блок 1. Три раунда
+## Block 0. What this consultation does not provide
 
-| Раунд | Кто работает | Что происходит |
+Before describing the protocol, be honest about its boundaries, because the name
+promises more than the mechanism can deliver.
+
+**Fifteen agents are not fifteen independent doctors.** All of them
+work on the same language model. Their errors are **correlated**: if the model
+systematically overestimates some connection, it will overestimate it in the role of
+cardiologist, neurologist, and devil's advocate. The consensus they reach is not
+independent confirmation - it is one judgment expressed fifteen times in different words.
+
+What the protocol **really** provides:
+
+- different angles of view on the same data - specialties ask different questions
+  to the same file
+- a test for internal inconsistency: a conclusion that does not withstand
+  substantive criticism is filtered out
+- expansion of the set of hypotheses - there will be more of them, and the weak ones will receive
+  objection
+- explicit fixation of what remains unresolved
+
+What it **doesn't** give:
+
+- independent confirmation of diagnosis
+- clinical validation - the system does not have a test kit with reference
+  diagnoses, nor measured sensitivity and specificity
+- substitution of medical judgment
+
+**Practical conclusion.** The agreement of all experts only means that
+the model is consistent, not that the conclusion is true. The value of the report is in the sections
+“Unresolved disagreements” and “Data gaps”: it says what
+the system does not know, and this is its most reliable part.
+
+WHO recommends the use of such models as a supplement under human
+control and separately warns about authoritative-sounding but incorrect
+medical findings [WHO, guidance on ethics and management of LMM, 2024,
+Level A].
+
+---
+
+## Block 1. Three rounds
+
+| Round | Who works | What's going on |
 |-------|--------------|----------------|
-| **1. Независимые заключения** | Все выбранные специалисты, параллельно | Каждый анализирует данные вслепую, не зная выводов остальных |
-| **2. Перекрёстная критика** | Только специалисты, чьи зоны пересеклись на спорных находках | Каждый получает чужие заключения и обязан их оспорить по существу |
-| **3. Разрешение и синтез** | Оркестратор в основном контексте | Сведение споров, вердикты, фиксация неразрешённого |
+| **1. Independent opinions** | All selected specialists, in parallel | Everyone analyzes the data blindly, without knowing the conclusions of the others |
+| **2. Cross criticism** | Only specialists whose zones overlapped on controversial finds | Everyone receives someone else's conclusions and is obliged to challenge them on the merits |
+| **3. Resolution and synthesis** | Orchestrator in the main context | Resolution of disputes, verdicts, recording of unresolved issues |
 
-**Почему раунд 1 слепой:** если специалист видит чужой вывод до того, как сформировал свой, он якорится на нём. Независимость первого раунда — источник разнообразия гипотез, без него спорить будет не о чем.
+**Why round 1 is blind:** if the specialist sees someone else's conclusion before he has formed his own, he anchors on it. The independence of the first round is a source of diversity in hypotheses; without it there will be nothing to argue about.
 
-**Почему раунд 2 выборочный:** запускать всех повторно дорого и бессмысленно. Во второй раунд идут только те, у кого есть предмет спора: пересечение по маркеру, оси, органу или конкурирующая гипотеза по одной жалобе.
+**Why round 2 is selective:** restarting everyone is expensive and pointless. Only those who have a subject of dispute go to the second round: intersection along a marker, axis, organ, or a competing hypothesis for one complaint.
 
 ---
 
-## Блок 2. Раунд 1 — независимые заключения
+## Block 2. Round 1 - independent conclusions
 
-Стандартный анализ по контракту специалиста. Дополнительное требование:
+Standard analysis under specialist contract. Additional requirement:
 
-**Каждый специалист обязан выдать минимум две конкурирующие гипотезы** по своему направлению с указанием, что их различает. Одна гипотеза — повод отправить заключение на доработку.
+**Each specialist is required to produce at least two competing hypotheses** in his area, indicating what distinguishes them. One hypothesis is a reason to send the conclusion for revision.
 
-В конце заключения добавляется секция:
+At the end of the conclusion a section is added:
 
 ```markdown
-### Уверенность и уязвимость
-- **Насколько уверен:** высокая / средняя / низкая
-- **Самое слабое место моего вывода:** [что именно легче всего оспорить]
-- **Что меня переубедит:** [конкретный результат или наблюдение]
+### Confidence and vulnerability
+- **How confident:** high / medium / low
+- **The weakest point of my conclusion:** [which is the easiest to challenge]
+- **What will convince me:** [specific result or observation]
 ```
 
-Эта секция — точка входа для критики в раунде 2. Специалист, честно назвавший слабое место, экономит консилиуму раунд.
+This section is the entry point for criticism in round 2. A specialist who honestly names a weak point saves the consultation a round.
 
 ---
 
-## Блок 3. Раунд 2 — перекрёстная критика
+## Block 3. Round 2 - cross-criticism
 
-### Кого запускать
+### Who to launch
 
-Оркестратор формирует пары и группы по признакам:
+The orchestrator forms pairs and groups based on the following characteristics:
 
-- два и более специалиста высказались об одном маркере, органе или оси
-- гипотезы противоречат друг другу либо дают разные объяснения одной жалобе
-- один специалист выставил флаг другому
-- один назвал находку значимой, другой — незначимой
-- сработал паттерн из `cross-specialty-map.json`, затрагивающий нескольких
+- two or more specialists spoke about one marker, organ or axis
+- hypotheses contradict each other or give different explanations for the same complaint
+- one specialist flagged another
+- one called the find significant, the other - insignificant
+- a pattern from `cross-specialty-map.json` was triggered, affecting several
 
-Если пересечений нет вообще — раунд 2 пропускается, это фиксируется в отчёте.
+If there are no intersections at all, round 2 is skipped and this is recorded in the report.
 
-### Что получает специалист
+### What does a specialist get?
 
-Заключения коллег по спорной теме плюс прямое задание: оспорить.
+The colleagues’ conclusions on the disputed topic, plus a direct task to challenge them.
 
-### Что обязан вернуть
+### What I must return
 
 ```markdown
-## Критика — [специальность]
+## Criticism - [specialty]
 
-### С чем согласен
-- [Тезис коллеги] — согласен, потому что [обоснование по данным]. Уровень: [A/B/C/D]
+### What I agree with
+- [Colleague's thesis] - I agree, because [justification based on data]. Level: [A/B/C/D]
 
-### С чем не согласен
-- **Оспариваю:** [тезис коллеги и чей]
-- **Основание:** [конкретные данные, которые противоречат]
-- **Моя альтернатива:** [другое объяснение тех же данных]
-- **Что нас рассудит:** [конкретное исследование или наблюдение]
-- **Уровень моего возражения:** [A/B/C/D/⚠️]
+### What I disagree with
+- **I dispute:** [colleague’s thesis and whose]
+- **Basis:** [specific data that contradicts]
+- **My alternative:** [another explanation of the same data]
+- **What will resolve this:** [specific research or observation]
+- **Level of my objection:** [A/B/C/D/⚠️]
 
-### Что коллеги не рассмотрели
-- [Объяснение, которое никто не выдвинул, хотя данные его допускают]
+### What colleagues did not consider
+- [An explanation that no one has put forward, although the data allows it]
 
-### Возражений по существу нет
-[Заполняется ТОЛЬКО если после честной проверки возразить нечего. Обязательно указать, что именно проверено и почему возражение не нашлось. Пустая формулировка «согласен со всем» не принимается]
+### No substantive objections
+[To be completed ONLY if after an honest check there is nothing to object to. Be sure to indicate what exactly was checked and why no objection was found. The empty formulation “I agree with everything” is not accepted]
 ```
 
-### Правила критики
+### Rules of criticism
 
-1. **Возражение обосновывается данными**, а не мнением. «Мне кажется, это не так» — не возражение.
-2. **Возражать ради возражения запрещено.** Если после проверки возразить нечего — так и сказать, объяснив, что проверялось.
-3. **Авторитет специальности не аргумент.** Кардиолог не прав по умолчанию в вопросах сердца, если данные говорят иное.
-4. **Атакуй самое сильное прочтение чужого тезиса,** а не удобную упрощённую версию.
-5. **Оспаривать можно и собственный вывод первого раунда,** если чужие данные его опровергли. Это не потеря лица, а нормальный ход разбора.
-6. **Уровень доказательности возражения обязателен.** Возражение уровня D не опрокидывает вывод уровня A — оно лишь ставит вопрос.
+1. **Objection is based on data**, not opinion. “It seems to me that this is not so” is not an objection.
+2. **Objecting for the sake of objecting is prohibited.** If after checking there is nothing to object, say so, explaining what was checked.
+3. **The authority of the specialty is not an argument.** The cardiologist is not right by default in matters of the heart if the data says otherwise.
+4. **Attack the strongest reading of someone else's thesis,** not the convenient simplified version.
+5. **You can also challenge your own conclusion of the first round** if someone else’s data has refuted it. This is not a loss of face, but a normal course of analysis.
+6. **The level of evidence of the objection is required.** A Level D objection does not overturn the Level A conclusion - it only raises the question.
 
 ---
 
-## Блок 4. Раунд 3 — разрешение
+## Block 4. Round 3 - resolution
 
-Выполняет оркестратор. По каждому спору:
+Performed by the orchestrator. For each dispute:
 
-### Правила вердикта
+### Verdict Rules
 
-| Ситуация | Вердикт |
+| Situation | Verdict |
 |----------|---------|
-| Одна позиция опирается на более высокий уровень доказательности | Побеждает более высокий уровень, расхождение фиксируется |
-| Уровни равны, но у одной позиции есть критерий опровержения, а у другой нет | Побеждает опровержимая — она проверяема |
-| Уровни равны, обе опровержимы, данных для различения нет | **Неразрешённое разногласие.** Обе позиции идут в отчёт, назначается исследование-арбитр |
-| Спор возник из-за разных единиц измерения или разных лабораторий | Не спор, а артефакт. Нормализовать по `Data/labs/_marker-aliases.json` и пересобрать |
-| Один опирается на данные старше 24 месяцев, другой на свежие | Побеждают свежие данные |
-| Позиция опирается на утверждение из промпта, а не из `Data/` | Отклоняется: фактов о пациенте в промптах нет |
+| One position is based on a higher level of evidence | The higher level wins, the discrepancy is fixed |
+| The levels are equal, but one position has a refutation criterion, while the other does not | The refutable wins - it is verifiable |
+| Levels are equal, both are refutable, there is no data to differentiate | **Unresolved disagreement.** Both positions go into the report, a research arbiter is appointed |
+| The dispute arose due to different units of measurement or different laboratories | Not a dispute, but an artifact. Normalize by `Data/labs/_marker-aliases.json` and rebuild |
+| One relies on data older than 24 months, the other on fresh data | Fresh data wins |
+| The position relies on the assertion from the prompt, not from `Data/` | Rejected: there are no facts about the patient in the prompts |
 
-### Запрет на искусственный консенсус
+### Prohibition on artificial consensus
 
-**Неразрешённое разногласие обязано попасть в отчёт как есть.** Сводить спор к усреднённой формулировке, замалчивать проигравшую позицию или объявлять согласие там, где его нет, — прямое нарушение протокола.
+**An unresolved disagreement must be included in the report as is.** Reducing a dispute to an average formulation, hushing up the losing position, or declaring agreement where there is none is a direct violation of the protocol.
 
-Ценность неразрешённого спора в том, что он точно указывает, какое исследование нужно сделать следующим. Сглаженная формулировка эту информацию уничтожает.
+The value of an unresolved dispute is that it pinpoints exactly what research needs to be done next. Smooth wording destroys this information.
 
-### Адвокат дьявола
+### Devil's Advocate
 
-Для ведущей гипотезы консилиума — той, что объясняет больше всего находок, — назначается оппонент из числа участников, чья зона наименее с ней связана. Его задача одна: попытаться её опрокинуть.
+For the leading hypothesis of the consultation - the one that explains the most findings - an opponent is assigned from among the participants whose zone is least connected with it. His task is one: to try to overturn it.
 
-Если гипотеза устояла под целенаправленной атакой, её уверенность растёт. Если рухнула — консилиум сэкономил пациенту деньги и время на ненужных обследованиях.
+If a hypothesis survives a targeted attack, its confidence increases. If it collapsed, the consultation saved the patient money and time on unnecessary examinations.
 
 ---
 
-## Блок 5. Секции отчёта
+## Block 5. Report sections
 
-Добавляются к стандартному формату отчёта консилиума.
+Added to the standard council report format.
 
 ```markdown
-### Ход обсуждения
+### Discussion progress
 
-**Раунд 1:** [сколько специалистов, сколько гипотез выдвинуто]
-**Раунд 2:** [кто с кем спорил и по какому предмету]
+**Round 1:** [how many specialists, how many hypotheses put forward]
+**Round 2:** [who argued with whom and on what subject]
 
-### Разрешённые споры
+### Resolved disputes
 
-| Предмет спора | Позиция A (кто) | Позиция B (кто) | Вердикт | Основание |
+| Subject of dispute | Position A (who) | Position B (who) | Verdict | Base |
 |---------------|-----------------|-----------------|---------|-----------|
 
-### Неразрешённые разногласия
-> Здесь не сглаживать. Это самая полезная часть отчёта — она показывает, чего мы не знаем
+### Unresolved disagreements
+> No smoothing here. This is the most useful part of the report - it shows what we don't know.
 
-1. **[Предмет]**
-   - Позиция A: [...] — [специальность], уровень [X]
-   - Позиция B: [...] — [специальность], уровень [X]
-   - Почему не разрешено: [нет данных / равные уровни / нужен арбитр]
-   - **Что рассудит:** [конкретное исследование]
+1. **[Item]**
+   - Position A: [...] - [specialty], level [X]
+   - Position B: [...] - [specialty], level [X]
+   - Why not allowed: [no data / equal levels / referee needed]
+   - **What will judge:** [specific research]
 
-### Проверка ведущей гипотезы
-- **Гипотеза:** [...]
-- **Оппонент:** [специальность]
-- **Аргументы против:** [...]
-- **Устояла:** да / нет / частично
-- **Итоговая уверенность:** [выросла / не изменилась / снизилась]
+### Testing the leading hypothesis
+- **Hypothesis:** [...]
+- **Opponent:** [specialty]
+- **Arguments against:** [...]
+- **Resisted:** yes / no / partially
+- **Overall confidence:** [increased / unchanged / decreased]
 
-### Отклонённые гипотезы
-| Гипотеза | Кто выдвинул | Почему отклонена |
+### Rejected hypotheses
+| Hypothesis | Who nominated | Why rejected |
 |----------|--------------|------------------|
 ```
 
 ---
 
-## Блок 6. Антипаттерны
+## Block 6. Antipatterns
 
-| Антипаттерн | Почему запрещён |
+| Antipattern | Why is it prohibited |
 |-------------|-----------------|
-| Согласиться, не проверив | Превращает консилиум в набор монологов |
-| Возразить без опоры на данные | Шум, маскирующийся под дискуссию |
-| Уступить более «авторитетной» специальности | Авторитет не заменяет доказательство |
-| Атаковать упрощённую версию чужого тезиса | Спор с соломенным чучелом ничего не проверяет |
-| Объявить консенсус при неразрешённом споре | Скрывает от пациента главное — чего система не знает |
-| Сгладить формулировку ради гладкости отчёта | Уничтожает информацию о том, какое исследование нужно |
-| Держаться за свою гипотезу вопреки опровержению | Разрушает доказательность всей системы |
-| Пропустить раунд 2, потому что «и так всё ясно» | Именно там находится ценность консилиума |
+| Agree without checking | Turns the consultation into a set of monologues |
+| Object without relying on data | Noise masquerading as discussion |
+| Yield to a more “authoritative” specialty | Authority is no substitute for evidence |
+| Attack a simplified version of someone else's thesis | Arguing with a straw man tests nothing |
+| Announce consensus in case of unresolved dispute | Hides the main thing from the patient - what the system does not know |
+| Smooth out the wording for the sake of a smooth report | Destroys information about what research is needed |
+| Hold on to your hypothesis despite refutation | Destroys the evidence of the entire system |
+| Skip round 2 because “everything is clear” | This is where the value of the consultation lies |
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+⚕️ The information is for reference only. Consult your doctor for treatment decisions.

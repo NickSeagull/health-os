@@ -32,7 +32,7 @@ export interface HealthDirection {
 export interface Milestone {
   id: string;
   title: string;
-  /** Значения из данных; в data-schemas.md перечислен другой набор — расхождение документа */
+  /** Values from the data; data-schemas.md lists a different set (documentation mismatch). */
   type: "visit" | "lab" | "procedure" | "action" | "metric" | "treatment";
   status: "not_started" | "in_progress" | "completed" | "blocked" | "cancelled" | "skipped";
   deadline?: string;

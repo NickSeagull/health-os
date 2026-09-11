@@ -1,170 +1,170 @@
-# Половые различия в анализе
+# Sex differences in analysis
 
-> Обязательный документ для всех AI-специалистов. Читается вместе с `holistic-framework.md` и `specialist-contract.md`.
-
----
-
-## Зачем этот документ
-
-Пол меняет три вещи: какие состояния вероятны, какие обследования показаны по возрасту и как читаются одни и те же цифры. Специалист, который этого не учитывает, систематически пропускает половину диагностического поля.
-
-Показательный пример. Снижающийся ферритин у женщины детородного возраста — в первую очередь вопрос о менструальной кровопотере, и только потом о ЖКТ. У мужчины того же возраста менструальной причины нет, поэтому поиск источника кровопотери в ЖКТ становится приоритетом, а не запасным вариантом. Одни и те же цифры, разные ближайшие шаги.
+> Mandatory document for all AI specialists. Read together with `holistic-framework.md` and `specialist-contract.md`.
 
 ---
 
-## Блок 1. Три разных поля, не одно
+## Why this document
 
-В `Data/profile.json` → `basic` живут три независимых поля. Их нельзя смешивать.
+Sex changes three things: what conditions are likely, what tests are indicated by age, and how the same numbers are read. A specialist who does not take this into account systematically misses half of the diagnostic field.
 
-| Поле | Значения | На что влияет |
+Case in point. Declining ferritin in a woman of childbearing age is primarily a question about menstrual blood loss, and only then about the gastrointestinal tract. A man of the same age does not have a menstrual reason, so finding the source of blood loss in the gastrointestinal tract becomes a priority, not a backup option. Same numbers, different next steps.
+
+---
+
+## Block 1. Three different fields, not one
+
+Three independent fields live in `Data/profile.json` → `basic`. They cannot be mixed.
+
+| Field | Values ​​| What is affected by |
 |------|----------|---------------|
-| `sex` | `male` / `female` / `intersex` / `not_specified` | Референсные интервалы, скрининговые программы, анатомические гипотезы |
-| `gender_identity` | свободный текст либо `null` | Обращение к человеку. На интерпретацию анализов не влияет |
-| `hormone_therapy` | объект либо `null` | **Сдвигает интерпретацию** — см. Блок 5 |
+| `sex` | `male` / `female` / `intersex` / `not_specified` | Reference intervals, screening programs, anatomical hypotheses |
+| `gender_identity` | free text or `null` | Addressing a person. Does not affect the interpretation of laboratory results |
+| `hormone_therapy` | object or `null` | **Shifts interpretation** - see Unit 5 |
 
-**Почему разделены.** Референсы и скрининг привязаны к биологии: простата есть или её нет, риск рака шейки матки существует или нет. Идентичность к этому отношения не имеет и служит другой цели — уважительному обращению. Смешать их в одно поле значит либо выдавать неверные медицинские выводы, либо обращаться к человеку не так, как он себя называет. Обе ошибки не нужны.
+**Why are they divided?** References and screening are tied to biology: whether there is a prostate or not, the risk of cervical cancer exists or not. Identity has nothing to do with this and serves another purpose - respectful treatment. To mix them into one field means either to give incorrect medical conclusions, or to address the person differently than he claims to be. Both errors are unnecessary.
 
-**Если `sex` не указан** — не додумывать. Прямо сказать, что часть выводов невозможна без этой информации, и перечислить, каких именно. Молча предположить мужчину — то, как система работала раньше, и это дефект.
-
----
-
-## Блок 2. Скрининг по полу и возрасту
-
-Ориентиры международных руководств (USPSTF, WHO, профильные общества). Конкретные интервалы уточняются по актуальной редакции и национальной программе.
-
-### Для всех
-
-> **Про обозначения.** В колонке «Рекомендация USPSTF» стоят буквы **шкалы USPSTF**, а не шкалы доказательности этого проекта из `evidence-base.md`. Это разные системы, и путать их нельзя: в шкале USPSTF **grade D означает «рекомендовано не проводить»**, тогда как в нашей шкале D — «механистическое рассуждение». Собственные уровни доказательности всегда пишутся словами: «уровень доказательности B».
-
-| Что | Когда | Рекомендация USPSTF |
-|-----|-------|---------------------|
-| Артериальное давление | с 18 лет, регулярно | A — проводить |
-| Липидный профиль | с 20–35 лет по факторам риска | B — проводить |
-| Глюкоза или HbA1c | с 35 лет либо при избыточном весе | B — проводить |
-| Колоректальный скрининг | с 45 лет | A — проводить |
-| Гепатит C | однократно во взрослом возрасте | B — проводить |
-| ВИЧ | однократно в 15–65 лет | A — проводить |
-
-### Специфично для женщин
-
-| Что | Когда | Рекомендация USPSTF |
-|-----|-------|---------------------|
-| Цитология шейки матки | с 21 года, каждые 3 года | A — проводить |
-| Цитология + ВПЧ | с 30 лет, каждые 5 лет | A — проводить |
-| Маммография | с 40–50 лет, каждые 1–2 года | B — проводить |
-| Денситометрия | с 65 лет либо раньше при факторах риска | B — проводить |
-| Ферритин и железо при обильных менструациях | в любом возрасте | вне шкалы USPSTF, уровень доказательности B |
-| Функция щитовидной железы при планировании беременности | — | вне шкалы USPSTF, уровень доказательности B |
-
-### Специфично для мужчин
-
-| Что | Когда | Рекомендация USPSTF |
-|-----|-------|---------------------|
-| ПСА | обсуждение с 50 лет, с 45 при семейном анамнезе | C — решение принимается индивидуально совместно с врачом |
-| Аневризма брюшной аорты | однократно в 65–75 лет при стаже курения | B — проводить |
-| Скрининг рака яичка у бессимптомных | — | **D — рекомендовано НЕ проводить.** Не путать с обращением к врачу при обнаруженном образовании: это не скрининг, а диагностика по симптому |
+**If `sex` is not specified** - do not guess. Say directly that some conclusions are impossible without this information, and list which ones. Silently assuming a man is how the system worked before, and this is a defect.
 
 ---
 
-## Блок 3. Что различается в интерпретации
+## Block 2. Screening by sex and age
 
-**Референсные интервалы берутся из бланка анализа** — лаборатория печатает их под пол пациента. Нормы «по памяти» запрещены контрактом специалиста. Ниже — не значения, а понимание, почему они расходятся.
+Use international guidelines (USPSTF, WHO, and specialty societies). Specify intervals according to the current edition and national program.
 
-| Маркер | Суть различия |
+### For everyone
+
+> **About the designations.** The "USPSTF Recommendation" column contains the letters **USPSTF** scales, not the evidence scales of this project from `evidence-base.md`. These are different systems and should not be confused: in the USPSTF scale **grade D means “recommended not to be carried out”**, while in our grade D it means “mechanistic reasoning”. Own levels of evidence are always written with the words: “level of evidence B”.
+
+| What | When | USPSTF Recommendation |
+|-----|-------|---------------------|
+| Blood pressure | from 18 years old, regularly | A - recommended |
+| Lipid profile | from 20–35 years old by risk factors | B - recommended |
+| Glucose or HbA1c | from 35 years old or overweight | B - recommended |
+| Colorectal screening | from 45 years old | A - recommended |
+| Hepatitis C | once in adulthood | B - recommended |
+| HIV | once between ages 15 and 65 | A - recommended |
+
+### Specific for women
+
+| What | When | USPSTF Recommendation |
+|-----|-------|---------------------|
+| Cervical cytology | from 21 years old, every 3 years | A - recommended |
+| Cytology + HPV | from 30 years old, every 5 years | A - recommended |
+| Mammography | from 40–50 years, every 1–2 years | B - recommended |
+| Densitometry | from 65 years of age or earlier with risk factors | B - recommended |
+| Ferritin and iron for heavy menstruation | at any age | off USPSTF scale, level of evidence B |
+| Thyroid function during pregnancy planning | — | off USPSTF scale, level of evidence B |
+
+### Specific for men
+
+| What | When | USPSTF Recommendation |
+|-----|-------|---------------------|
+| PSA | discussion from 50 years old, from 45 with family history | C - the decision is made individually together with the doctor |
+| Abdominal aortic aneurysm | once at 65–75 years of age with smoking history | B - recommended |
+| Screening for testicular cancer in asymptomatic individuals | — | **D - it is recommended NOT to carry out.** Not to be confused with contacting a doctor if a formation is detected: this is not a screening, but a diagnosis based on a symptom |
+
+---
+
+## Block 3. What differs in interpretation
+
+**Reference intervals are taken from the analysis form** - the laboratory prints them according to the patient’s sex. Standards “from memory” are prohibited by the specialist’s contract. Below are not the values, but an understanding of why they diverge.
+
+| Marker | The essence of the difference |
 |--------|---------------|
-| Гемоглобин, гематокрит, эритроциты | У мужчин выше из-за андрогенной стимуляции эритропоэза |
-| Ферритин | У женщин детородного возраста ниже из-за регулярной кровопотери. «Нижняя граница нормы» у них чаще означает скрытый дефицит |
-| Креатинин, СКФ | Зависят от мышечной массы, поэтому формулы расчёта учитывают пол |
-| Мочевая кислота | У мужчин выше; у женщин растёт после менопаузы |
-| Щелочная фосфатаза | Растёт при беременности за счёт плацентарной фракции |
-| ТТГ | Целевой диапазон при беременности уже обычного |
-| Тестостерон, эстрадиол, ЛГ, ФСГ | Интерпретируются только вместе с полом, возрастом и фазой цикла |
+| Hemoglobin, hematocrit, red blood cells | In men it is higher due to androgenic stimulation of erythropoiesis |
+| Ferritin | In women of childbearing age it is lower due to regular blood loss. For them, the “lower limit of normal” often means a hidden deficiency |
+| Creatinine, GFR | Depends on muscle mass, so calculation formulas take into account sex |
+| Uric acid | In men it is higher; increases in women after menopause |
+| Alkaline phosphatase | Rises during pregnancy due to the placental fraction |
+| TSH | Target range during pregnancy is narrower than usual |
+| Testosterone, estradiol, LH, FSH | Interpreted only in conjunction with sex, age and cycle phase |
 
 ---
 
-## Блок 4. Фаза цикла меняет результат
+## Block 4. Menstrual cycle phase changes the result
 
-У женщин детородного возраста без гормональной контрацепции ряд показателей зависит от дня цикла. Анализ, сданный не в ту фазу, интерпретировать нельзя.
+In women of childbearing age without hormonal contraception, a number of indicators depend on the day of the cycle. An analysis taken in the wrong phase cannot be interpreted.
 
-| Показатель | Когда сдавать |
+| Indicator | When to take |
 |------------|---------------|
-| ФСГ, ЛГ, эстрадиол | 2–5 день цикла |
-| Прогестерон | 19–23 день, для подтверждения овуляции |
-| Пролактин | 2–5 день, утром, в покое |
-| Ферритин, железо | вне менструации |
-| Гемоглобин | вне менструации либо с поправкой |
+| FSH, LH, estradiol | Days 2–5 of the cycle |
+| Progesterone | Days 19–23, to confirm ovulation |
+| Prolactin | 2–5 days, in the morning, at rest |
+| Ferritin, iron | outside of menstruation |
+| Hemoglobin | outside of menstruation or with appropriate adjustment |
 
-**Правило:** если день цикла неизвестен, а показатель от него зависит — сказать об этом прямо и не строить выводов. Это тот же класс ошибки, что сравнение значений из разных лабораторий без нормализации.
+**Rule:** if the day of the cycle is unknown, and the indicator depends on it, say so directly and do not draw conclusions. This is the same class of error as comparing values ​​from different laboratories without normalization.
 
 ---
 
-## Блок 5. Гормональная терапия
+## Block 5. Hormone therapy
 
-Поле `hormone_therapy` содержит тип, длительность и препараты. Оно **меняет ожидаемые значения**, и игнорировать его нельзя.
+The `hormone_therapy` field contains the type, duration, and drugs. It **changes expected values** and cannot be ignored.
 
-| Ситуация | Что происходит |
+| Situation | What's going on |
 |----------|----------------|
-| Эстрогенная терапия | Гемоглобин и гематокрит смещаются к женским значениям; растёт риск тромбозов; меняется липидный профиль |
-| Тестостероновая терапия | Гемоглобин и гематокрит растут вплоть до эритроцитоза; требуется контроль |
-| Комбинированная контрацепция | Влияет на ГСПГ, липиды, свёртывание; маскирует естественный цикл |
-| Менопаузальная терапия | Сдвигает липиды, плотность кости, риск тромбозов |
+| Estrogen therapy | Hemoglobin and hematocrit shift to female values; the risk of thrombosis increases; lipid profile changes |
+| Testosterone Therapy | Hemoglobin and hematocrit increase until erythrocytosis; control required |
+| Combined contraception | Affects SHBG, lipids, coagulation; masks the natural cycle |
+| Menopausal Therapy | Shifts lipids, bone density, risk of thrombosis |
 
-**Важно про скрининг:** он определяется наличием органа, а не гормональным статусом и не идентичностью. Если орган на месте — соответствующий скрининг показан. Если удалён — не показан. Это единственный корректный критерий.
+**Important about screening:** it is determined by the presence of an organ, not by hormonal status or identity. If the organ is in place, appropriate screening is indicated. If removed, not shown. This is the only correct criterion.
 
 ---
 
-## Блок 6. Типичные причины по полу
+## Block 6. Typical reasons by sex
 
-Перечислены наиболее частые объяснения — то, что проверяется первым, а не единственно возможное.
+The most common explanations are listed - the one that is checked first, and not the only possible one.
 
-### Дефицит железа
+### Iron deficiency
 
-| У женщин детородного возраста | У мужчин и женщин в менопаузе |
+| In women of childbearing age | In men and women in menopause |
 |-------------------------------|-------------------------------|
-| **Менструальная кровопотеря — причина номер один.** Обильные или длительные менструации, миома, аденомиоз | **ЖКТ-кровотечение до доказанного обратного.** Эрозии, язвы, полипы, опухоли — требуется эндоскопия |
-| Беременности и лактация в анамнезе | Нарушение всасывания: целиакия, атрофический гастрит, приём ИПП |
-| Далее — недостаточное поступление, нарушение всасывания | Донорство, приём антикоагулянтов |
+| **Menstrual blood loss is the number one reason.** Heavy or prolonged periods, fibroids, adenomyosis | **Gastrointestinal bleeding until proven otherwise.** Erosions, ulcers, polyps, tumors - endoscopy required |
+| History of pregnancy and lactation | Malabsorption: celiac disease, atrophic gastritis, PPI use |
+| Next - insufficient intake, malabsorption | Donation, taking anticoagulants |
 
-**Практическое следствие.** Вопрос об объёме менструальной кровопотери обязателен при дефиците железа у женщины детородного возраста, и задаётся до направления на эндоскопию. У мужчины ситуация обратная: отсутствие менструальной причины делает поиск в ЖКТ приоритетным.
+**Practical consequence.** The question about the volume of menstrual blood loss is mandatory in case of iron deficiency in a woman of childbearing age, and is asked before referral for endoscopy. For a man, the situation is the opposite: the absence of a menstrual cause makes the search in the gastrointestinal tract a priority.
 
-### Другие частые расхождения
+### Other common discrepancies
 
-| Состояние | Комментарий |
+| State | Comment |
 |-----------|-------------|
-| Усталость | У женщин чаще дефицит железа и тиреоидные нарушения; у мужчин — апноэ сна и дефицит тестостерона |
-| Сердечно-сосудистый риск | У женщин растёт после менопаузы; симптомы инфаркта чаще атипичны — тошнота, одышка, боль в спине вместо классической загрудинной |
-| Остеопороз | У женщин раньше и чаще из-за падения эстрогенов; у мужчин недодиагностируется |
-| Аутоиммунные заболевания | Существенно чаще у женщин |
-| Депрессия и тревога | Чаще диагностируются у женщин; у мужчин чаще маскируются раздражительностью, алкоголем, соматическими жалобами |
-| Мочевые инфекции | У женщин часты и обычно неосложнённые; у мужчин редки и требуют поиска причины |
+| Fatigue | Women are more likely to have iron deficiency and thyroid disorders; in men - sleep apnea and testosterone deficiency |
+| Cardiovascular risk | In women it grows after menopause; symptoms of a heart attack are often atypical - nausea, shortness of breath, back pain instead of the classic chest pain |
+| Osteoporosis | In women, earlier and more often due to a drop in estrogen; men are underdiagnosed |
+| Autoimmune diseases | Significantly more often in women |
+| Depression and Anxiety | More often diagnosed in women; in men they are often masked by irritability, alcohol, and somatic complaints |
+| Urinary infections | In women they are common and usually uncomplicated; in men are rare and require a search for the cause |
 
 ---
 
-## Блок 7. Зоны ответственности
+## Block 7. Areas of responsibility
 
-| Агент | Мужчины | Женщины |
+| Agent | Men | Women |
 |-------|---------|---------|
-| `urologist` | Почки, мочевые пути, простата, мужское здоровье | Почки и мочевые пути. Простаты нет |
-| `gynecologist` | Не применяется | Цикл, репродуктивное здоровье, менопауза, скрининг шейки матки и груди |
-| `endocrinologist` | Тестостерон, гинекомастия | Эстрогены, СПКЯ, цикл-ассоциированные нарушения — совместно с гинекологом |
+| `urologist` | Kidneys, urinary tract, prostate, men's health | Kidneys and urinary tract. No prostate |
+| `gynecologist` | Not applicable | Cycle, reproductive health, menopause, cervical and breast screening |
+| `endocrinologist` | Testosterone, gynecomastia | Estrogens, PCOS, cycle-associated disorders - together with a gynecologist |
 
-**Правило флага.** Флаг ставится только существующему агенту. Если нужного специалиста в системе нет — сказать об этом в «Пробелах в данных», а не выпускать флаг в пустоту.
+**Flag rule.** The flag is set only to an existing agent. If the required specialist is not in the system, say so in the “Data Gaps” section, rather than throwing a flag into the void.
 
 ---
 
-## Блок 8. Антипаттерны
+## Block 8. Antipatterns
 
-| Антипаттерн | Почему запрещён |
+| Antipattern | Why is it prohibited |
 |-------------|-----------------|
-| Предполагать пол, если он не указан | Именно так система работала раньше, и это дефект |
-| Выводить пол из имени | Имя не определяет ни биологию, ни идентичность |
-| Использовать `gender_identity` для выбора референсов | Референсы привязаны к биологии |
-| Использовать `sex` для обращения к человеку | Для этого есть `gender_identity` |
-| Игнорировать `hormone_therapy` при разборе гормонов и крови | Ожидаемые значения смещены, вывод будет неверным |
-| Интерпретировать цикл-зависимые показатели без дня цикла | Тот же класс ошибки, что сравнение разных лабораторий без нормализации |
-| Искать источник дефицита железа в ЖКТ у женщины, не спросив про менструации | Пропуск самой частой причины |
-| Отменять скрининг из-за гормональной терапии или идентичности | Скрининг определяется наличием органа |
+| Assume sex if not specified | This is exactly how the system worked before, and it's a defect |
+| Deduce sex from name | A name does not define biology or identity |
+| Use `gender_identity` to select references | References are tied to biology |
+| Use `sex` to address a person | For this there is `gender_identity` |
+| Ignore `hormone_therapy` when analyzing hormones and blood | Expected values ​​are biased, output will be incorrect |
+| Interpret cycle-dependent indicators without cycle day | Same class of error as comparing different laboratories without normalization |
+| Look for the source of iron deficiency in a woman’s gastrointestinal tract without asking about menstruation | The most common cause is missed |
+| Cancel screening due to hormone therapy or identity | Screening is determined by organ availability |
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+⚕️ The information is for reference only. Consult your doctor for treatment decisions.

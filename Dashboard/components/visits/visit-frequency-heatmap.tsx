@@ -28,15 +28,15 @@ export function VisitFrequencyHeatmap() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Частота визитов</CardTitle>
-        <CardDescription>По годам</CardDescription>
+        <CardTitle>Visit frequency</CardTitle>
+        <CardDescription>By year</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : years.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="grid grid-cols-4 gap-2">

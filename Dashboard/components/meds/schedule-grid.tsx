@@ -15,10 +15,10 @@ import type { MedsFile, Medication, Supplement } from "@/lib/types/medication";
 type MedItem = (Medication | Supplement) & { category: string };
 
 const timeSlots = [
-  { key: "утро", label: "Утро", emoji: "🌅" },
-  { key: "день", label: "День", emoji: "☀️" },
-  { key: "вечер", label: "Вечер", emoji: "🌆" },
-  { key: "ночь", label: "Ночь", emoji: "🌙" },
+  { key: "morning", label: "Morning", emoji: "🌅" },
+  { key: "day", label: "Day", emoji: "☀️" },
+  { key: "evening", label: "Evening", emoji: "🌆" },
+  { key: "night", label: "Night", emoji: "🌙" },
 ];
 
 function matchTiming(timing: string[], slot: string): boolean {
@@ -42,15 +42,15 @@ export function ScheduleGrid() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Расписание приёма</CardTitle>
-        <CardDescription>{allItems.length} активных препаратов</CardDescription>
+        <CardTitle>Medication schedule</CardTitle>
+        <CardDescription>{allItems.length} active medications</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-48 w-full" />
         ) : allItems.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет активных препаратов
+            No active medications
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,7 +84,7 @@ export function ScheduleGrid() {
                             }
                             className="text-xs"
                           >
-                            {item.category === "med" ? "Лек" : "БАД"}
+                            {item.category === "med" ? "Med" : "Supplement"}
                           </Badge>
                         </div>
                       ))}

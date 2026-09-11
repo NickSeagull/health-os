@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Health-OS — установка.
+# Health-OS — Setup.
 #
-#   ./setup.sh          рабочий режим: пустые шаблоны, готовые к заполнению
-#   ./setup.sh --demo   демо-режим: данные вымышленного пациента, чтобы осмотреться
+#   ./setup.sh          working mode: empty templates ready to fill in
+#   ./setup.sh --demo   demo mode: fictional patient data to explore
 #
-# Скрипт идемпотентен: существующие файлы не перезаписываются никогда.
+# This script is idempotent: existing files are never overwritten.
 
 set -euo pipefail
 
@@ -14,7 +14,7 @@ ASSUME_YES="no"
 for arg in "$@"; do
   case "$arg" in
     --demo) MODE="demo" ;;
-    -y|--yes) ASSUME_YES="yes" ;;   # принять условия без вопроса — для автоматизации
+    -y|--yes) ASSUME_YES="yes" ;;   # accept terms without prompting, for automation
   esac
 done
 
@@ -28,105 +28,105 @@ err()  { echo "  ${RED}✗${NC} $*"; }
 skip() { echo "  ${DIM}·${NC} $*"; }
 
 echo
-echo "Health-OS — установка (режим: $MODE)"
+echo "Health-OS — Setup (mode: $MODE)"
 echo "═══════════════════════════════════════════════"
 echo
-echo "${YELLOW}⚠️  ПРОЧТИТЕ ПЕРЕД УСТАНОВКОЙ${NC}"
+echo "${YELLOW}⚠️  READ BEFORE INSTALLING${NC}"
 echo
-echo "  Это ${YELLOW}не медицинское изделие${NC}: программа не зарегистрирована,"
-echo "  не сертифицирована и не проходила клинических испытаний."
-echo "  Она не диагностирует, не лечит и не заменяет врача."
+echo "  This is ${YELLOW}not a medical device${NC}: the software is not registered,"
+echo "  certified, or clinically tested."
+echo "  It does not diagnose, treat, or replace a doctor."
 echo
-echo "  Некоммерческий проект. Предоставляется «как есть», без гарантий."
-echo "  ${YELLOW}Использование — исключительно на собственный риск.${NC}"
-echo "  Авторы не отвечают за вред здоровью, ошибочные выводы и утрату данных."
+echo "  Noncommercial project. Provided as is, without warranties."
+echo "  ${YELLOW}Use entirely at your own risk.${NC}"
+echo "  The authors are not liable for health harm, incorrect conclusions, or data loss."
 echo
-echo "  За сохранность и законность обработки своих данных отвечаете вы."
-echo "  Содержимое файлов передаётся в API языковой модели при каждом обращении."
+echo "  You are responsible for data security and lawful data processing."
+echo "  File contents are sent to the language model API with each interaction."
 echo
-echo "  Все демонстрационные данные вымышлены."
+echo "  All demonstration data is fictional."
 echo
-echo "  Полные условия: DISCLAIMER.md"
+echo "  Full terms: DISCLAIMER.md"
 echo
-echo "  🚨 При неотложном состоянии — скорая помощь. Программа не мониторинг."
+echo "  🚨 In an emergency, contact emergency services. This is not a monitoring system."
 echo
 if [ "$ASSUME_YES" = "yes" ]; then
-  ok "условия приняты (флаг --yes)"
+  ok "terms accepted (--yes flag)"
 else
-  printf "  Принимаете условия? [y/N] "
+  printf "  Do you accept the terms? [y/N] "
   if read -r ACCEPT </dev/tty 2>/dev/null; then
     case "$ACCEPT" in
-      [yYдД]*) echo; ok "условия приняты" ;;
-      *) echo; err "Установка отменена. Без принятия условий использовать программу нельзя."; exit 1 ;;
+      [yY]*) echo; ok "terms accepted" ;;
+      *) echo; err "Setup canceled. You must accept the terms to use the software."; exit 1 ;;
     esac
   else
     echo
-    err "Терминал недоступен. Для неинтерактивной установки: ./setup.sh --yes"
+    err "No terminal available. For noninteractive setup: ./setup.sh --yes"
     exit 1
   fi
 fi
 echo
 
-# ── 1. Проверка окружения ──────────────────────────────────────────
-echo "Проверяю окружение"
+# ── 1. Environment check ──────────────────────────────────────────
+echo "Checking the environment"
 MISSING=0
 need() {
   if command -v "$1" >/dev/null 2>&1; then ok "$1"; else err "$1 — $2"; MISSING=1; fi
 }
-need python3 "нужен для проверок целостности"
+need python3 "required for integrity checks"
 if command -v python3 >/dev/null 2>&1; then
-  # Скрипт целостности использует аннотации вида `bool | None` — это Python 3.10+
+  # The integrity script uses annotations such as `bool | None`, requiring Python 3.10+
   if python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)' 2>/dev/null; then
     ok "python3 $(python3 -c 'import sys;print(".".join(map(str,sys.version_info[:3])))')"
   else
-    err "python3 $(python3 -c 'import sys;print(".".join(map(str,sys.version_info[:3])))') — нужен 3.10 или новее"
+    err "python3 $(python3 -c 'import sys;print(".".join(map(str,sys.version_info[:3])))') — requires 3.10 or newer"
     MISSING=1
   fi
 fi
-need jq       "нужен для хуков сессий"
-need git      "нужен для локального контроля версий"
+need jq       "required for session hooks"
+need git      "required for local version control"
 
 if command -v node >/dev/null 2>&1; then
   NODE_MAJOR=$(node -p "process.versions.node.split('.')[0]")
-  if [ "$NODE_MAJOR" -ge 20 ]; then ok "node $(node -v)"; else warn "node $(node -v) — дашборду нужен 20+"; fi
+  if [ "$NODE_MAJOR" -ge 20 ]; then ok "node $(node -v)"; else warn "node $(node -v) — the dashboard requires 20+"; fi
 else
-  warn "node не найден — система работает, дашборд не запустится"
+  warn "node not found: the system works, but the dashboard will not start"
 fi
 
 if [ "$MISSING" -eq 1 ]; then
   echo
-  err "Не хватает обязательных зависимостей. Установите их и запустите скрипт снова."
+  err "Required dependencies are missing. Install them and rerun this script."
   exit 1
 fi
 echo
 
-# ── 2. Файлы данных ────────────────────────────────────────────────
-echo "Разворачиваю файлы данных"
+# ── 2. Data files ────────────────────────────────────────────────
+echo "Deploying data files"
 
-# Смешивать режимы нельзя: демо-файлы лягут поверх пустых, а индексы останутся
-# от чистой установки — получится рассогласованное состояние, которое падает
-# на проверке целостности. Проверяем до первого копирования.
+# Do not mix modes: demo files would overlay empty files while indexes remain
+# from the blank installation, producing an inconsistent state that fails
+# integrity checks. Check before copying anything.
 EXISTING=$(find Data/profiles -type f \( -name "*.json" -o -name "*.csv" -o -name "*.jsonl" -o -name "*.md" \) \
   ! -name "*.example.*" ! -name "*.demo.*" ! -name "*.reference.*" 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$EXISTING" -gt 0 ] && [ "$MODE" = "demo" ]; then
   echo
-  err "В Data/profiles/ уже есть $EXISTING файлов, развёрнутых ранее."
-  err "Накладывать демо-набор поверх них нельзя — индексы разойдутся с файлами."
+  err "Data/profiles/ already contains $EXISTING previously deployed files."
+  err "Do not overlay demo data: the indexes would no longer match the files."
   echo
-  echo "  Если это ваши данные — не запускайте --demo, вы их перезапишете."
-  echo "  Если это прошлая установка и её не жаль, очистите каталог:"
+  echo "  If this is your data, do not run --demo; you would overwrite it."
+  echo "  If this is an old installation you can discard, clear the directory:"
   echo
   echo "    rm -rf Data/profiles/*/ && rm -f Data/profiles/_active.json"
   echo
-  echo "  Затем запустите ./setup.sh --demo снова."
+  echo "  Then run ./setup.sh --demo again."
   echo
   exit 1
 fi
 
-# Данные раскладываются по профилям: Data/profiles/<id>/. Первый профиль —
-# владелец установки. Шаблоны при этом остаются на месте, в Data/: они общие
-# и служат источником для каждого нового профиля.
+# Data is organized by profile: Data/profiles/<id>/. The first profile belongs
+# to the installation owner. Templates remain in Data/: they are shared
+# and serve as the source for every new profile.
 PROFILE="${PROFILE:-owner}"
 PROFILE_DIR="Data/profiles/$PROFILE"
 
@@ -135,20 +135,20 @@ medications,mental,goals,costs,traction,consilium,history,wiki/condition,\
 wiki/hypothesis,wiki/symptom,wiki/synthesis} 2>/dev/null
 mkdir -p Data/wiki/source Data/wiki/marker 2>/dev/null
 
-# Куда разворачивается шаблон. Всё, что лежит в Data/profiles/, — служебное
-# (указатель активного профиля) и остаётся на своём уровне. Остальное уходит
-# внутрь профиля: Data/labs/_index.example.json → Data/profiles/owner/labs/_index.json
+# Template destination. Files in Data/profiles/ are service files
+# (the active-profile pointer) and stay at that level. Everything else goes
+# inside the profile: Data/labs/_index.example.json → Data/profiles/owner/labs/_index.json
 target_for() {
   local tpl="$1" suffix="$2" ext="$3"
   local rel="${tpl#Data/}"
   local stem="${rel%$suffix}"
   case "$rel" in
-    # Служебное: указатель активного профиля лежит над профилями
+    # Service file: the active-profile pointer sits above individual profiles
     profiles/*)              printf 'Data/%s.%s' "$stem" "$ext" ;;
-    # Общая wiki: литература и справка по маркерам одинаковы для всех людей,
-    # дублировать их по профилям бессмысленно
+    # Shared wiki: literature and marker references apply to everyone;
+    # duplicating them per profile serves no purpose
     wiki/source/*|wiki/marker/*) printf 'Data/%s.%s' "$stem" "$ext" ;;
-    # Личная wiki и все остальные данные — внутрь профиля
+    # Personal wiki and all other data go inside the profile
     *)                       printf '%s/%s.%s' "$PROFILE_DIR" "$stem" "$ext" ;;
   esac
 }
@@ -161,7 +161,7 @@ while IFS= read -r -d '' tpl; do
   target="$(target_for "$tpl" "$SUFFIX" json)"
   base="$(basename "$target")"
   if [ -e "$target" ]; then
-    skip "$base — уже есть, не трогаю"
+    skip "$base — already exists, leaving unchanged"
     KEPT=$((KEPT+1))
   else
     mkdir -p "$(dirname "$target")"
@@ -171,115 +171,109 @@ while IFS= read -r -d '' tpl; do
   fi
 done < <(find Data -name "*$SUFFIX" -print0 2>/dev/null)
 
-# Остальные форматы: таблицы, построчные журналы, протоколы в Markdown
+# Other formats: tables, line-based journals, and Markdown visit notes
 for ext in csv jsonl md; do
   pat=".example.$ext"; [ "$MODE" = "demo" ] && pat=".demo.$ext"
   while IFS= read -r -d '' tpl; do
     target="$(target_for "$tpl" "$pat" "$ext")"
     base="$(basename "$target")"
-    if [ -e "$target" ]; then skip "$base — уже есть"; KEPT=$((KEPT+1))
+    if [ -e "$target" ]; then skip "$base — already exists"; KEPT=$((KEPT+1))
     else mkdir -p "$(dirname "$target")"; cp "$tpl" "$target"; ok "$base"; CREATED=$((CREATED+1)); fi
   done < <(find Data -name "*$pat" -print0 2>/dev/null)
 done
 
-# Годовые файлы: цели и расходы называются по году — 2026.json, 2026.jsonl.
-# Шаблоны лежат под нейтральными именами, чтобы не устаревать; здесь имя
-# получает актуальный год. Без этого дашборд, ищущий файл по маске \d{4}.json,
-# целей просто не находит.
+# Annual files: goals and expenses are named by year, e.g. 2026.json, 2026.jsonl.
+# Templates use neutral names so they do not become outdated; here the name
+# receives the current year. Without this, the dashboard searches for \d{4}.json
+# and cannot find goals.
 YEAR="$(date +%Y)"
 for pair in "$PROFILE_DIR/goals/goals.json:$PROFILE_DIR/goals/$YEAR.json" "$PROFILE_DIR/costs/costs.jsonl:$PROFILE_DIR/costs/$YEAR.jsonl"; do
   src="${pair%%:*}"; dst="${pair##*:}"
   if [ -f "$src" ] && [ ! -e "$dst" ]; then
     mv "$src" "$dst"
-    ok "$(basename "$dst") — годовой файл"
+    ok "$(basename "$dst") — annual file"
   elif [ -f "$src" ] && [ -e "$dst" ]; then
     rm -f "$src"
-    skip "$(basename "$dst") — уже есть"
+    skip "$(basename "$dst") — already exists"
   fi
 done
 
-echo "  создано: $CREATED, сохранено существующих: $KEPT"
+echo "  created: $CREATED, existing files kept: $KEPT"
 echo
 
-# ── 3. Конфигурация MCP ────────────────────────────────────────────
-echo "Настраиваю интеграции"
+# ── 3. MCP configuration ────────────────────────────────────────────
+echo "Setting up integrations"
 if [ -f ".mcp.json" ]; then
-  skip ".mcp.json — уже есть"
+  skip ".mcp.json — already exists"
 elif [ -f ".mcp.json.example" ]; then
   cp .mcp.json.example .mcp.json
   chmod 600 .mcp.json
-  ok ".mcp.json создан из шаблона (права 600)"
-  warn "впишите свои ключи вручную — в шаблоне заглушки"
+  ok ".mcp.json created from template (permissions 600)"
+  warn "enter your keys manually: the template contains placeholders"
 fi
 echo
 
-# ── 4. Права доступа ───────────────────────────────────────────────
-echo "Ограничиваю права"
-chmod -R go-rwx Data 2>/dev/null && ok "Data/ — только для владельца"
+# ── 4. Access permissions ───────────────────────────────────────────────
+echo "Restricting permissions"
+chmod -R go-rwx Data 2>/dev/null && ok "Data/ — owner access only"
 [ -f .mcp.json ] && chmod 600 .mcp.json && ok ".mcp.json — 600"
-chmod +x .claude/hooks/*.sh 2>/dev/null && ok "хуки исполняемые"
+chmod +x .claude/hooks/*.sh 2>/dev/null && ok "hooks are executable"
 echo
 
-# ── 5. Локальный git ───────────────────────────────────────────────
-echo "Проверяю изоляцию репозитория"
+# ── 5. Local Git ───────────────────────────────────────────────
+echo "Checking repository isolation"
 if [ ! -d .git ]; then
   git init -q
-  ok "git-репозиторий создан"
+  ok "Git repository created"
 fi
 
 if git remote | grep -q .; then
-  # После клонирования с GitHub origin есть всегда — это норма, а не авария.
-  # Красный крест здесь пугал бы каждого нового пользователя на ровном месте.
+  # A GitHub clone normally has an origin remote; this is not an error.
+  # A red error marker here would needlessly alarm every new user.
   REMOTE_NAME=$(git remote | head -1)
   REMOTE_URL=$(git remote get-url "$REMOTE_NAME" 2>/dev/null || echo "")
-  warn "У репозитория есть remote: $REMOTE_NAME → $REMOTE_URL"
-  echo "     Если это origin от клонирования — снимите его, чтобы медданные"
-  echo "     физически некуда было отправить:"
+  warn "The repository has a remote: $REMOTE_NAME → $REMOTE_URL"
+  echo "     If this is the origin from cloning, remove it so that medical data"
+  echo "     has no configured upload destination:"
   echo
   echo "       git remote remove $REMOTE_NAME"
   echo
-  echo "     Обновляться после этого можно так (см. INSTALL.md, раздел «Обновление»):"
-  echo "       git fetch <адрес> && git merge FETCH_HEAD"
+  echo "     You can then update as follows (see Updating in INSTALL.md):"
+  echo "       git fetch <repository-url> && git merge FETCH_HEAD"
 else
-  ok "remote отсутствует — данные останутся локально"
+  ok "no remote: data will stay local"
 fi
 
-# Проверяем, что предохранитель работает
+# Check that the safeguard works
 PROBE="Data/__gitignore_probe.json"
 echo '{}' > "$PROBE"
 if git check-ignore -q "$PROBE" 2>/dev/null; then
-  ok ".gitignore закрывает Data/ — проверено"
+  ok ".gitignore protects Data/: verified"
 else
-  err ".gitignore НЕ закрывает Data/ — это опасно, не начинайте вносить данные"
+  err ".gitignore does NOT protect Data/: unsafe, do not enter data"
 fi
 rm -f "$PROBE"
 echo
 
-# ── 6. Итог ────────────────────────────────────────────────────────
+# ── 6. Summary ────────────────────────────────────────────────────────
 echo "═══════════════════════════════════════════════"
 if [ "$MODE" = "demo" ]; then
-  echo "Готово. Развёрнут демо-набор вымышленного пациента."
+  echo "Done. The fictional patient demo dataset has been deployed."
   echo
-  echo "Посмотреть дашборд:"
+  echo "View the dashboard:"
   echo "  cd Dashboard && npm install && npm run dev"
   echo
-  echo "Когда наиграетесь — удалите демо-данные и запустите ./setup.sh заново."
+  echo "When finished exploring, remove the demo data and run ./setup.sh again."
 else
-  echo "Готово. Файлы данных пусты и ждут наполнения."
+  echo "Done. Data files are empty and ready to fill in."
   echo
-  echo "Дальше:"
-  echo "  1. Откройте проект в Claude Code"
-  echo "  2. Запустите /onboarding — система соберёт стартовую медкарту"
-  echo "  3. Кладите PDF анализов в Inbox/ и запускайте /inbox"
+  echo "Next steps:"
+  echo "  1. Open the project in Claude Code"
+  echo "  2. Run /onboarding to create your initial medical record"
+  echo "  3. Place lab PDFs in Inbox/ and run /inbox"
   echo
-  echo "Пошагово: docs/ONBOARDING.md"
+  echo "Step-by-step guide: docs/ONBOARDING.md"
 fi
 echo
-echo "⚕️  Система не ставит диагнозов и не заменяет врача."
-echo
-echo "─────────────────────────────────────────────────"
-echo "  Разбор системы:  https://youtu.be/sA1rrgo8x64"
-echo "  Автор:           Александр Ярыгин, @alxyrgin"
-echo "  Telegram:        https://t.me/+oYugtGxjawYxZmVi"
-echo "  При поддержке Glake AI:  https://glake.ai/?utm_source=cli&utm_medium=setup&utm_campaign=health-os"
+echo "⚕️  The system does not diagnose conditions or replace a doctor."
 echo

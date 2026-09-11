@@ -2,17 +2,17 @@
   "version": 1,
   "doctors": [
     {
-      "name": "Демо Терапевт",
-      "specialty": "терапевт",
-      "clinic": "Поликлиника по месту жительства, Ваш город",
+      "name": "Demo Primary Care Physician",
+      "specialty": "primary care",
+      "clinic": "Local outpatient clinic, Your city",
       "phone": "+7 (900) 000-00-00",
       "period": "2026",
       "status": "active"
     },
     {
-      "name": "Демо Стоматолог",
-      "specialty": "стоматолог-терапевт",
-      "clinic": "Демо-стоматология, Ваш город",
+      "name": "Demo Dentist",
+      "specialty": "restorative dentist",
+      "clinic": "Demo Dental Clinic, Your city",
       "period": "2023–2026",
       "status": "active"
     }

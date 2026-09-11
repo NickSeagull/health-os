@@ -20,7 +20,7 @@ import { useHealthData } from "@/lib/hooks/use-health-data";
 import type { TodoistTask, TodoistSection } from "@/lib/data/todoist";
 
 const COLORS = ["#ef4444", "#f97316", "#3b82f6", "#9ca3af"];
-const LABELS = ["p1 (Срочно)", "p2 (Высокий)", "p3 (Средний)", "p4 (Обычный)"];
+const LABELS = ["p1 (Urgent)", "p2 (High)", "p3 (Medium)", "p4 (Normal)"];
 
 export function TaskPriorityChart() {
   const { data, isLoading } = useHealthData<{
@@ -43,15 +43,15 @@ export function TaskPriorityChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Приоритеты</CardTitle>
-        <CardDescription>Распределение по приоритетам</CardDescription>
+        <CardTitle>Priorities</CardTitle>
+        <CardDescription>Distribution by priority</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[250px] w-full" />
         ) : chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="h-[250px]">

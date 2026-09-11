@@ -26,8 +26,8 @@ export function DentalProcedureTimeline() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>История процедур</CardTitle>
-        <CardDescription>{procs?.length ?? 0} процедур</CardDescription>
+        <CardTitle>Procedure history</CardTitle>
+        <CardDescription>{procs?.length ?? 0} procedures</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -38,7 +38,7 @@ export function DentalProcedureTimeline() {
           </div>
         ) : !procs?.length ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет записей о процедурах
+            No procedure records
           </p>
         ) : (
           <div className="space-y-2 border-l-2 border-muted ml-2 pl-4">
@@ -50,7 +50,7 @@ export function DentalProcedureTimeline() {
                     <p className="text-sm font-medium">{p.description}</p>
                     <p className="text-xs text-muted-foreground">
                       {p.date && formatDate(p.date)} ·{" "}
-                      {p.teeth.length > 0 && `Зубы: ${p.teeth.join(", ")}`}
+                      {p.teeth.length > 0 && `Teeth: ${p.teeth.join(", ")}`}
                     </p>
                     {p.notes && (
                       <p className="text-xs text-muted-foreground mt-1">

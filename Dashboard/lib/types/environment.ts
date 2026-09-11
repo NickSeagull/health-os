@@ -1,10 +1,10 @@
 /**
- * `Data/context/environment.json` — внешний контекст жизни пациента.
+ * `Data/context/environment.json` — the patient's external life context.
  *
- * Файл объявлен обязательным к прочтению всеми AI-специалистами
- * (`holistic-framework.md`, Блок 4), но дашборд не читал его вообще: ни страницы,
- * ни карточки. При жалобе на хроническую усталость климат, циркадный контекст
- * и стрессоры — первый экран, а не пятый.
+ * All AI specialists are required to read this file (`holistic-framework.md`,
+ * Block 4), but the dashboard did not read it at all: neither the page nor the card.
+ * For a complaint of chronic fatigue, climate, circadian context, and stressors
+ * belong on the first screen, not the fifth.
  */
 export interface EnvironmentData {
   version: number;
@@ -32,7 +32,7 @@ export interface EnvironmentData {
   };
   climate?: {
     type?: string;
-    /** Выводы, следующие из широты и климата, — готовые формулировки для врача */
+    /** Latitude and climate findings, ready-made wording for a physician. */
     derived_facts?: string[];
     seasonal_pattern_observed?: string | null;
   };
@@ -56,7 +56,7 @@ export interface EnvironmentData {
     work_stress_level?: string | null;
     social_support?: Record<string, unknown>;
     life_events_recent?: string[] | string | null;
-    /** Якоря хронологии: год, возраст и событие — привязка симптомов к жизни */
+    /** Chronology anchors: year, age, and event linking symptoms to life events. */
     chronology_anchors?: {
       year: number;
       age?: number;
@@ -65,6 +65,6 @@ export interface EnvironmentData {
       needs_clarification?: boolean;
     }[];
   };
-  /** Что ещё не собрано — показывается как чеклист */
+  /** Data not yet collected, shown as a checklist. */
   _needs_input?: string[];
 }

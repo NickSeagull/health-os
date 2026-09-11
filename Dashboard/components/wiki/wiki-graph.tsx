@@ -22,15 +22,15 @@ const W = 900;
 const H = 560;
 
 /**
- * Раскладка силовым методом.
+ * Force-directed layout.
  *
- * Считается на клиенте за фиксированное число шагов и замирает: анимация,
- * которая никогда не останавливается, мешает читать граф и греет процессор.
+ * Computed on the client for a fixed number of steps, then stopped: an
+ * endless animation makes the graph harder to read and wastes CPU.
  */
 function layout(pages: WikiPage[], edges: WikiEdge[]): Node[] {
   const nodes: Node[] = pages.map((p, i) => {
-    // Стартовое размещение по кругу — детерминированное, чтобы граф
-    // не прыгал при каждом открытии страницы
+    // Start in a deterministic circle so the graph does not jump each time
+    // the page is opened.
     const a = (2 * Math.PI * i) / Math.max(pages.length, 1);
     return {
       id: p.id,
@@ -58,8 +58,8 @@ function layout(pages: WikiPage[], edges: WikiEdge[]): Node[] {
         let dy = b.y - a.y;
         let d2 = dx * dx + dy * dy;
         if (d2 < 1) {
-          // Совпавшие узлы разводятся детерминированным смещением,
-          // а не случайным: граф должен выглядеть одинаково при каждом входе
+          // Separate coincident nodes with a deterministic offset rather than
+          // a random one so the graph looks the same on every visit.
           dx = ((i % 7) - 3) || 1;
           dy = ((j % 5) - 2) || 1;
           d2 = dx * dx + dy * dy;
@@ -154,10 +154,10 @@ export function WikiGraph({ pages, edges }: { pages: WikiPage[]; edges: WikiEdge
   if (pages.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-        Wiki пока пуста.
+        The wiki is empty.
         <br />
-        Запустите <code className="font-mono">/wiki build</code> в Claude Code — слой
-        соберётся из уже имеющихся данных.
+        Run <code className="font-mono">/wiki build</code> in Claude Code to build
+        the graph from the available data.
       </div>
     );
   }
@@ -187,7 +187,7 @@ export function WikiGraph({ pages, edges }: { pages: WikiPage[]; edges: WikiEdge
         ))}
         {selected && (
           <Button variant="ghost" size="sm" onClick={() => setSelected(null)}>
-            Показать всё
+            Show all
           </Button>
         )}
       </div>
@@ -198,7 +198,7 @@ export function WikiGraph({ pages, edges }: { pages: WikiPage[]; edges: WikiEdge
           className="h-[560px] w-full min-w-[700px]"
           style={{ opacity: ready ? 1 : 0, transition: "opacity .25s" }}
           role="img"
-          aria-label="Граф связей медкарты"
+          aria-label="Medical record relationship graph"
         >
           <g>
             {visibleEdges.map((e, i) => {
@@ -258,13 +258,13 @@ export function WikiGraph({ pages, edges }: { pages: WikiPage[]; edges: WikiEdge
             <span className="font-medium">{active.title}</span>
             {active.updated && (
               <span className="text-xs text-muted-foreground">
-                обновлено {active.updated}
+                updated {active.updated}
               </span>
             )}
           </div>
           {active.sources.length > 0 && (
             <div className="mt-3">
-              <div className="text-xs text-muted-foreground">Источники</div>
+              <div className="text-xs text-muted-foreground">Sources</div>
               <ul className="mt-1 space-y-0.5">
                 {active.sources.map((s) => (
                   <li key={s} className="font-mono text-xs">

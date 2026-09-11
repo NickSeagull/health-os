@@ -41,13 +41,13 @@ const statusColors: Record<ToothStatus, string> = {
 };
 
 const statusLabels: Record<ToothStatus, string> = {
-  healthy: "Здоров",
-  filled: "Пломба",
-  crowned: "Коронка",
-  extracted: "Удалён",
-  implant: "Имплант",
-  needs_treatment: "Нужно лечение",
-  root_canal: "Каналы",
+  healthy: "Healthy",
+  filled: "Filling",
+  crowned: "Crown",
+  extracted: "Extracted",
+  implant: "Implant",
+  needs_treatment: "Needs treatment",
+  root_canal: "Root canal",
 };
 
 const allStatuses: ToothStatus[] = [
@@ -59,14 +59,14 @@ const upperLeft = ["21", "22", "23", "24", "25", "26", "27", "28"];
 const lowerLeft = ["31", "32", "33", "34", "35", "36", "37", "38"];
 const lowerRight = ["48", "47", "46", "45", "44", "43", "42", "41"];
 
-/** Цвет и обводка для зуба, о котором в карте нет записи */
+/** Fill and outline for a tooth with no record in the map. */
 const UNKNOWN_FILL = "transparent";
 const UNKNOWN_STROKE = "#a1a1aa";
 
 function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined }) {
-  // `teeth` разрежен: отсутствие ключа означает «статус неизвестен», а не «здоров».
-  // Прежний дефолт `?? "healthy"` рисовал 30 из 32 зубов зелёными без единого осмотра
-  // и подставлял «healthy» в запись при сохранении заметки.
+  // `teeth` is sparse: a missing key means "status unknown," not "healthy."
+  // The previous `?? "healthy"` default rendered 30 of 32 teeth green without
+  // an examination and inserted "healthy" when saving a note.
   const [status, setStatus] = useState<ToothStatus | "">(tooth?.status ?? "");
   const [notes, setNotes] = useState(tooth?.notes ?? "");
   const [saving, setSaving] = useState(false);
@@ -81,7 +81,7 @@ function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined
 
   async function handleSave() {
     if (!known) {
-      toast.error("Выберите статус зуба");
+      toast.error("Select a tooth status");
       return;
     }
     setSaving(true);
@@ -93,12 +93,12 @@ function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined
       });
       if (!res.ok) {
         const { error } = await res.json().catch(() => ({ error: "" }));
-        throw new Error(error || "Ошибка сохранения");
+        throw new Error(error || "Save failed");
       }
-      toast.success(`Зуб ${number} обновлён`);
+      toast.success(`Tooth ${number} updated`);
       mutate("/api/dental");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Ошибка сохранения");
+      toast.error(e instanceof Error ? e.message : "Save failed");
     }
     setSaving(false);
   }
@@ -125,12 +125,12 @@ function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined
       </PopoverTrigger>
       <PopoverContent className="w-56">
         <div className="space-y-3">
-          <span className="font-medium text-sm">Зуб {number}</span>
+          <span className="font-medium text-sm">Tooth {number}</span>
           <div>
-            <Label className="text-xs">Статус</Label>
+            <Label className="text-xs">Status</Label>
             <Select value={status} onValueChange={(v) => setStatus(v as ToothStatus)}>
               <SelectTrigger className="h-8 text-xs">
-                <SelectValue placeholder="Нет данных" />
+                <SelectValue placeholder="No data" />
               </SelectTrigger>
               <SelectContent>
                 {allStatuses.map((s) => (
@@ -140,7 +140,7 @@ function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined
             </Select>
           </div>
           <div>
-            <Label className="text-xs">Заметки</Label>
+            <Label className="text-xs">Notes</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -149,7 +149,7 @@ function ToothCell({ number, tooth }: { number: string; tooth: Tooth | undefined
             />
           </div>
           <Button size="sm" className="w-full" onClick={handleSave} disabled={saving}>
-            {saving ? "..." : "Сохранить"}
+            {saving ? "..." : "Save"}
           </Button>
         </div>
       </PopoverContent>
@@ -165,18 +165,19 @@ export function ToothMapSvg() {
 
   const teeth = data?.toothMap?.teeth ?? {};
   const summary = data?.toothMap?.summary;
-  // Разница между рядом и числом записей — не «здоровые», а неосмотренные.
-  // Без этой строки карта выглядит полной при двух заполненных зубах из 32
+  // The difference between the row count and the number of records represents
+  // unexamined teeth, not healthy teeth. Without this line, the map looks
+  // complete with only two of 32 teeth recorded.
   const unknown = unknownToothCount(teeth);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Карта зубов</CardTitle>
+        <CardTitle>Tooth map</CardTitle>
         <CardDescription>
           {summary
-            ? `${summary.total} позиций · ${summary.healthy} здоровых · ${summary.extracted} удалено · ${unknown} без данных`
-            : "ISO 3950 · Нажмите на зуб для редактирования"}
+            ? `${summary.total} teeth · ${summary.healthy} healthy · ${summary.extracted} extracted · ${unknown} without data`
+            : "ISO 3950 · Click a tooth to edit"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -199,7 +200,7 @@ export function ToothMapSvg() {
               ))}
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground text-center">Верхняя челюсть</p>
+              <p className="text-xs text-muted-foreground text-center">Upper jaw</p>
               <div className="flex justify-center gap-1">
                 {upperRight.map((n) => (<ToothCell key={n} number={n} tooth={teeth[n]} />))}
                 <div className="w-px bg-border mx-1" />
@@ -212,7 +213,7 @@ export function ToothMapSvg() {
                 <div className="w-px bg-border mx-1" />
                 {lowerLeft.map((n) => (<ToothCell key={n} number={n} tooth={teeth[n]} />))}
               </div>
-              <p className="text-xs text-muted-foreground text-center">Нижняя челюсть</p>
+              <p className="text-xs text-muted-foreground text-center">Lower jaw</p>
             </div>
           </div>
         )}

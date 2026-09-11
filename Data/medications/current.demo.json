@@ -4,15 +4,15 @@
   "supplements": [
     {
       "id": "sup_01",
-      "name": "Витамин D3 (холекальциферол)",
-      "brand": "Демо-бренд",
-      "dosage": "2000 МЕ/день",
-      "frequency": "ежедневно",
-      "timing": ["утро"],
-      "reason": "Недостаточность витамина D по анализу от 2026-06-18 (24 нг/мл)",
+      "name": "Vitamin D3 (cholecalciferol)",
+      "brand": "Demo brand",
+      "dosage": "2,000 IU/day",
+      "frequency": "daily",
+      "timing": ["morning"],
+      "reason": "Vitamin D insufficiency on the 2026-06-18 test (24 ng/mL)",
       "started": "2026-06-26",
       "status": "active",
-      "notes": "Назначено терапевтом на приёме 2026-06-25. Принимать с едой. Контроль 25(OH)D — сентябрь 2026"
+      "notes": "Prescribed by the primary care physician at the 2026-06-25 visit. Take with food. Repeat 25(OH)D in September 2026"
     }
   ],
   "topical": [],

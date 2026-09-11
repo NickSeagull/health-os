@@ -2,15 +2,16 @@ import fs from "fs";
 import { sharedDataPath } from "./paths";
 
 /**
- * Канонические имена маркеров и единицы измерения.
+ * Canonical marker names and measurement units.
  *
- * Источник истины — `Data/labs/_marker-aliases.json`. Прежде здесь лежал хардкод
- * БЕЗ информации о единицах, из-за чего тренд по маркеру, приходящему из разных
- * лабораторий в разных единицах, давал числовую бессмыслицу: например
- * тестостерон 17.33 нмоль/л → 6.5 нг/мл выглядел как обвал втрое, хотя это рост.
+ * The source of truth is `Data/labs/_marker-aliases.json`. Previously this file
+ * contained hard-coded aliases WITHOUT unit information, so a trend for a marker
+ * reported by different laboratories in different units could become numerically
+ * meaningless: for example, testosterone 17.33 nmol/L → 6.5 ng/mL looked like a
+ * threefold collapse even though it was an increase.
  *
- * Английские сокращения из аппаратных выгрузок словарём не покрываются —
- * для них оставлен дополнительный слой ниже.
+ * English abbreviations from analyzer exports are not necessarily covered by the
+ * canonical dictionary, so an additional device-alias layer is defined below.
  */
 
 interface CanonicalMarker {
@@ -29,51 +30,54 @@ interface AliasFile {
   markers: CanonicalMarker[];
 }
 
-/** Английские сокращения приборов — их нет в каноническом словаре */
+/** Analyzer abbreviations and common English names not guaranteed in the canonical dictionary. */
 const deviceAliases: Record<string, string> = {
-  HGB: "Гемоглобин",
-  Hb: "Гемоглобин",
-  Hemoglobin: "Гемоглобин",
-  "Гемоглобин (HGB)": "Гемоглобин",
-  WBC: "Лейкоциты",
-  RBC: "Эритроциты",
-  PLT: "Тромбоциты",
-  HCT: "Гематокрит",
-  "Гематокрит (HCT)": "Гематокрит",
-  ESR: "СОЭ",
-  Glucose: "Глюкоза",
-  "Глюкоза (венозная)": "Глюкоза",
-  "Глюкоза венозная": "Глюкоза",
-  Creatinine: "Креатинин",
-  Urea: "Мочевина",
-  "Uric acid": "Мочевая кислота",
-  ALT: "АЛТ",
-  AST: "АСТ",
-  GGT: "ГГТ",
-  ALP: "Щелочная фосфатаза",
-  "Total cholesterol": "Холестерин общий",
-  HDL: "ЛПВП",
-  LDL: "ЛПНП",
-  Triglycerides: "Триглицериды",
-  TSH: "ТТГ (тиреотропный гормон)",
-  "Free T3": "Т3 свободный",
-  "Free T4": "Тироксин свободный (св. Т4)",
-  Testosterone: "Тестостерон общий",
-  Cortisol: "Кортизол",
-  ACTH: "АКТГ",
-  "25-OH Vitamin D": "Витамин D суммарный (25-OH D2 и D3)",
-  "25(OH)D": "Витамин D суммарный (25-OH D2 и D3)",
-  "Vitamin B12": "Витамин B12",
-  Ferritin: "Ферритин",
-  Iron: "Железо сывороточное",
-  CRP: "С-реактивный белок",
-  СРБ: "С-реактивный белок",
-  Potassium: "Калий",
-  Sodium: "Натрий",
-  Calcium: "Кальций",
-  GFR: "СКФ",
-  eGFR: "СКФ",
-  Microalbumin: "Микроальбумин",
+  HGB: "Hemoglobin",
+  Hb: "Hemoglobin",
+  Hemoglobin: "Hemoglobin",
+  "Hemoglobin (HGB)": "Hemoglobin",
+  WBC: "White blood cells",
+  "White blood cells": "White blood cells",
+  RBC: "Red blood cells",
+  PLT: "Platelets",
+  Platelets: "Platelets",
+  HCT: "Hematocrit",
+  "Hematocrit (HCT)": "Hematocrit",
+  ESR: "ESR",
+  Glucose: "Glucose",
+  "Venous glucose": "Glucose",
+  Creatinine: "Creatinine",
+  Urea: "Urea",
+  "Uric acid": "Uric acid",
+  ALT: "ALT",
+  AST: "AST",
+  GGT: "GGT",
+  ALP: "Alkaline phosphatase",
+  "Total cholesterol": "Total cholesterol",
+  HDL: "HDL",
+  LDL: "LDL",
+  Triglycerides: "Triglycerides",
+  TSH: "TSH",
+  "TSH (thyroid-stimulating hormone)": "TSH",
+  "Free T3": "Free T3",
+  "Free T4": "Free T4",
+  Testosterone: "Total testosterone",
+  "Total testosterone": "Total testosterone",
+  Cortisol: "Cortisol",
+  ACTH: "ACTH",
+  "25-OH Vitamin D": "Vitamin D",
+  "25(OH)D": "Vitamin D",
+  "Vitamin D": "Vitamin D",
+  "Vitamin B12": "Vitamin B12",
+  Ferritin: "Ferritin",
+  Iron: "Iron",
+  CRP: "C-reactive protein",
+  Potassium: "Potassium",
+  Sodium: "Sodium",
+  Calcium: "Calcium",
+  GFR: "GFR",
+  eGFR: "GFR",
+  Microalbumin: "Microalbumin",
 };
 
 let aliasMap: Record<string, string> = {};
@@ -100,9 +104,12 @@ function load(): void {
       if (m.canonical_unit) unitMap[m.canonical] = m.canonical_unit;
       if (m.risk) riskMap[m.canonical] = m.risk;
     }
+    // Keep the English analyzer names canonical even when an older registry
+    // still contains a synonym with a broader or legacy label.
+    aliasMap = { ...aliasMap, ...deviceAliases };
   } catch {
-    // Словарь недоступен — работаем на слое сокращений приборов.
-    // Единицы при этом не проверяются, поэтому тренды помечаются как несверенные.
+    // The dictionary is unavailable; use the analyzer-abbreviation layer.
+    // Units cannot be checked in this case, so trends are marked as unverified.
   }
 }
 
@@ -111,22 +118,22 @@ export function resolveAlias(name: string): string {
   return aliasMap[name] ?? name;
 }
 
-/** Каноническая единица маркера. undefined, если маркера нет в словаре */
+/** Canonical marker unit; undefined when the marker is absent from the dictionary. */
 export function getCanonicalUnit(canonicalName: string): string | undefined {
   load();
   return unitMap[canonicalName];
 }
 
-/** Уровень риска путаницы единиц: high / medium / low */
+/** Risk of unit confusion: high / medium / low. */
 export function getUnitRisk(canonicalName: string): string | undefined {
   load();
   return riskMap[canonicalName];
 }
 
 /**
- * Отличается ли единица точки от канонической.
- * Если маркера нет в словаре либо единица не указана — считаем совпадающей,
- * чтобы не засорять график ложными предупреждениями.
+ * Whether a point's unit differs from the canonical unit.
+ * If the marker is absent from the dictionary or has no unit, treat it as matching
+ * so the chart is not filled with false warnings.
  */
 export function isUnitMismatch(
   canonicalName: string,
@@ -138,12 +145,12 @@ export function isUnitMismatch(
   return normalizeUnit(unit) !== normalizeUnit(expected);
 }
 
-/** Приводит написания единиц к сравнимому виду: «10^9/л», «x10^9/л» и «×10⁹/л» — одно и то же */
+/** Normalize unit spellings: "10^9/L", "x10^9/L", and "×10⁹/L" are equivalent. */
 function normalizeUnit(u: string): string {
   return u
     .toLowerCase()
     .replace(/\s+/g, "")
-    .replace(/[х×x]/g, "x")
+    .replace(/[×x]/g, "x")
     .replace(/⁹/g, "9")
     .replace(/¹²/g, "12")
     .replace(/\^/g, "")

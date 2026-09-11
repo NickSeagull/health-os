@@ -43,8 +43,8 @@ export function AbnormalityScatter() {
         const idxRes = await fetch("/api/labs");
         const idx: LabIndex = await idxRes.json();
 
-        // Файлы читаются один раз, а не дважды: прежний код обходил весь индекс
-        // сначала ради имён, потом ради точек — 120 запросов вместо 60
+        // Read each file once. The previous code traversed the entire index
+        // first for names and then for points, making 120 requests instead of 60.
         const raw: Omit<AbnormalPoint, "markerIdx">[] = [];
         const names = new Set<string>();
 
@@ -54,8 +54,8 @@ export function AbnormalityScatter() {
             const res = await fetch(`/api/labs/${encodeURIComponent(entry.file)}`);
             const lab: LabFileData = await res.json();
 
-            // Маркеры собираются из markers[], panels[] и studies[] — чтение
-            // одного лишь lab.markers прятало все отклонения 2026 года
+            // Collect markers from markers[], panels[], and studies[]. Reading
+            // only lab.markers hid all abnormalities from 2026.
             for (const m of collectMarkers(lab)) {
               if (m.status === "normal" || typeof m.value !== "number") continue;
               names.add(m.name);
@@ -89,9 +89,9 @@ export function AbnormalityScatter() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Отклонения</CardTitle>
+        <CardTitle>Abnormalities</CardTitle>
         <CardDescription>
-          Все отклонения от нормы на одном графике
+          All out-of-range results on one chart
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -99,7 +99,7 @@ export function AbnormalityScatter() {
           <Skeleton className="h-[300px] w-full" />
         ) : points.length === 0 ? (
           <p className="text-sm text-muted-foreground py-12 text-center">
-            Нет отклонений
+            No abnormalities
           </p>
         ) : (
           <div className="h-[300px]">

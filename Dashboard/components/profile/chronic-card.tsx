@@ -21,8 +21,8 @@ export function ChronicCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Хронические состояния</CardTitle>
-        <CardDescription>{profile.chronic_conditions.length} записей</CardDescription>
+        <CardTitle>Chronic conditions</CardTitle>
+        <CardDescription>{profile.chronic_conditions.length} records</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2 max-h-[400px] overflow-auto">
@@ -31,7 +31,7 @@ export function ChronicCard() {
               <div>
                 <p className="text-sm font-medium">{c.condition}</p>
                 <p className="text-xs text-muted-foreground">
-                  С {c.since}{c.notes && ` · ${c.notes}`}
+                  Since {c.since}{c.notes && ` · ${c.notes}`}
                 </p>
               </div>
               <StatusBadge status={c.status} />

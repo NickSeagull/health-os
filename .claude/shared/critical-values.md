@@ -1,149 +1,149 @@
-# Критические значения и красные флаги
+# Critical values and red flags
 
-> Обязательный документ для скиллов `/labs`, `/inbox`, `/body`, `/mental` и всех AI-специалистов.
-
----
-
-## Зачем этот документ
-
-В системе существовал статус `critical` и правило «при critical рекомендовать обратиться к врачу», но критерии не были определены нигде. Механизм экстренного реагирования был объявлен и нереализуем: критический результат при разборе документа сохранялся бы молча как обычное отклонение.
-
-Документ задаёт пороги, при которых обычный workflow останавливается.
-
-**Важные оговорки:**
-
-1. Health-OS **не является системой мониторинга** и не заменяет неотложную помощь. Пороги ниже — ориентир для того, чтобы не пропустить опасное, а не инструмент диагностики.
-2. Пороги **зависят от лаборатории и метода**. Всегда сверяйся с референсом из самого файла анализа. Значения ниже — общепринятые ориентиры для взрослых.
-3. Критично не только абсолютное значение, но и **скорость изменения**. Резкое падение гемоглобина на 30 г/л за неделю тревожнее стабильно низкого.
-4. При любом сомнении **эскалируй**. Ложная тревога стоит дёшево, пропущенное критическое значение — нет.
+> Mandatory for `/labs`, `/inbox`, `/body`, `/mental`, and all AI specialists.
 
 ---
 
-## Блок 1. Что делать при обнаружении критического значения
+## Why this document exists
 
-Порядок обязателен и имеет приоритет над любым текущим workflow.
+The system had a `critical` status and a rule to «recommend seeing a doctor for critical findings», but no criteria were defined anywhere. Emergency response had been declared but could not be implemented: a critical result found while processing a document would have been silently saved as an ordinary abnormality.
 
-1. **Остановить пакетную обработку.** Если разбирается несколько документов — прервать очередь.
-2. **Вывести критическую находку первым сообщением**, до любых других результатов, таблиц и сводок.
-3. **Назвать конкретно:** маркер, значение, референс лаборатории, насколько превышен порог.
-4. **Прямо сказать, что делать:** обратиться к врачу сегодня либо вызвать скорую — по таблицам ниже.
-5. **Записать алерт** в `Cache/alerts/YYYY-MM-DD.json` с `severity: "critical"` по схеме из Блока 5.
-6. **Не интерпретировать и не успокаивать.** Не подбирать объяснения вроде «возможно, ошибка лаборатории» — это решение врача, а не системы.
+This document defines thresholds that stop the normal workflow.
+
+**Important qualifications:**
+
+1. Health-OS **is not a monitoring system** and does not replace emergency care. The thresholds below help avoid missing danger; they are not a diagnostic tool.
+2. Thresholds **depend on the laboratory and method**. Always check the reference interval in the test file itself. The values below are commonly accepted adult guideposts.
+3. Both the absolute value and the **rate of change** matter. A sudden hemoglobin drop of 30 g/L in a week is more concerning than a stable low value.
+4. When in doubt, **escalate**. A false alarm costs little; a missed critical value does not.
 
 ---
 
-## Блок 2. Лабораторные критические значения
+## Block 1. What to do when a critical value is found
 
-Ориентиры для взрослых. Всегда сверять с референсом конкретной лаборатории.
+This sequence is mandatory and overrides any current workflow.
 
-### Требуют неотложной помощи
+1. **Stop batch processing.** If processing multiple documents, interrupt the queue.
+2. **Report the critical finding in the first message**, before any other results, tables, or summaries.
+3. **Be specific:** name the marker, value, laboratory reference interval, and how far the threshold is exceeded.
+4. **State the action directly:** see a doctor today or call emergency medical services, according to the tables below.
+5. **Record an alert** in `Cache/alerts/YYYY-MM-DD.json` with `severity: "critical"`, using the schema in Block 5.
+6. **Do not interpret or reassure.** Do not offer explanations such as «perhaps a laboratory error» — that is for a doctor to decide, not the system.
 
-| Маркер | Порог | Почему |
+---
+
+## Block 2. Critical laboratory values
+
+Adult guideposts. Always check the specific laboratory's reference interval.
+
+### Require emergency care
+
+| Marker | Threshold | Why |
 |--------|-------|--------|
-| Калий | < 2.5 или > 6.5 ммоль/л | Жизнеугрожающие аритмии |
-| Натрий | < 120 или > 160 ммоль/л | Отёк мозга, судороги |
-| Глюкоза | < 2.8 или > 22 ммоль/л | Гипогликемия, кетоацидоз |
-| Кальций общий | < 1.6 или > 3.5 ммоль/л | Судороги, аритмии |
-| Гемоглобин | < 70 г/л | Тяжёлая анемия, тканевая гипоксия |
-| Тромбоциты | < 30 ×10⁹/л | Риск спонтанного кровотечения |
-| Нейтрофилы абсолютные | < 0.5 ×10⁹/л | Агранулоцитоз, риск сепсиса |
-| Тропонин | выше порога лаборатории | Повреждение миокарда |
-| МНО | > 5 | Риск кровотечения |
-| Магний | < 0.4 ммоль/л | Аритмии, судороги |
+| Potassium | < 2.5 or > 6.5 mmol/L | Life-threatening arrhythmias |
+| Sodium | < 120 or > 160 mmol/L | Cerebral edema, seizures |
+| Glucose | < 2.8 or > 22 mmol/L | Hypoglycemia, ketoacidosis |
+| Total calcium | < 1.6 or > 3.5 mmol/L | Seizures, arrhythmias |
+| Hemoglobin | < 70 g/L | Severe anemia, tissue hypoxia |
+| Platelets | < 30 ×10⁹/L | Risk of spontaneous bleeding |
+| Absolute neutrophil count | < 0.5 ×10⁹/L | Agranulocytosis, risk of sepsis |
+| Troponin | above the laboratory threshold | Myocardial injury |
+| INR | > 5 | Bleeding risk |
+| Magnesium | < 0.4 mmol/L | Arrhythmias, seizures |
 
-### Требуют обращения к врачу в течение суток
+### Require seeing a doctor within 24 hours
 
-| Маркер | Порог | Почему |
+| Marker | Threshold | Why |
 |--------|-------|--------|
-| Калий | 2.5–3.0 или 6.0–6.5 ммоль/л | Аритмогенный потенциал |
-| Гемоглобин | 70–90 г/л | Значимая анемия |
-| Тромбоциты | 30–50 ×10⁹/л или > 1000 ×10⁹/л | Гемостаз |
-| Лейкоциты | < 1.5 или > 50 ×10⁹/л | Иммунодефицит либо лейкемоидная реакция |
-| Креатинин | > 400 мкмоль/л либо рост вдвое от предыдущего | Острое почечное повреждение |
-| АЛТ или АСТ | > 10 верхних границ нормы | Острое поражение печени |
-| Билирубин общий | > 100 мкмоль/л | Желтуха, холестаз |
-| ТТГ | < 0.01 или > 100 мЕд/л | Тиреотоксикоз либо микседема |
-| СРБ | > 100 мг/л | Тяжёлое воспаление, сепсис |
-| Ферритин | > 1000 мкг/л | Перегрузка железом, гиперферритинемия |
-| Витамин D | > 100 нг/мл | Риск гиперкальциемии при передозировке |
+| Potassium | 2.5–3.0 or 6.0–6.5 mmol/L | Arrhythmogenic potential |
+| Hemoglobin | 70–90 g/L | Significant anemia |
+| Platelets | 30–50 ×10⁹/L or > 1000 ×10⁹/L | Hemostasis |
+| White blood cells | < 1.5 or > 50 ×10⁹/L | Immunodeficiency or leukemoid reaction |
+| Creatinine | > 400 µmol/L or twice the previous value | Acute kidney injury |
+| ALT or AST | > 10 times the upper limit of normal | Acute liver injury |
+| Total bilirubin | > 100 µmol/L | Jaundice, cholestasis |
+| TSH | < 0.01 or > 100 mU/L | Thyrotoxicosis or myxedema |
+| CRP | > 100 mg/L | Severe inflammation, sepsis |
+| Ferritin | > 1000 µg/L | Iron overload, hyperferritinemia |
+| Vitamin D | > 100 ng/mL | Risk of hypercalcemia from overdose |
 
-### Качественные критические результаты
+### Qualitative critical results
 
-| Находка | Действие |
+| Finding | Action |
 |---------|----------|
-| Положительный результат на ВИЧ, гепатит B или C, сифилис | К врачу. Не интерпретировать самостоятельно, подтверждающий тест обязателен |
-| Рост патогена в стерильном локусе (кровь, ликвор) | Неотложно |
-| Обнаружение бластных клеток в мазке | Неотложно, к гематологу |
-| M-градиент в белковых фракциях | К гематологу в течение недели |
-| Токсины C. difficile | К врачу, риск псевдомембранозного колита |
+| Positive HIV, hepatitis B or C, or syphilis result | See a doctor. Do not interpret independently; confirmatory testing is mandatory |
+| Pathogen growth from a sterile site (blood, cerebrospinal fluid) | Emergency care |
+| Blast cells detected on a smear | Urgent hematology assessment |
+| M-spike in protein fractions | See a hematologist within a week |
+| C. difficile toxins | See a doctor; risk of pseudomembranous colitis |
 
 ---
 
-## Блок 3. Витальные показатели
+## Block 3. Vital signs
 
-| Показатель | Неотложно | К врачу в течение суток |
+| Measurement | Emergency care | See a doctor within 24 hours |
 |------------|-----------|-------------------------|
-| Артериальное давление | ≥ 180/120 мм рт. ст. — **гипертонический криз** | 160–179 / 100–119 устойчиво |
-| Артериальное давление | < 90/60 с обмороком, спутанностью или холодным потом | < 90/60 без симптомов, впервые |
-| ЧСС в покое | < 40 или > 150 уд/мин | < 50 или > 120 устойчиво |
-| SpO₂ | < 90% | 90–93% устойчиво |
-| Температура | > 39.5 °C с нарушением сознания либо сыпью | > 38.5 °C дольше трёх суток |
-| Вес | потеря > 5% массы за месяц без намерения | потеря > 10% за полгода |
+| Blood pressure | ≥ 180/120 mmHg — **hypertensive crisis** | persistently 160–179 / 100–119 |
+| Blood pressure | < 90/60 with fainting, confusion, or cold sweats | newly observed < 90/60 without symptoms |
+| Resting heart rate | < 40 or > 150 bpm | persistently < 50 or > 120 |
+| SpO₂ | < 90% | persistently 90–93% |
+| Temperature | > 39.5 °C with altered consciousness or a rash | > 38.5 °C for more than three days |
+| Weight | unintentional loss of > 5% of body weight in a month | loss of > 10% in six months |
 
-**Важно про давление:** гипертонический криз ≥180/120 — это не «повышенное давление», а неотложное состояние. При сопутствующих боли в груди, одышке, нарушении зрения, речи или асимметрии лица — вызывать скорую немедленно, это признаки поражения органов-мишеней.
-
----
-
-## Блок 4. Красные флаги психического состояния
-
-Этот блок имеет абсолютный приоритет. При его срабатывании обычный workflow скилла `/mental` останавливается.
-
-### Немедленная остановка и вывод контактов помощи
-
-Срабатывает при любом из признаков:
-
-- Упоминание суицидальных мыслей, намерений или плана — в любой формулировке, включая косвенные («не хочу просыпаться», «всем будет лучше без меня», «нет смысла»)
-- Упоминание самоповреждения
-- Оценка настроения ≤ 2 по десятибалльной шкале
-- Падение настроения на 4 и более пункта за сутки
-- Настроение ≤ 4 устойчиво семь дней и более
-- Упоминание безнадёжности в сочетании с бессонницей и утратой интереса
-
-### Что выводить
-
-```
-⚠️ Судя по записи, тебе сейчас тяжело. Это не то, с чем стоит справляться в одиночку.
-
-Куда обратиться прямо сейчас:
-• 112 — единый номер экстренных служб, круглосуточно
-• 103 — скорая помощь
-
-Психологическая помощь (Россия):
-• 8 (495) 051 с мобильного, 051 с городского — экстренная психологическая помощь МЧС, круглосуточно, для взрослых
-• 8-800-2000-122 — Детский телефон доверия: для детей, подростков и их родителей
-
-Если вы в другой стране — найдите местную линию кризисной помощи:
-findahelpline.com либо befrienders.org
-
-Если есть мысли о причинении себе вреда — позвони сейчас, не откладывая.
-```
-
-После вывода: записать алерт с `severity: "critical"`, не продолжать обычный разбор корреляций и паттернов, не давать советов по режиму и питанию.
-
-### Правила
-
-- **Не диагностировать.** Никаких «у тебя депрессия».
-- **Не обесценивать и не подбадривать дежурно.** Формулировки вроде «всё наладится» неуместны.
-- **Не откладывать реакцию.** Прежнее правило «при устойчиво низком настроении неделю рекомендовать специалиста» слишком медленное для острого состояния.
-- **Реагировать на текст, а не только на цифру.** Свободное поле `notes` в журнале настроения читается на предмет красных флагов всегда.
+**Important note on blood pressure:** a hypertensive crisis ≥180/120 is not merely «elevated blood pressure» but an emergency. With accompanying chest pain, shortness of breath, impaired vision or speech, or facial asymmetry, call emergency medical services immediately — these indicate target-organ damage.
 
 ---
 
-## Блок 5. Схема алерта
+## Block 4. Mental health red flags
 
-Единый путь: `Cache/alerts/YYYY-MM-DD.json`.
+This block has absolute priority. When triggered, the normal `/mental` workflow stops.
 
-Путь `Cache/health/alerts/` не используется: он попал в часть инструкций по ошибке. Единственный корректный каталог алертов — `Cache/alerts/`.
+### Stop immediately and display support contacts
+
+Triggered by any of the following:
+
+- Mention of suicidal thoughts, intent, or a plan, however phrased, including indirect statements («I don't want to wake up», «everyone would be better off without me», «there is no point»)
+- Mention of self-harm
+- Mood score ≤ 2 on a ten-point scale
+- Mood drop of 4 or more points in 24 hours
+- Mood persistently ≤ 4 for seven days or more
+- Mention of hopelessness together with insomnia and loss of interest
+
+### What to display
+
+```
+⚠️ Your entry suggests that things are difficult right now. You should not have to face this alone.
+
+Where to get help right now:
+• 112 — unified emergency services number, available 24/7
+• 103 — emergency medical services
+
+Psychological support (Russia):
+• 8 (495) 051 from a mobile, 051 from a landline — EMERCOM emergency psychological support, available 24/7 for adults
+• 8-800-2000-122 — Children's Helpline: for children, adolescents, and their parents
+
+If you are in another country, find a local crisis helpline:
+findahelpline.com or befrienders.org
+
+If you are thinking about hurting yourself, call now. Do not put it off.
+```
+
+After displaying this, record an alert with `severity: "critical"`. Do not continue the usual correlation and pattern analysis or give lifestyle and nutrition advice.
+
+### Rules
+
+- **Do not diagnose.** Do not say «you have depression».
+- **Do not minimize or offer stock encouragement.** Phrases such as «everything will be fine» are inappropriate.
+- **Do not delay the response.** The previous rule to «recommend a specialist after a week of persistently low mood» is too slow for an acute crisis.
+- **Respond to the text, not just the score.** Always read the mood journal's free-text `notes` field for red flags.
+
+---
+
+## Block 5. Alert schema
+
+Single path: `Cache/alerts/YYYY-MM-DD.json`.
+
+Do not use `Cache/health/alerts/`: it appeared in some instructions by mistake. The only correct alert directory is `Cache/alerts/`.
 
 ```json
 {
@@ -156,31 +156,31 @@ findahelpline.com либо befrienders.org
       "severity": "critical|high|medium|low",
       "type": "lab_critical|vital_critical|mental_crisis|medication|follow_up|recovery|other",
       "source": "labs|inbox|body|mental|coach",
-      "title": "Краткая формулировка",
-      "detail": "Что именно обнаружено, с числами и референсом лаборатории",
-      "marker": "Название маркера или показателя, если применимо",
+      "title": "Brief description",
+      "detail": "Exactly what was found, with numbers and the laboratory reference interval",
+      "marker": "Marker or measurement name, if applicable",
       "value": null,
-      "reference": "Референс лаборатории, если применимо",
-      "action": "Что нужно сделать",
+      "reference": "Laboratory reference interval, if applicable",
+      "action": "What needs to be done",
       "acknowledged": false
     }
   ]
 }
 ```
 
-Правила записи: файл за дату дополняется, а не перезаписывается; `id` инкрементальный в пределах дня; при повторном срабатывании того же условия в тот же день дубликат не создаётся.
+Writing rules: append to the file for that date rather than overwriting it; `id` increments within the day; do not create a duplicate when the same condition triggers again on the same day.
 
 ---
 
-## Блок 6. Чего этот документ не делает
+## Block 6. What this document does not do
 
-- Не заменяет врача и неотложную помощь
-- Не является исчерпывающим списком опасных состояний
-- Не учитывает индивидуальные особенности, беременность, детский возраст, сопутствующие заболевания и принимаемые препараты
-- Не отменяет правило «никаких диагнозов»
+- Replace a doctor or emergency care
+- Provide an exhaustive list of dangerous conditions
+- Account for individual characteristics, pregnancy, childhood, comorbidities, or medications
+- Override the «no diagnoses» rule
 
-Отсутствие срабатывания порогов **не означает, что всё в порядке**. Плохое самочувствие при нормальных анализах — повод обратиться к врачу, а не аргумент против обращения.
+No threshold being triggered **does not mean everything is fine**. Feeling unwell despite normal tests is a reason to see a doctor, not an argument against doing so.
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу. При признаках неотложного состояния звоните 103 или 112.
+⚕️ This information is for reference only. Consult a doctor for treatment decisions. If there are signs of an emergency, call 103 or 112.

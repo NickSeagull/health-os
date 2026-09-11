@@ -9,7 +9,7 @@ import { MilestoneTimeline } from "@/components/goals/milestone-timeline";
 export default function GoalsPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Цели" description="Прогресс по OKR O5 — здоровье" />
+      <PageHeader title="Goals" description="Progress on OKR O5 — health" />
       <PhaseProgressBars />
       <DirectionCards />
       <div className="grid gap-6 lg:grid-cols-2">

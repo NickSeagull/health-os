@@ -10,8 +10,8 @@ export default function TasksPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Задачи"
-        description="Todoist — проект «Здоровье»"
+        title="Tasks"
+        description="Todoist — the Health project"
       />
       <div className="grid gap-6 lg:grid-cols-2">
         <UpcomingTasks />

@@ -31,15 +31,15 @@ export function WeightProgression() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Динамика веса</CardTitle>
-        <CardDescription>Взрослый период (с 2010)</CardDescription>
+        <CardTitle>Weight progression</CardTitle>
+        <CardDescription>Adult period (since 2010)</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : !filtered?.length ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="h-[300px]">
@@ -55,7 +55,7 @@ export function WeightProgression() {
                   domain={["dataMin - 5", "dataMax + 5"]}
                   tick={{ fontSize: 11 }}
                   label={{
-                    value: "кг",
+                    value: "kg",
                     angle: -90,
                     position: "insideLeft",
                     style: { fontSize: 11 },
@@ -68,8 +68,8 @@ export function WeightProgression() {
                     return (
                       <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                         <p className="font-medium">{formatDateShort(d.date)}</p>
-                        <p>Вес: {d.weight_kg} кг</p>
-                        {d.body_fat_pct && <p>Жир: {d.body_fat_pct}%</p>}
+                        <p>Weight: {d.weight_kg} kg</p>
+                        {d.body_fat_pct && <p>Body fat: {d.body_fat_pct}%</p>}
                         {d.bmi && <p>BMI: {d.bmi}</p>}
                       </div>
                     );
@@ -81,7 +81,7 @@ export function WeightProgression() {
                   stroke="var(--chart-1)"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  name="Вес"
+                  name="Weight"
                 />
                 {filtered.some((m) => m.body_fat_pct) && (
                   <Line
@@ -91,7 +91,7 @@ export function WeightProgression() {
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     dot={{ r: 3 }}
-                    name="% жира"
+                    name="Body fat %"
                     yAxisId="right"
                   />
                 )}

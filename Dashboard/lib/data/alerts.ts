@@ -18,11 +18,11 @@ function isKnownSeverity(value: unknown): value is AlertSeverity {
 }
 
 /**
- * Читает `Cache/alerts/YYYY-MM-DD.json` — каждый файл это обёртка `{version, date, alerts[]}`.
+ * Read `Cache/alerts/YYYY-MM-DD.json`; each file wraps `{version, date, alerts[]}`.
  *
- * Прежняя версия клала весь файл целиком в массив как один алерт, из-за чего у «алерта»
- * не было ни `severity`, ни `title`. Каталог до сих пор пуст, поэтому ошибка не всплывала:
- * сломался бы ровно первый настоящий алерт.
+ * The previous version put the entire file into the array as one alert, leaving
+ * the "alert" without either `severity` or `title`. The directory was empty, so
+ * the bug stayed hidden and would have broken the first real alert.
  */
 export async function readAlerts(): Promise<HealthAlert[]> {
   let files: string[];
@@ -38,7 +38,7 @@ export async function readAlerts(): Promise<HealthAlert[]> {
     const parsed = await safeReadJson<AlertFile>(path.join(ALERTS_DIR(), file));
     if (!parsed || !Array.isArray(parsed.alerts)) continue;
 
-    // Дата файла — запасной источник сортировки, если у записи нет ts
+    // The file date is a fallback sort value when a record has no ts.
     const fileDate = parsed.date ?? file.replace(/\.json$/, "");
 
     for (const alert of parsed.alerts) {
@@ -46,8 +46,8 @@ export async function readAlerts(): Promise<HealthAlert[]> {
       alerts.push({
         ...alert,
         date: alert.date ?? fileDate,
-        // Неизвестная severity не должна ронять панель. Сводим к самой громкой:
-        // неопознанный алерт лучше показать лишний раз, чем потерять
+        // An unknown severity must not crash the panel. Use the highest severity:
+        // showing an unrecognized alert twice is safer than losing it.
         severity: isKnownSeverity(alert.severity) ? alert.severity : "high",
       });
     }

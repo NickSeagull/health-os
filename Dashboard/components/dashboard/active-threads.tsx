@@ -32,9 +32,9 @@ export function ActiveThreads() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Активные направления</CardTitle>
+        <CardTitle>Active areas</CardTitle>
         <CardDescription>
-          Текущие направления лечения и исследования
+          Current treatment and research areas
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,16 +45,16 @@ export function ActiveThreads() {
             ))}
           </div>
         ) : !directions?.length ? (
-          <p className="text-sm text-muted-foreground">Нет активных направлений</p>
+          <p className="text-sm text-muted-foreground">No active areas</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Направление</TableHead>
+                <TableHead>Area</TableHead>
                 <TableHead>KR</TableHead>
-                <TableHead>Статус</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="hidden md:table-cell">
-                  Последняя активность
+                  Last activity
                 </TableHead>
                 <TableHead className="hidden lg:table-cell">
                   Milestones
@@ -91,7 +91,7 @@ export function ActiveThreads() {
           href="/goals"
           className="mt-3 inline-block text-xs text-muted-foreground hover:text-foreground"
         >
-          Все направления →
+          All areas →
         </Link>
       </CardContent>
     </Card>

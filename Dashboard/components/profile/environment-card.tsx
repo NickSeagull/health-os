@@ -24,7 +24,7 @@ export function EnvironmentCard() {
         </CardContent>
       </Card>
     );
-  // Роут отдаёт объект ошибки, если файла нет — по version отличаем данные от него
+  // The route returns an error object when the file is missing; use version to distinguish it.
   if (!env || typeof env.version !== "number") return null;
 
   const loc = env.location;
@@ -36,17 +36,17 @@ export function EnvironmentCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Внешний контекст</CardTitle>
+        <CardTitle>External context</CardTitle>
         <CardDescription>
-          Локация, климат, работа, хронология
-          {env.updated && ` · обновлено ${formatDate(env.updated)}`}
+          Location, climate, work, and chronology
+          {env.updated && ` · updated ${formatDate(env.updated)}`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <dl className="grid gap-3 text-sm">
           {loc && (
             <div>
-              <dt className="text-muted-foreground">Локация</dt>
+              <dt className="text-muted-foreground">Location</dt>
               <dd>
                 {[loc.city, loc.district, loc.street].filter(Boolean).join(", ")}
                 {loc.latitude != null && ` · ${loc.latitude}°N`}
@@ -55,37 +55,37 @@ export function EnvironmentCard() {
           )}
           {care && (
             <div>
-              <dt className="text-muted-foreground">Доступ к медпомощи</dt>
+              <dt className="text-muted-foreground">Healthcare access</dt>
               <dd>
                 {care.insurance}
-                {care.dms === false && " · ДМС нет"}
+                {care.dms === false && " · No private insurance"}
                 {care.travel_readiness && ` · ${care.travel_readiness}`}
               </dd>
             </div>
           )}
           {work && (
             <div>
-              <dt className="text-muted-foreground">Работа</dt>
+              <dt className="text-muted-foreground">Work</dt>
               <dd>
                 {[work.field, work.posture].filter(Boolean).join(" · ")}
                 {work.screen_hours_per_day != null &&
-                  ` · ${work.screen_hours_per_day} ч экрана`}
+                  ` · ${work.screen_hours_per_day} h of screen time`}
               </dd>
             </div>
           )}
           {env.climate?.type && (
             <div>
-              <dt className="text-muted-foreground">Климат</dt>
+              <dt className="text-muted-foreground">Climate</dt>
               <dd>{env.climate.type}</dd>
             </div>
           )}
         </dl>
 
-        {/* Выводы из климата и широты — то, ради чего файл и заведён:
-            сезонный дефицит витамина D, амплитуда светового дня, сухость зимой */}
+        {/* Climate and latitude implications: seasonal vitamin D deficiency,
+            daylight variation, and winter dryness. */}
         {!!env.climate?.derived_facts?.length && (
           <div>
-            <p className="text-xs font-medium mb-1.5">Следствия среды</p>
+            <p className="text-xs font-medium mb-1.5">Environmental implications</p>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {env.climate.derived_facts.map((fact, i) => (
                 <li key={i} className="flex gap-1.5">
@@ -99,7 +99,7 @@ export function EnvironmentCard() {
 
         {!!work?.health_implications?.length && (
           <div>
-            <p className="text-xs font-medium mb-1.5">Следствия работы</p>
+            <p className="text-xs font-medium mb-1.5">Work implications</p>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {work.health_implications.map((item, i) => (
                 <li key={i} className="flex gap-1.5">
@@ -113,7 +113,7 @@ export function EnvironmentCard() {
 
         {!!anchors.length && (
           <div>
-            <p className="text-xs font-medium mb-1.5">Якоря хронологии</p>
+            <p className="text-xs font-medium mb-1.5">Chronology anchors</p>
             <ul className="space-y-1.5 text-xs">
               {anchors
                 .slice()
@@ -122,13 +122,13 @@ export function EnvironmentCard() {
                   <li key={i} className="flex gap-2">
                     <span className="shrink-0 font-medium tabular-nums">
                       {a.year}
-                      {a.age != null && ` (${a.age} л.)`}
+                      {a.age != null && ` (${a.age} years)`}
                     </span>
                     <span className="text-muted-foreground">
                       {a.event}
                       {a.needs_clarification && (
                         <Badge variant="outline" className="ml-1.5 text-[10px]">
-                          уточнить
+                          clarify
                         </Badge>
                       )}
                     </span>
@@ -141,7 +141,7 @@ export function EnvironmentCard() {
         {!!gaps.length && (
           <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
             <p className="text-xs font-medium mb-1.5">
-              Не заполнено: {gaps.length} блоков
+              Incomplete: {gaps.length} sections
             </p>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {gaps.map((gap, i) => (

@@ -1,29 +1,29 @@
 #!/bin/bash
-# session-save.sh — Stop hook для сохранения breadcrumb сессии
-# Срабатывает после каждого ответа Claude. Перезаписывает файл по session_id.
-# Когда сессия заканчивается, breadcrumb остаётся как pending.
+# session-save.sh — Stop hook that saves a session breadcrumb
+# Runs after each Claude response. Overwrites the file identified by session_id.
+# When the session ends, the breadcrumb remains pending.
 
 set -euo pipefail
 
-# Защита от рекурсии
+# Prevent recursion
 if [ "${CLAUDE_STOP_HOOK_ACTIVE:-}" = "1" ]; then
   exit 0
 fi
 export CLAUDE_STOP_HOOK_ACTIVE=1
 
-# Читаем JSON из stdin
+# Read JSON from stdin
 INPUT=$(cat)
 
-# Хук должен срабатывать только в этом проекте.
-# Проверяем по факту наличия самого хука в рабочем каталоге, а не по имени
-# каталога: привязка к подстроке «health-os» ломала breadcrumbs у всех,
-# кто склонировал репозиторий под другим именем.
+# Run this hook only in this project.
+# Check that the hook exists in the working directory rather than matching
+# its name: matching the substring "health-os" broke breadcrumbs for anyone
+# who cloned the repository under a different directory name.
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)
 if [ -z "$CWD" ] || [ ! -f "$CWD/.claude/hooks/session-save.sh" ]; then
   exit 0
 fi
 
-# Извлекаем данные
+# Extract data
 SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty' 2>/dev/null)
 if [ -z "$SESSION_ID" ]; then
   exit 0
@@ -32,9 +32,9 @@ fi
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S")
 DATE=$(date +"%Y-%m-%d")
 
-# Считаем сообщения по транскрипту.
-# ВАЖНО: в payload Stop-хука поля .num_turns НЕТ — прежняя версия всегда писала 0,
-# из-за чего /recover-sessions считал все сессии пустыми и удалял их без логов.
+# Count messages in the transcript.
+# IMPORTANT: the Stop hook payload has NO .num_turns field. The previous version
+# always wrote 0, causing /recover-sessions to discard every session without logs.
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null)
 MSG_COUNT=0
 if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
@@ -42,7 +42,7 @@ if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
   MSG_COUNT=${MSG_COUNT:-0}
 fi
 
-# Читаем start_time и вычисляем длительность
+# Read start_time and calculate elapsed time
 START_FILE="$CWD/.claude/hooks/session-start-${SESSION_ID}.tmp"
 START_EPOCH=""
 ELAPSED_SECONDS=0
@@ -51,8 +51,8 @@ if [ -f "$START_FILE" ]; then
   NOW_EPOCH=$(date +%s)
   ELAPSED_SECONDS=$((NOW_EPOCH - START_EPOCH))
 fi
-# date -r — синтаксис BSD (macOS), date -d @ — GNU (Linux).
-# Пробуем оба, иначе на Linux время старта молча оставалось пустым
+# date -r is BSD syntax (macOS); date -d @ is GNU syntax (Linux).
+# Try both; otherwise the start time silently remains empty on Linux.
 START_TIME=""
 if [ -n "$START_EPOCH" ]; then
   START_TIME=$(date -r "$START_EPOCH" -u +"%Y-%m-%dT%H:%M:%S" 2>/dev/null \
@@ -60,11 +60,11 @@ if [ -n "$START_EPOCH" ]; then
             || echo "")
 fi
 
-# Директория для breadcrumbs
+# Breadcrumb directory
 PENDING_DIR="$CWD/.claude/hooks/pending-sessions"
 mkdir -p "$PENDING_DIR"
 
-# Записываем breadcrumb (перезаписываем на каждом Stop — идемпотентно)
+# Write the breadcrumb (idempotently overwritten on each Stop)
 cat > "$PENDING_DIR/${SESSION_ID}.json" << EOF
 {
   "session_id": "$SESSION_ID",

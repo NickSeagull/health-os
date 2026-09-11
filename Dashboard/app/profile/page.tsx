@@ -12,7 +12,7 @@ import { EnvironmentCard } from "@/components/profile/environment-card";
 export default function ProfilePage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Профиль" description="Персональная медицинская карта" />
+      <PageHeader title="Profile" description="Personal medical record" />
       <div className="grid gap-6 lg:grid-cols-2">
         <BasicInfoCard />
         <AllergiesCard />

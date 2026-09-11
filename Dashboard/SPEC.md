@@ -1,36 +1,36 @@
 # Health Dashboard — Spec
 
-> Реализация в отдельных сессиях. Этот файл — полный spec для входа через plan mode.
+> Implementation is split across sessions. This file is the complete specification for starting in plan mode.
 
 ---
 
-## Технологии
+## Technology
 
 - **Next.js 15** (App Router)
 - **shadcn/ui + Tailwind CSS 4**
-- **Recharts** (графики)
+- **Recharts** (charts)
 - **SWR** (data fetching)
-- **csv-parse** (CSV парсинг)
-- **date-fns** (даты)
+- **csv-parse** (CSV parsing)
+- **date-fns** (dates)
 - **gray-matter** (Markdown frontmatter)
 - **TypeScript strict**
 
 ---
 
-## Архитектура
+## Architecture
 
 ```
 [Data/ files] ──fs.readFile──▶ [lib/data/*.ts] ──▶ [app/api/*/route.ts] ──JSON──▶ [Client + Recharts/shadcn]
 ```
 
-- API Routes читают `../Data/` через Node.js `fs`
-- Клиент — SWR для data fetching
-- Кеширование: без кеша в dev, `revalidate: 60` в prod
-- Только чтение — дашборд не мутирует данные
+- API routes read `../Data/` through Node.js `fs`
+- The client uses SWR for data fetching
+- Caching: no cache in development, `revalidate: 60` in production
+- Read-only: the dashboard does not mutate data
 
 ---
 
-## Структура проекта
+## Project Structure
 
 ```
 dashboard/
@@ -47,7 +47,7 @@ dashboard/
 │   ├── whoop/page.tsx          ← Recovery, HRV, Sleep
 │   └── api/
 │       ├── labs/route.ts
-│       ├── labs/markers/route.ts  ← GET ?name=Гемоглобин → [{date, value, status, ref_min, ref_max}]
+│       ├── labs/markers/route.ts  ← GET ?name=Hemoglobin → [{date, value, status, ref_min, ref_max}]
 │       ├── body-metrics/route.ts
 │       ├── visits/route.ts
 │       ├── meds/route.ts
@@ -97,70 +97,72 @@ dashboard/
 
 ---
 
-## Страницы (9 views)
+## Pages (9 views)
 
 ### 1. Dashboard (`/`)
 
-- 4 summary cards: вес/BMI, возраст, active KRs count, active meds count
+- 4 summary cards: weight/BMI, age, active KR count, active medication count
 - Active threads table (from goals v2 — directions with `status != resolved`)
 - Recent 5 labs with flag badges
 - Alerts panel (from `Cache/alerts/`)
 
 ### 2. Labs (`/labs`)
 
-- Combobox для выбора маркера
-- LineChart с зонами референсных значений (зелёная зона между `ref_min` и `ref_max`)
-- Точки окрашены зелёным/красным по статусу
-- Aliases mapping для inconsistent названий маркеров (например, «Гемоглобин» vs «Гемоглобин (Hb)» vs «HGB»)
-- Таблица со всеми результатами анализов, сортировка по дате
+- Combobox for selecting a marker
+- LineChart with reference zones (green zone between `ref_min` and `ref_max`)
+- Points colored green/red by status
+- Alias mapping for inconsistent marker names (for example, “Hemoglobin” vs “Hemoglobin (Hb)” vs “HGB”)
+- Canonical marker labels exposed by the UI: Hemoglobin, White blood cells, Platelets, ESR, Glucose, Creatinine, ALT, AST, Total cholesterol, LDL, HDL, Triglycerides, TSH, Free T4, Total testosterone, Cortisol, Vitamin D, Vitamin B12, Ferritin, Iron
+- The shared marker registry must contain all 20 UI canonical labels. It is a superset of this selection and also retains other analytes. Identity-only entries do not define measurement units or conversion factors.
+- Table of all lab results, sorted by date
 
 ### 3. Body (`/body`)
 
-- Weight LineChart (3 фазы: gain → loss → gain, с аннотациями)
-- BMI AreaChart с зонами (underweight / normal / overweight)
+- Weight LineChart (3 phases: gain → loss → gain, with annotations)
+- BMI AreaChart with zones (underweight / normal / overweight)
 - Blood pressure dual line chart (systolic + diastolic)
-- Exclude childhood measurements (2001–2003) в отдельную секцию «История»
+- Place childhood measurements (2001–2003) in a separate “History” section
 
 ### 4. Visits (`/visits`)
 
-- Vertical timeline, группировка по годам
-- Color-coded по специальности
-- Click → Sheet (shadcn) с полными деталями визита
-- Dual format: JSON (20 файлов) + Markdown (46 файлов)
-- Для MD: regex parser для полей (`# title`, `- **Дата:**`, `- **Врач:**`)
-- Data source: `Data/doctors/visits/_index.json` для быстрого доступа
+- Vertical timeline, grouped by year
+- Color-coded by specialty
+- Click → Sheet (shadcn) with full visit details
+- Dual format: JSON (20 files) + Markdown (46 files)
+- For MD: regex parser for fields (`# title`, `- **Date:**`, `- **Doctor:**`, `- **Specialty:**`, `- **Clinic:**`)
+- Data source: `Data/doctors/visits/_index.json` for fast access
 
 ### 5. Meds (`/meds`)
 
 - Grid: morning / day / evening / night × medications
-- Отдельные секции: medications, supplements, topical
+- Separate sections: medications, supplements, topical
 - Status badges (`active`, `as_needed`, `completed`)
 
 ### 6. Dental (`/dental`)
 
-- SVG-диаграмма 32 зубов (квадранты 1–4, ISO 3950)
-- Цвет по статусу: healthy (белый), treated (синий), missing (серый), needs_treatment (красный)
-- Hover → tooltip с заметками
+- SVG diagram of 32 teeth (quadrants 1–4, ISO 3950)
+- Color by status: healthy (white), treated (blue), missing (gray), needs_treatment (red)
+- Hover → tooltip with notes
 - Data source: `Data/dental/tooth-map.json`
 
 ### 7. Mental (`/mental`)
 
-- 4 линии: mood, energy, stress, sleep_quality (шкала 1–10)
+- 4 lines: mood, energy, stress, sleep_quality (1–10 scale)
 - Data source: `Data/mental/journal.jsonl`
 - Date range selector
 
 ### 8. Goals (`/goals`)
 
-- Progress tracker организован по фазам (Phase 1/2/3)
-- Milestones checklist по каждому направлению
+- Progress tracker organized by phase (Phase 1/2/3)
+- Milestone checklist for each health area
 - Cost summary table (estimate vs actual)
-- Status badges с цветами
+- Colored status badges
 
 ### 9. WHOOP (`/whoop`)
 
 - Recovery %, HRV, RHR line charts
 - Sleep performance, strain
-- Data source: `Cache/whoop/` (переопределяется `HEALTH_OS_WHOOP_DIR`) либо WHOOP MCP
+- Data source: `Cache/whoop/` (overridden by `HEALTH_OS_WHOOP_DIR`) or WHOOP MCP
 
 ---
 
@@ -256,10 +258,10 @@ interface VisitIndex {
 
 ## Known Complexities
 
-1. **Marker name aliases** — inconsistent naming across labs. Решение: aliases mapping в `lib/data/labs.ts`
-2. **Two visit formats** — JSON (20) + Markdown (46). API определяет формат по расширению файла
-3. **Sparse body metrics** — 14 точек за 24 года. Детские измерения (2001–2003) — в отдельную секцию
-4. **WHOOP** — MCP-сервер (npx), без HTTP API. Решение: читать кеш из `Cache/whoop/`
+1. **Marker name aliases** — inconsistent naming across labs. Solution: alias mapping in `lib/data/labs.ts`
+2. **Two visit formats** — JSON (20) + Markdown (46). The API detects the format from the file extension
+3. **Sparse body metrics** — 14 points over 24 years. Childhood measurements (2001–2003) go in a separate section
+4. **WHOOP** — MCP server (npx), without an HTTP API. Solution: read the cache from `Cache/whoop/`
 
 ---
 
@@ -277,9 +279,9 @@ interface VisitIndex {
 
 ## Data Paths
 
-Все пути относительно корня проекта (`health-os/`):
+All paths are relative to the project root (`health-os/`):
 
-| Данные | Путь |
+| Data | Path |
 |--------|------|
 | Profile | `Data/profile.json` |
 | Goals | `Data/goals/2026.json` (v2) |
@@ -300,6 +302,6 @@ interface VisitIndex {
 
 ## Health Disclaimer
 
-Каждая страница обязана отображать:
+Every page must display:
 
-> ⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+> ⚕️ This information is for reference only. Consult a doctor for treatment decisions.

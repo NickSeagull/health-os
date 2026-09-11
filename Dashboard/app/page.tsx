@@ -12,7 +12,7 @@ import { ErrorBoundary } from "@/components/shared/error-boundary";
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Обзор" description="Сводка по здоровью" />
+      <PageHeader title="Overview" description="Health summary" />
       <ErrorBoundary>
         <SummaryCards />
       </ErrorBoundary>

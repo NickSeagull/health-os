@@ -32,7 +32,7 @@ export function TasksBySection() {
 
   const counts: Record<string, number> = {};
   data?.tasks?.forEach((t) => {
-    const name = sectionMap.get(t.section_id ?? "") ?? "Без секции";
+    const name = sectionMap.get(t.section_id ?? "") ?? "No section";
     counts[name] = (counts[name] || 0) + 1;
   });
 
@@ -43,15 +43,15 @@ export function TasksBySection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Задачи по секциям</CardTitle>
-        <CardDescription>{data?.tasks?.length ?? 0} активных</CardDescription>
+        <CardTitle>Tasks by section</CardTitle>
+        <CardDescription>{data?.tasks?.length ?? 0} active</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="h-[300px]">

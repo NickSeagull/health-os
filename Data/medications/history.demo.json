@@ -3,19 +3,19 @@
   "completed_courses": [
     {
       "id": "med_01",
-      "name": "Демо-препарат (ибупрофен)",
-      "dosage": "200 мг",
-      "frequency": "по потребности, не чаще 2 раз в сутки",
+      "name": "Demo medication (ibuprofen)",
+      "dosage": "200 mg",
+      "frequency": "as needed, no more than twice daily",
       "timing": [],
       "with_food": true,
-      "reason": "Головная боль на фоне рабочей нагрузки",
+      "reason": "Headache associated with workload",
       "doctor_id": null,
       "started": "2026-04-02",
       "until": "2026-04-05",
       "completed_date": "2026-04-05",
       "side_effects": [],
       "status": "finished",
-      "notes": "Самоназначение, три дня. Врачу сообщено на приёме 2026-06-25"
+      "notes": "Self-medication for three days. The doctor was informed at the 2026-06-25 visit"
     }
   ]
 }

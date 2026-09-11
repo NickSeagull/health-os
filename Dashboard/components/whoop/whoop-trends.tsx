@@ -46,15 +46,15 @@ export function WhoopTrends() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recovery & Strain — 30 дней</CardTitle>
-        <CardDescription>Тренды из WHOOP API</CardDescription>
+        <CardTitle>Recovery & Strain — 30 days</CardTitle>
+        <CardDescription>Trends from the WHOOP API</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : !chartData?.length ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных — проверьте WHOOP credentials в .env.local
+            No data — check your WHOOP credentials in .env.local
           </p>
         ) : (
           <div className="h-[300px]">

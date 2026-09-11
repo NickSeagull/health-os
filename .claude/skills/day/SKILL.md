@@ -1,129 +1,129 @@
 ---
 name: day
 description: |
-  Старт рабочей сессии health-os: дельта с прошлого раза, проверка целостности данных, алерты, 2–3 рекомендации на сегодня.
-  Не для полного среза состояния — для этого /status. Не для завершения сессии — для этого /wrap-up.
-  Триггеры: «day», «начнём день», «стартуем», «что сегодня», «с чего начать»
+  Start a health-os work session: delta since last time, data integrity check, alerts, and 2–3 recommendations for today.
+  Not for a full status snapshot — use /status for that. Not for ending a session — use /wrap-up for that.
+  Triggers: “day”, “start the day”, “let’s start”, “what today”, “where to start”
 ---
 
-# Day — старт сессии
+# Day — session start
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Загрузить горячий контекст, показать дельту с прошлой сессии, алерты и рекомендовать 2–3 действия. Точка входа в каждую сессию.
+Load the hot context, show the delta since the previous session, show alerts, and recommend 2–3 actions. This is the entry point for every session.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### 1. Загрузка контекста (параллельно)
+### 1. Load context (in parallel)
 
-Прочитать через Read tool:
-- `MEMORY.md` — долгосрочная память, активные треды, открытые вопросы
-- `Cache/active-context.md` — горячий контекст: задачи, ожидания, блокеры
-- `Cache/checkpoint.yml` — точка восстановления прерванной задачи
-- `Data/goals/YYYY.json` — направления, фазы, milestones, дедлайны
-- `Data/medications/current.json` — активные курсы лекарств/БАДов
+Read using the Read tool:
+- `MEMORY.md` — long-term memory, active threads, open questions
+- `Cache/active-context.md` — hot context: tasks, expectations, blockers
+- `Cache/checkpoint.yml` — recovery point for an interrupted task
+- `Data/goals/YYYY.json` — directions, phases, milestones, deadlines
+- `Data/medications/current.json` — active medication/supplement courses
 
 ### 2. Checkpoint recovery
 
-Если `Cache/checkpoint.yml` содержит `active: true`:
+If `Cache/checkpoint.yml` contains `active: true`:
 ```
-⚡ Прерванная задача: {task_title}
-   Прогресс: {current_step}/{total_steps}
-   Скилл: /{skill}
-   Продолжить? (да / начать заново / отменить)
+⚡ Interrupted task: {task_title}
+   Progress: {current_step}/{total_steps}
+   Skill: /{skill}
+   Continue? (yes / start over / cancel)
 ```
 
-### 3. Проверка pending breadcrumbs
+### 3. Check pending breadcrumbs
 
-Через Glob проверить `.claude/hooks/pending-sessions/*.json`:
-- Если есть pending файлы (кроме текущей сессии) → предложить `/recover-sessions`
-- Если нет → продолжить
+Use Glob to check `.claude/hooks/pending-sessions/*.json`:
+- If pending files exist (other than the current session), suggest `/recover-sessions`
+- If none exist, continue
 
-### 4. Дельта с прошлой сессии
+### 4. Delta since the previous session
 
-Из `Cache/active-context.md` показать:
-- Когда была последняя сессия и что сделано
-- Что ожидалось к этой сессии (секция «Ожидания»)
-- Что изменилось (если есть новые данные)
+From `Cache/active-context.md`, show:
+- When the last session was and what was done
+- What was expected by this session (the “Expectations” section)
+- What changed (if there is new data)
 
-### 5. Текущие задачи
+### 5. Current tasks
 
-Из `Cache/active-context.md` секция «Текущие задачи» — показать таблицу со статусами.
-Если есть задачи со статусом `waiting` и ожидаемое событие уже произошло — пометить как готовые к работе.
+From the “Current tasks” section of `Cache/active-context.md`, show a table with statuses.
+If a task has status `waiting` and its expected event has already occurred, mark it ready to work on.
 
-### 6. Проверка целостности данных
+### 6. Data integrity check
 
 ```bash
 python3 .claude/scripts/check-integrity.py
 ```
 
-Быстрая проверка: валидность JSON, полнота индексов, однородность CSV, формат дат, достижимость маркеров, сходимость смет, разрешимость ссылок на файлы.
+Quick check: JSON validity, index completeness, CSV consistency, date formats, marker reachability, estimate reconciliation, and resolvable file references.
 
-- Всё пройдено — не показывать ничего, просто идти дальше
-- Есть проблемы — вывести их до алертов и предложить починить. Расхождение схемы с данными портит выводы молча, поэтому оно важнее любого health-алерта
-- Скрипт недоступен или падает — не блокировать сессию, отметить одной строкой
+- If everything passes, show nothing and continue
+- If there are problems, show them before alerts and offer to fix them. A schema/data mismatch silently corrupts results, so it takes priority over any health alert
+- If the script is unavailable or fails, do not block the session; note it in one line
 
-### 7. Алерты
+### 7. Alerts
 
-Проверить и показать если есть:
+Check and show if there is:
 
-| Тип | Условие | Severity |
+| Type | Condition | Severity |
 |-----|---------|----------|
-| Milestone дедлайн | ≤7 дней до дедлайна | medium |
-| Milestone просрочен | past due | high |
-| Курс заканчивается | ≤3 дня до окончания | medium |
-| Follow-up просрочен | past due | high |
-| Ревакцинация | просрочена | low |
+| Milestone deadline | ≤7 days until deadline | medium |
+| Milestone overdue | past due | high |
+| Course ending | ≤3 days until end | medium |
+| Follow-up overdue | past due | high |
+| Revaccination | overdue | low |
 
-Формат:
+Format:
 ```
-⚠️ [severity] описание — дедлайн DD.MM
-```
-
-### 8. Рекомендации (2–3 действия)
-
-Приоритет:
-1. **Фаза 1** milestones (срочное) → рекомендовать первыми
-2. **Фаза 2** milestones (плановое) → если фаза 1 под контролем
-3. **Регулярные** — traction-ревью, mood, вес
-
-Формат:
-```
-### Рекомендую сегодня
-
-1. [действие] — почему сейчас
-2. [действие] — почему сейчас
-3. [действие] — почему сейчас
+⚠️ [severity] description — deadline DD.MM
 ```
 
-### 9. Утренний контекст (до 12:00)
+### 8. Recommendations (2–3 actions)
 
-Если текущее время до 12:00, дополнительно показать:
-- Препараты на утро (из `current.json`, по расписанию)
-- Визиты на сегодня (из Todoist/Calendar если есть)
-- WHOOP recovery (если MCP доступен)
+Priority:
+1. **Phase 1** milestones (urgent) → recommend first
+2. **Phase 2** milestones (planned) → if phase 1 is under control
+3. **Recurring items** — traction review, mood, weight
 
-### 10. Финал
+Format:
+```
+### Recommended for today
+
+1. [action] — why now
+2. [action] — why now
+3. [action] — why now
+```
+
+### 9. Morning context (before 12:00)
+
+If the current time is before 12:00, also show:
+- Morning medications (from `current.json`, according to the schedule)
+- Today’s visits (from Todoist/Calendar, if available)
+- WHOOP recovery (if the MCP is available)
+
+### 10. Finish
 
 ```
 ---
-Что делаем сегодня?
+What are we doing today?
 ```
 
-## Правила
+## Rules
 
-- Показывать только факты из данных, не домысливать
-- Если `active-context.md` не существует — это первый запуск либо файл ещё не создавался. Не отправлять пользователя в `/status`: файл пишет только `/wrap-up`. Показать, что есть, и продолжить работу
-- Если данных мало — не раздувать, показать что есть
-- Не дублировать полный `/status` — показать только дельту и алерты
+- Show only facts from the data; do not infer
+- If `active-context.md` does not exist, this is the first run or the file has not been created yet. Do not send the user to `/status`: only `/wrap-up` writes this file. Show what is available and continue
+- If there is little data, do not pad the output; show what exists
+- Do not duplicate the full `/status`; show only the delta and alerts
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a doctor before making treatment decisions.*

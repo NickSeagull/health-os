@@ -35,16 +35,16 @@ export async function PUT(
   try {
     const { file } = await params;
     if (!isPlainFilename(file)) {
-      return badRequest("file: имя файла без пути");
+      return badRequest("file: filename without a path");
     }
 
     const body = await request.json();
 
     if (file.endsWith(".md")) {
-      // Раньше при отсутствии content в writeFile уходил undefined — протокол
-      // затирался строкой «undefined» либо падал пятисоткой
+      // Previously, missing content passed undefined to writeFile, so the protocol
+      // was overwritten with "undefined" or the route returned a 500.
       if (typeof body?.content !== "string" || body.content.trim() === "") {
-        return badRequest("content: непустая строка с текстом протокола");
+        return badRequest("content: non-empty protocol text string");
       }
       await writeVisitDetailMd(file, body.content);
       return NextResponse.json({ success: true });
@@ -66,7 +66,7 @@ export async function PUT(
       body.prescriptions.forEach((p: unknown, i: number) => {
         const drug = (p as { drug?: unknown })?.drug;
         if (typeof drug !== "string" || drug.trim() === "") {
-          v.add(`prescriptions[${i}].drug: обязательное поле`);
+          v.add(`prescriptions[${i}].drug: required field`);
         }
       });
     }
@@ -74,8 +74,8 @@ export async function PUT(
     const invalid = v.response();
     if (invalid) return invalid;
 
-    // Слияние с существующим: тело запроса заменяло файл целиком и сносило
-    // card_number, source и прочие поля, которых редактор не показывает
+    // Merge with the existing record: replacing the whole file would remove
+    // card_number, source, and other fields not shown by the editor.
     await writeVisitDetailJson(file, {
       ...existing,
       ...body,

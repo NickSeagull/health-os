@@ -8,8 +8,8 @@ export default function MentalPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ментальное"
-        description="Настроение, энергия, стресс, сон"
+        title="Mental health"
+        description="Mood, energy, stress, and sleep"
         actions={<MoodInputDialog />}
       />
       <MoodChart />

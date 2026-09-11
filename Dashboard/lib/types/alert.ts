@@ -1,11 +1,10 @@
 /**
- * Каноническая схема алерта — Блок 5 файла `.claude/shared/critical-values.md`.
+ * Canonical alert schema — Block 5 of `.claude/shared/critical-values.md`.
  *
- * Прежний плоский тип `{id, date, severity, category, title, message}` не совпадал
- * с тем, что пишут скиллы, ни одним полем кроме `id` и `title`. `readAlerts()`
- * клала весь файл целиком как один алерт, а панель обращалась к
- * `severityConfig[alert.severity]` по значению `undefined` — первый же настоящий
- * алерт ронял страницу в ErrorBoundary.
+ * The previous flat type `{id, date, severity, category, title, message}` matched
+ * only the `id` and `title` fields written by skills. `readAlerts()` treated the
+ * entire file as one alert, and the panel looked up `severityConfig[alert.severity]`
+ * with an `undefined` value; the first real alert then crashed the page in ErrorBoundary.
  */
 
 export type AlertSeverity = "critical" | "high" | "medium" | "low";
@@ -23,24 +22,24 @@ export type AlertSource = "labs" | "inbox" | "body" | "mental" | "coach";
 
 export interface HealthAlert {
   id: string;
-  /** Отметка времени с зоной: `YYYY-MM-DDTHH:MM:SS+03:00` */
+  /** Timestamp with time zone: `YYYY-MM-DDTHH:MM:SS+03:00`. */
   ts: string;
   severity: AlertSeverity;
   type: AlertType | string;
   source: AlertSource | string;
   title: string;
-  /** Что именно обнаружено, с числами и референсом лаборатории */
+  /** What was detected, including values and the laboratory reference. */
   detail: string;
   marker?: string | null;
   value?: number | string | null;
   reference?: string | null;
   action?: string | null;
   acknowledged?: boolean;
-  /** Дата файла `Cache/alerts/YYYY-MM-DD.json`, из которого пришёл алерт */
+  /** Date of the `Cache/alerts/YYYY-MM-DD.json` file containing the alert. */
   date?: string;
 }
 
-/** Файл `Cache/alerts/YYYY-MM-DD.json` — обёртка, а не голый массив */
+/** `Cache/alerts/YYYY-MM-DD.json` wraps the alerts; it is not a bare array. */
 export interface AlertFile {
   version: number;
   date: string;

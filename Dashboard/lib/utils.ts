@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format, differenceInYears, parseISO } from "date-fns";
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,9 +11,9 @@ export function formatDate(date: string | Date, fmt: string = "d MMM yyyy"): str
   if (typeof date === "string") {
     const parsed = parseISO(date);
     if (isNaN(parsed.getTime())) return date;
-    return format(parsed, fmt, { locale: ru });
+    return format(parsed, fmt, { locale: enUS });
   }
-  return format(date, fmt, { locale: ru });
+  return format(date, fmt, { locale: enUS });
 }
 
 export function formatDateShort(date: string | Date): string {
@@ -29,7 +29,7 @@ export function calcAge(dateOfBirth: string): number {
 }
 
 export function formatRub(amount: number): string {
-  return new Intl.NumberFormat("ru-RU", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "RUB",
     maximumFractionDigits: 0,

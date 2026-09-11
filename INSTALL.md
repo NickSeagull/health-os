@@ -1,53 +1,53 @@
-# Установка
+# Installation
 
-> ⚠️ **Не медицинское изделие. Не медицинская рекомендация. Некоммерческий проект.**
-> Предоставляется «как есть», без гарантий. Использование — на собственный риск.
-> Все демо-данные вымышлены. Полные условия — [DISCLAIMER.md](DISCLAIMER.md) (в корне репозитория).
-> 🚨 При неотложном состоянии — скорая помощь.
+> ⚠️ **Not a medical device. Not medical advice. Non-commercial project.**
+> Provided “as is,” without warranties. Use at your own risk.
+> All demo data is fictional. Full terms are in [DISCLAIMER.md](DISCLAIMER.md) (in the repository root).
+> 🚨 In an emergency, call emergency services.
 
-Пошаговая установка Health-OS. Занимает около двадцати минут, из них половина — необязательные интеграции, которые можно отложить.
+Step-by-step Health-OS installation. It takes about twenty minutes; roughly half of that is optional integrations that can be postponed.
 
-Система устроена так, что каждый следующий шаг добавляет возможность, но не требуется для работы предыдущих. Без дашборда система работает. Без MCP-интеграций работает. Без хуков сессий тоже работает — просто теряется автоматическое восстановление прерванных сессий.
+The system is arranged so that each step adds a capability without being required for the previous steps. The system works without the dashboard. It works without MCP integrations. It also works without session hooks — only automatic recovery of interrupted sessions is lost.
 
 ---
 
-## Короткий путь
+## Quick path
 
-Если вы уже понимаете, что делаете:
+If you already know what you are doing:
 
 ```bash
-git clone <репозиторий> health-os
+git clone <repository> health-os
 cd health-os
 ./setup.sh
 ```
 
-Дальше — открыть каталог в Claude Code и запустить `/onboarding`.
+Then open the directory in Claude Code and run `/onboarding`.
 
-Всё остальное в этом документе — подробности, проверки и то, что делать, когда не сработало.
+Everything else in this document covers details, checks, and what to do when something fails.
 
 ---
 
-## Блок 1. Требования
+## Block 1. Requirements
 
-> **Операционная система: macOS или Linux.** Установка, хуки сессий и примеры проверок написаны на bash и используют POSIX-утилиты. На Windows проект работает **через WSL2** — установите его и выполняйте все команды внутри Linux-окружения. Нативный Windows не поддерживается.
+> **Operating system: macOS or Linux.** Installation, session hooks, and sample checks are written in bash and use POSIX utilities. On Windows, the project works **through WSL2** — install it and run all commands inside the Linux environment. Native Windows is not supported.
 
-| Что | Зачем | Минимум | Как проверить |
-|-----|-------|---------|---------------|
-| [Claude Code](https://claude.com/claude-code) | Движок системы: скиллы, агенты, работа с файлами | текущая версия | `claude --version` |
-| `git` | Локальный контроль версий данных | 2.x | `git --version` |
-| `jq` | Разбор JSON в хуках сессий | 1.6+ | `jq --version` |
-| `python3` | Проверки целостности данных | **3.10+** | `python3 --version` |
-| Node.js + npm | Только дашборд | 20+ | `node -v && npm -v` |
+| What | Why | Minimum | How to check |
+|-----|-----|---------|--------------|
+| [Claude Code](https://claude.com/claude-code) | System engine: skills, agents, file operations | current version | `claude --version` |
+| `git` | Local data version control | 2.x | `git --version` |
+| `jq` | Parse JSON in session hooks | 1.6+ | `jq --version` |
+| `python3` | Data-integrity checks | **3.10+** | `python3 --version` |
+| Node.js + npm | Dashboard only | 20+ | `node -v && npm -v` |
 
-Одной командой:
+All at once:
 
 ```bash
 claude --version; git --version; jq --version; python3 --version; node -v
 ```
 
-`setup.sh` считает обязательными `python3`, `jq` и `git` — без любого из них он остановится. Node проверяется мягко: если его нет или версия ниже 20, скрипт предупредит и продолжит, потому что без дашборда система работоспособна.
+`setup.sh` treats `python3`, `jq`, and `git` as mandatory — it stops if any is missing. Node is checked softly: if it is absent or below version 20, the script warns and continues because the system works without the dashboard.
 
-### Как поставить недостающее
+### Installing missing components
 
 ```bash
 # macOS
@@ -60,60 +60,60 @@ sudo apt install jq python3 nodejs npm
 sudo dnf install jq python3 nodejs
 ```
 
-Если в репозиториях дистрибутива Node старой версии — ставьте через [nvm](https://github.com/nvm-sh/nvm), иначе дашборд не соберётся.
+If the distribution repositories contain an old Node version, install it through [nvm](https://github.com/nvm-sh/nvm), or the dashboard will not build.
 
 ---
 
-## Блок 2. Клонирование
+## Block 2. Cloning
 
 ```bash
-git clone <репозиторий> health-os
+git clone <repository> health-os
 cd health-os
 ```
 
-**Имя каталога имеет значение.** Хук сохранения сессий срабатывает только тогда, когда в пути к рабочему каталогу встречается подстрока `health-os` — это защита от того, чтобы он не писал breadcrumbs при работе над другими проектами. Если назвать каталог иначе, всё будет работать, кроме восстановления прерванных сессий. Как это изменить — в блоке 9.
+**The directory name matters.** The session-save hook runs only when the working-directory path contains the substring `health-os` — this keeps it from writing breadcrumbs while working on other projects. If you use another directory name, everything works except interrupted-session recovery. Block 9 explains how to change this.
 
 ---
 
-## Блок 3. Запуск `setup.sh`
+## Block 3. Running `setup.sh`
 
 ```bash
 ./setup.sh
 ```
 
-Скрипт идемпотентен: существующие файлы он не перезаписывает никогда. Повторный запуск безопасен и полезен — он же служит проверкой состояния установки.
+The script is idempotent: it never overwrites existing files. Running it again is safe and useful — it also serves as an installation-state check.
 
-Что происходит по шагам:
+What happens:
 
-1. **Проверка окружения.** `python3`, `jq`, `git` — обязательны, при их отсутствии скрипт останавливается с ненулевым кодом. Node проверяется на версию 20+, при несоответствии — предупреждение.
-2. **Развёртывание файлов данных.** Все шаблоны `*.example.json`, `*.example.csv`, `*.example.jsonl` в `Data/` копируются в файлы без суффикса `example`. Существующие файлы пропускаются с пометкой «уже есть, не трогаю». В конце — счётчик «создано / сохранено существующих».
-3. **Конфигурация MCP.** `.mcp.json.example` копируется в `.mcp.json` и получает права `600`. В шаблоне заглушки, а не ключи — вписывать свои значения нужно вручную.
-4. **Ограничение прав.** `chmod -R go-rwx Data` — каталог данных становится доступен только владельцу. `.mcp.json` — `600`. Хуки получают бит исполнения.
-5. **Изоляция репозитория.** Если `.git` нет, выполняется `git init`. Затем проверяется, что у репозитория нет remote, — при наличии выводится ошибка с объяснением. Отдельно создаётся пробный файл в `Data/`, и `git check-ignore` подтверждает, что `.gitignore` действительно закрывает каталог данных. Пробный файл удаляется.
+1. **Environment check.** `python3`, `jq`, and `git` are mandatory; if any is missing, the script stops with a non-zero exit code. Node is checked for version 20+ and a mismatch produces a warning.
+2. **Deploy data files.** Every `*.example.json`, `*.example.csv`, and `*.example.jsonl` template in `Data/` is copied to a file without the `example` suffix. Existing files are skipped with the note “already exists, leaving it alone.” The end reports counts of “created / existing preserved.”
+3. **MCP configuration.** `.mcp.json.example` is copied to `.mcp.json` with permission `600`. The template contains placeholders, not keys — enter your own values manually.
+4. **Restrict permissions.** `chmod -R go-rwx Data` makes the data directory accessible only to its owner. `.mcp.json` is set to `600`. Hooks receive the executable bit.
+5. **Repository isolation.** If `.git` is absent, `git init` runs. The script then checks that the repository has no remote and reports an explanatory error if one exists. It creates a test file in `Data/`, and `git check-ignore` confirms that `.gitignore` actually covers the data directory. The test file is removed.
 
-### Демо-режим
+### Demo mode
 
 ```bash
 ./setup.sh --demo
 ```
 
-То же самое, но разворачиваются шаблоны `*.demo.*` — данные вымышленного пациента. Полезно, чтобы посмотреть на систему до того, как вносить своё.
+The same process, but `*.demo.*` templates are deployed — data for a fictional patient. This is useful for exploring the system before entering your own data.
 
-Когда наигрались — очистите каталог данных командой из раздела «Переход с демо на свои данные» в `Data/` и запустите `./setup.sh` без флага. Скрипт не перезапишет демо-данные сам: он не различает, откуда взялся существующий файл.
+When you are done, clear the data directory using the command in “Switching from demo to your own data” and run `./setup.sh` without the flag. The script will not overwrite demo data by itself: it cannot tell where an existing file came from.
 
 ---
 
-## Блок 4. Хуки сессий
+## Block 4. Session hooks
 
-Хуки восстанавливают контекст между сессиями: при завершении ответа сохраняется breadcrumb, при старте новой сессии система замечает незакрытые сессии и устаревший контекст.
+Hooks restore context between sessions: when a response ends, a breadcrumb is saved; when a new session starts, the system notices unfinished sessions and stale context.
 
-Сами скрипты лежат в `.claude/hooks/`, но Claude Code узнаёт о них только из настроек проекта. Проверьте, есть ли файл `.claude/settings.json`:
+The scripts live in `.claude/hooks/`, but Claude Code learns about them only from project settings. Check whether `.claude/settings.json` exists:
 
 ```bash
 cat .claude/settings.json
 ```
 
-Если файла нет — создайте его:
+If it does not exist, create it:
 
 ```json
 {
@@ -136,29 +136,29 @@ cat .claude/settings.json
 }
 ```
 
-Перезапустите Claude Code — настройки хуков читаются при старте.
+Restart Claude Code — hook settings are read at startup.
 
-Шаг необязательный. Без него теряется только автоматическое обнаружение прерванных сессий; скиллы `/day`, `/wrap-up` и `/recover-sessions` работают и без хуков, просто вручную.
+This step is optional. Without it, only automatic detection of interrupted sessions is lost; `/day`, `/wrap-up`, and `/recover-sessions` still work without hooks, manually.
 
 ---
 
-## Блок 5. Первый запуск
+## Block 5. First launch
 
-Откройте каталог в Claude Code и запустите:
+Open the directory in Claude Code and run:
 
 ```
 /onboarding
 ```
 
-Скилл проведёт discovery-интервью и заполнит `Data/profile.json` и `Data/context/environment.json`. То, чего вы не знаете, оставляйте пустым — незаполненное попадает в `_needs_input` и всплывёт позже. Выдуманные значения хуже пустых: система будет строить на них выводы.
+The skill conducts a discovery interview and fills `Data/profile.json` and `Data/context/environment.json`. Leave anything you do not know blank — missing values go into `_needs_input` and surface later. Invented values are worse than blanks: the system will build conclusions on them.
 
-Подробный маршрут первых дней — [docs/ONBOARDING.md](docs/ONBOARDING.md).
+The detailed first-days path is in [docs/ONBOARDING.md](docs/ONBOARDING.md).
 
 ---
 
-## Блок 6. Дашборд
+## Block 6. Dashboard
 
-Дашборд опционален. Он показывает тренды маркеров, карточки лекарств, карту зубов и прогресс по целям — то же, что скиллы выдают текстом, но глазами удобнее.
+The dashboard is optional. It shows marker trends, medication cards, the dental chart, and progress toward goals — the same information skills provide as text, but easier to inspect visually.
 
 ```bash
 cd Dashboard
@@ -166,24 +166,24 @@ npm install
 npm run dev
 ```
 
-Открыть: `http://127.0.0.1:3000`.
+Open `http://127.0.0.1:3000`.
 
-**Только loopback.** Скрипты `dev` и `start` в `Dashboard/package.json` запускаются с `-H 127.0.0.1`. Это не настройка удобства, а граница безопасности: у дашборда нет аутентификации, и любая привязка к внешнему интерфейсу немедленно открывает весь медпрофиль всем устройствам в той же сети. Не меняйте `-H`, не разобравшись в [docs/SECURITY.md](docs/SECURITY.md).
+**Loopback only.** The `dev` and `start` scripts in `Dashboard/package.json` run with `-H 127.0.0.1`. This is a security boundary: the dashboard has no authentication, and binding to an external interface immediately exposes the entire medical profile to every device on the same network. Do not change `-H` without reading [docs/SECURITY.md](docs/SECURITY.md).
 
-Продакшен-сборка, если dev-сервер кажется медленным:
+For a production build if the dev server seems slow:
 
 ```bash
 npm run build
 npm run start
 ```
 
-`start` тоже привязан к `127.0.0.1`.
+`start` is also bound to `127.0.0.1`.
 
 ---
 
-## Блок 6a. Переменные окружения дашборда
+## Block 6a. Dashboard environment variables
 
-Два раздела дашборда — «Задачи» и «WHOOP» — обращаются во внешние сервисы. Без ключей они вернут `502` с пояснением; остальные одиннадцать разделов работают без всякой настройки.
+Two dashboard sections — “Tasks” and “WHOOP” — call external services. Without keys they return `502` with an explanation; the other eleven sections work without any configuration.
 
 ```bash
 cd Dashboard
@@ -191,26 +191,26 @@ cp .env.example .env.local
 chmod 600 .env.local
 ```
 
-Дальше откройте `.env.local` и заполните то, что нужно:
+Open `.env.local` and fill in what you need:
 
-| Переменная | Для чего | Где взять |
-|------------|----------|-----------|
-| `TODOIST_API_TOKEN` | Раздел «Задачи» | Todoist → Settings → Integrations → Developer |
-| `TODOIST_PROJECT_ID` | Какой проект показывать | Виден в URL проекта в веб-версии |
-| `WHOOP_EMAIL`, `WHOOP_PASSWORD` | Раздел «WHOOP» | Учётные данные аккаунта |
-| `HEALTH_OS_WHOOP_DIR` | Каталог кеша WHOOP | По умолчанию `Cache/whoop` |
+| Variable | Purpose | Where to get it |
+|----------|---------|-----------------|
+| `TODOIST_API_TOKEN` | “Tasks” section | Todoist → Settings → Integrations → Developer |
+| `TODOIST_PROJECT_ID` | Project to display | Visible in the project URL in the web version |
+| `WHOOP_EMAIL`, `WHOOP_PASSWORD` | “WHOOP” section | Account credentials |
+| `HEALTH_OS_WHOOP_DIR` | WHOOP cache directory | Defaults to `Cache/whoop` |
 
-> **Про пароль WHOOP.** Он хранится в файле открытым текстом. Это приемлемо на своей машине при правах `600`, но если такой вариант не устраивает — оставьте поля пустыми и пользуйтесь MCP-сервером WHOOP (Блок 7). Раздел дашборда при этом останется пустым, всё остальное работать будет.
+> **About the WHOOP password.** It is stored in the file as plain text. This is acceptable on your own machine with permission `600`, but if you do not want that, leave the fields blank and use the WHOOP MCP server (Block 7). The dashboard section will remain empty; everything else will work.
 
-Файл `.env.local` исключён из git.
+`.env.local` is excluded from git.
 
 ---
 
-## Блок 6b. Переход с демо на свои данные
+## Block 6b. Switching from demo to your own data
 
-Демо-набор и рабочие данные **не смешиваются**. Если развернуть демо поверх существующих файлов либо наоборот, индексы разойдутся с содержимым каталога, и проверка целостности начнёт падать.
+Demo and working data **must not be mixed**. If you deploy demo over existing files or vice versa, the indexes will diverge from the directory contents and the integrity check will start failing.
 
-Правильный порядок — сначала полностью очистить `Data/`:
+The correct order is to clear `Data/` completely first:
 
 ```bash
 find Data -type f ! -name '.gitkeep' ! -name 'README.md' \
@@ -220,9 +220,9 @@ find Data -type f ! -name '.gitkeep' ! -name 'README.md' \
 ./setup.sh
 ```
 
-Команда удаляет всё развёрнутое, включая `.md`-протоколы визитов, и сохраняет шаблоны, справочник маркеров и карту специальностей.
+The command removes everything deployed, including `.md` visit protocols, and preserves templates, the marker reference, and the specialty map.
 
-Проверить, что состояние согласовано:
+Check that the state is consistent:
 
 ```bash
 python3 .claude/scripts/check-integrity.py
@@ -230,82 +230,77 @@ python3 .claude/scripts/check-integrity.py
 
 ---
 
-## Блок 6c. Обновление установки, сделанной до появления профилей
+## Block 6c. Updating an installation made before profiles existed
 
-Раньше все данные лежали прямо в `Data/`. Теперь они раскладываются по
-профилям: `Data/profiles/<id>/`. Перенос выполняет отдельный скрипт.
+Previously all data lived directly in `Data/`. It is now distributed across profiles: `Data/profiles/<id>/`. A separate script performs the migration.
 
-Сначала посмотрите, что будет перенесено, — по умолчанию скрипт ничего
-не меняет:
+First inspect what will be migrated — by default the script changes nothing:
 
 ```bash
 ./.claude/scripts/migrate-to-profiles.sh
 ```
 
-Сделайте резервную копию. **Обратного хода у переноса нет:**
+Make a backup. **The migration cannot be undone:**
 
 ```bash
 cp -R Data Data.backup-$(date +%Y%m%d)
 ```
 
-Выполните:
+Run it:
 
 ```bash
 ./.claude/scripts/migrate-to-profiles.sh --apply
 ```
 
-Скрипт перенесёт данные в профиль `owner`, создаст указатель активного
-профиля и прогонит проверку целостности. Общесистемные справочники —
-`Data/labs/_marker-aliases.json`, `Data/specialists/` — и общая wiki
-остаются на месте: они одинаковы для всех людей.
+The script moves data into the `owner` profile, creates the active-profile pointer, and runs the integrity check. System-wide registries — `Data/labs/_marker-aliases.json`, `Data/specialists/` — and the shared wiki remain in place because they are common to everyone.
 
-Добавить члена семьи после переноса: `/profiles создать` в Claude Code.
+To add a family member after migration, use `/profiles create` in Claude Code.
 
 ---
 
-## Блок 7. MCP-интеграции
+## Block 7. MCP integrations
 
-Все три интеграции опциональны и независимы друг от друга. Система полностью работоспособна без единой из них — они добавляют данные и автоматизацию, но ничего не ломают своим отсутствием.
+All three integrations are optional and independent. The system is fully usable without any of them — they add data and automation but their absence breaks nothing.
 
-Конфигурация лежит в `.mcp.json`. Файл исключён из git и должен иметь права `600`:
+Configuration lives in `.mcp.json`. The file is excluded from git and must have permission `600`:
 
 ```bash
 chmod 600 .mcp.json
 ```
 
-В шаблоне все три сервера **выключены**: их имена начинаются с подчёркивания (`_whoop`, `_todoist`, `_google-calendar`). Чтобы включить интеграцию, уберите подчёркивание из имени ключа и перезапустите Claude Code.
+All three servers are **disabled** in the template: their names begin with an underscore (`_whoop`, `_todoist`, `_google-calendar`). To enable an integration, remove the underscore from the key name and restart Claude Code.
 
-### WHOOP — метрики сна, восстановления и нагрузки
+### WHOOP — sleep, recovery, and strain metrics
 
-Даёт агентам объективные данные о сне и восстановлении — то, что иначе приходится вспоминать по ощущениям.
+This gives agents objective sleep and recovery data — information that otherwise has to be recalled from subjective impressions.
 
-MCP-сервер WHOOP в комплект не входит: установите его отдельно и укажите в `args` абсолютный путь к точке входа.
+The WHOOP MCP server is not included. Install it separately and put the absolute path to its entry point in `args`.
 
 ```json
 "whoop": {
   "command": "npx",
-  "args": ["tsx", "/абсолютный/путь/к/whoop-mcp/index.ts"],
+  "args": ["tsx", "/absolute/path/to/whoop-mcp/index.ts"],
   "env": {}
 }
 ```
 
-Учётные данные храните в конфигурации самого сервера (обычно `.env` рядом с ним, права `600`), а не в `.mcp.json` — так секрет не размазывается по двум файлам.
+Store credentials in the server’s own configuration (usually an `.env` beside it, permission `600`) rather than in `.mcp.json`, so the secret is not spread across two files.
 
-### Todoist — задачи по здоровью
+### Todoist — health tasks
 
-Follow-up визиты, контроль анализов, дедлайны по milestone. Токен берётся в Todoist: Settings → Integrations → Developer.
+Follow-up visits, lab follow-ups, and milestone deadlines. Get the token in Todoist: Settings → Integrations → Developer.
 
 ```json
 "todoist": {
   "command": "npx",
   "args": ["-y", "@doist/todoist-mcp"],
-  "env": { "TODOIST_API_KEY": "<ваш токен>" }
+  "env": { "TODOIST_API_KEY": "<your token>" }
 }
 ```
 
-Учтите: названия задач уходят на серверы Todoist. «Записаться к эндокринологу» — это медицинская информация. Если такое неприемлемо, интеграцию лучше не включать.
+Remember that task names are sent to Todoist servers. “Make an endocrinology appointment” is medical information. If that is unacceptable, leave the integration disabled.
 
-### Google Calendar — визиты и ревакцинации
+### Google Calendar — visits and revaccinations
 
 ```json
 "google-calendar": {
@@ -315,51 +310,51 @@ Follow-up визиты, контроль анализов, дедлайны по
 }
 ```
 
-При первом запуске откроется браузер для OAuth-авторизации. Ключей вписывать не нужно.
+The first launch opens a browser for OAuth authorization. No keys need to be entered.
 
-### Проверка
+### Check
 
-В Claude Code:
+In Claude Code:
 
 ```
 /mcp
 ```
 
-Команда покажет список подключённых серверов и их статус. Проектные MCP-серверы требуют явного подтверждения при первом запуске — если сервер не появился, проверьте, не отклонили ли вы запрос.
+The command shows connected servers and their status. Project MCP servers require explicit confirmation on first launch — if a server does not appear, check whether you declined the request.
 
 ---
 
-## Блок 8. Проверка, что всё встало
+## Block 8. Checking the installation
 
-Ни одна из проверок ниже ничего не меняет.
+None of the checks below changes anything.
 
-### Файлы и изоляция
+### Files and isolation
 
 ```bash
 ./setup.sh
 ```
 
-Ожидается: все файлы данных отмечены как «уже есть», в итоге `создано: 0`.
+Expected: all data files are marked “already exists”; the final count is `created: 0`.
 
 ```bash
 git check-ignore -v Data/profile.json
 ```
 
-Ожидается строка вида `.gitignore:13:Data/**	Data/profile.json` — номер строки может отличаться, важно, что правило нашлось. Если команда не вывела ничего и вернула код 1 — предохранитель не работает, **не вносите данные**, пока не разберётесь.
+Expected: a line like `.gitignore:13:Data/**	Data/profile.json` — the line number may differ; the important part is that a rule is found. If the command prints nothing and returns code 1, the safeguard is not working; **do not enter data** until you understand why.
 
 ```bash
 git remote -v
 ```
 
-Ожидается пустой вывод. Любой remote — повод остановиться и понять, откуда он взялся.
+Expected: empty output. Any remote is a reason to stop and determine where it came from.
 
 ```bash
 git status --porcelain | grep -E '^\?\? (Data|Archive|Cache|Inbox)/' | head
 ```
 
-Ожидается пустой вывод: рабочие каталоги не должны попадать даже в untracked.
+Expected: empty output; working directories must not even appear as untracked.
 
-### Состав системы
+### System composition
 
 ```bash
 ls .claude/agents/*.md | wc -l      # 13
@@ -368,12 +363,12 @@ ls .claude/shared/*.md | wc -l      # 7
 ```
 
 ```bash
-bash -n .claude/hooks/*.sh && echo "синтаксис хуков в порядке"
+bash -n .claude/hooks/*.sh && echo "hook syntax is OK"
 ```
 
-### Хуки
+### Hooks
 
-Прогон вхолостую, без Claude Code:
+Dry run, without Claude Code:
 
 ```bash
 printf '{"session_id":"install-check","cwd":"%s","transcript_path":""}' "$PWD" \
@@ -381,59 +376,59 @@ printf '{"session_id":"install-check","cwd":"%s","transcript_path":""}' "$PWD" \
 ls .claude/hooks/pending-sessions/
 ```
 
-Ожидается файл `install-check.json`. Уберите его после проверки:
+Expected: `install-check.json`. Remove it after the check:
 
 ```bash
 rm .claude/hooks/pending-sessions/install-check.json
 ```
 
-Если файл не появился — почти всегда дело в имени каталога: хук выходит молча, когда в пути нет подстроки `health-os`. См. блок 9.
+If the file does not appear, the directory name is almost always the cause: the hook exits silently when the path has no `health-os` substring. See Block 9.
 
-### Дашборд
+### Dashboard
 
-При запущенном `npm run dev`:
+With `npm run dev` running:
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/api/profile
 ```
 
-Ожидается `200`.
+Expected: `200`.
 
 ```bash
 lsof -nP -iTCP:3000 -sTCP:LISTEN
 ```
 
-Ожидается адрес `127.0.0.1:3000`. Если видите `*:3000` — сервер слушает все интерфейсы, это надо чинить до того, как вы окажетесь в чужой сети.
+Expected address: `127.0.0.1:3000`. If you see `*:3000`, the server is listening on all interfaces; fix it before using the machine on another network.
 
-Регрессионная проверка на выход за пределы каталога данных:
+Regression check for escaping the data directory:
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' \
   'http://127.0.0.1:3000/api/labs/..%2F..%2F..%2F.mcp.json'
 ```
 
-Ожидается код, отличный от `200` (`404` или `400`), и никакого содержимого файла в теле ответа. `200` с содержимым означает, что защита из `resolveWithin` не работает — см. [docs/SECURITY.md](docs/SECURITY.md).
+Expected: a code other than `200` (`404` or `400`) and no file contents in the response body. `200` with contents means `resolveWithin` protection is not working — see [docs/SECURITY.md](docs/SECURITY.md).
 
 ---
 
-## Блок 9. Если что-то пошло не так
+## Block 9. If something goes wrong
 
-### `setup.sh` останавливается на проверке окружения
-
-```
-  ✗ jq — нужен для хуков сессий
-  ✗ Не хватает обязательных зависимостей.
-```
-
-Скрипт называет конкретно, чего не хватает. Установите (блок 1) и запустите снова. Он идемпотентен, повторный запуск ничего не сломает.
-
-### `node: command not found` или версия ниже 20
+### `setup.sh` stops at the environment check
 
 ```
-  ! node v18.19.0 — дашборду нужен 20+
+  ✗ jq — required for session hooks
+  ✗ Required dependencies are missing.
 ```
 
-Это предупреждение, а не ошибка: установка продолжится, система будет работать, не соберётся только дашборд. Обновление через nvm:
+The script identifies what is missing. Install it (Block 1) and run again. It is idempotent; a second run will not break anything.
+
+### `node: command not found` or version below 20
+
+```
+  ! node v18.19.0 — dashboard requires 20+
+```
+
+This is a warning, not an error: installation continues and the system works; only the dashboard will fail to build. Update through nvm:
 
 ```bash
 nvm install 22
@@ -441,119 +436,119 @@ nvm use 22
 node -v
 ```
 
-Если после смены версии `npm install` падает на нативных модулях, удалите `Dashboard/node_modules` и `Dashboard/package-lock.json` не трогайте — переустановите начисто:
+If `npm install` fails on native modules after changing versions, remove `Dashboard/node_modules` but do not touch `Dashboard/package-lock.json` — reinstall from scratch:
 
 ```bash
 rm -rf Dashboard/node_modules
 cd Dashboard && npm install
 ```
 
-### `setup.sh` ругается на remote
+### `setup.sh` complains about a remote
 
 ```
-  ✗ У репозитория есть remote: origin  git@github.com:...
+  ✗ The repository has a remote: origin  git@github.com:...
 ```
 
-Health-OS рассчитан на работу без remote: пушить некуда по построению, и это главный барьер против случайной публикации медданных. Уберите:
+Health-OS is designed to work without a remote: there is nowhere to push by design, and this is the main barrier against accidental publication of medical data. Remove it:
 
 ```bash
 git remote remove origin
 ```
 
-Если remote нужен осознанно — например, чтобы получать обновления проекта, — см. блок 10.
+If you deliberately need a remote — for example, to receive project updates — see Block 10.
 
-### Порт 3000 занят
+### Port 3000 is occupied
 
 ```
 Error: listen EADDRINUSE: address already in use 127.0.0.1:3000
 ```
 
-Посмотреть, кто занял:
+Find the process:
 
 ```bash
 lsof -nP -iTCP:3000 -sTCP:LISTEN
 ```
 
-Запустить на другом порту:
+Run on another port:
 
 ```bash
 npm run dev -- -p 3001
 ```
 
-Флаг `-H 127.0.0.1` при этом сохраняется — он прописан в самом скрипте `dev`.
+The `-H 127.0.0.1` flag remains in effect because it is part of the `dev` script.
 
-### Хуки не срабатывают
+### Hooks do not run
 
-Проверьте по порядку, останавливаясь на первом несовпадении:
+Check in order, stopping at the first mismatch:
 
-1. **Зарегистрированы ли хуки.** `cat .claude/settings.json` — должны быть секции `Stop` и `SessionStart` (блок 4). Без этого скрипты просто лежат на диске.
-2. **Перезапущен ли Claude Code** после правки настроек.
-3. **Есть ли бит исполнения.** `ls -l .claude/hooks/*.sh` — должно быть `-rwxr-xr-x`. Чинится: `chmod +x .claude/hooks/*.sh`.
-4. **Есть ли `jq`.** Оба скрипта разбирают им payload и без него молча выходят.
-5. **Содержит ли путь `health-os`.** Это самая частая причина. `session-save.sh` проверяет:
+1. **Are hooks registered?** `cat .claude/settings.json` — it must contain `Stop` and `SessionStart` sections (Block 4). Without this, the scripts merely sit on disk.
+2. **Was Claude Code restarted** after changing settings?
+3. **Is the executable bit set?** `ls -l .claude/hooks/*.sh` should show `-rwxr-xr-x`. Fix with `chmod +x .claude/hooks/*.sh`.
+4. **Is `jq` installed?** Both scripts parse their payload with it and exit silently without it.
+5. **Does the path contain `health-os`?** This is the most common cause. `session-save.sh` checks:
 
    ```bash
    if [[ -z "$CWD" || "$CWD" != *"health-os"* ]]; then exit 0; fi
    ```
 
-   Переименуйте каталог проекта или поправьте эту строку под своё имя.
+   Rename the project directory or adjust this line to your name.
 
-6. **Linux.** Проект написан на macOS, и в хуках используется BSD-синтаксис: `stat -f%m` в `session-restore.sh` и `date -r` в `session-save.sh`. На Linux нужны `stat -c%Y` и `date -d @<epoch>`. Без правки хуки не падают, но проверка свежести контекста будет срабатывать всегда, а время старта сессии останется пустым.
+6. **Linux.** The project was written on macOS, and the hooks use BSD syntax: `stat -f%m` in `session-restore.sh` and `date -r` in `session-save.sh`. Linux needs `stat -c%Y` and `date -d @<epoch>`. Without this change the hooks do not crash, but the context-freshness check always fires and the session start time remains empty.
 
-### Дашборд не видит данные
+### Dashboard does not see data
 
-Разделы пустые, графиков нет, хотя файлы в `Data/` есть.
+Sections are empty and charts are missing even though files exist in `Data/`.
 
-1. **Запускайте из `Dashboard/`.** Пути к данным строятся от рабочего каталога процесса: `DATA_ROOT` в `Dashboard/lib/data/paths.ts` — это `process.cwd()/../Data`. Запуск из корня проекта уводит дашборд на каталог выше.
-2. **Проверьте, что файлы созданы, а не остались шаблонами.** `ls Data/*.json` — если видите только `*.example.json`, `setup.sh` не отработал.
-3. **Проверьте, что JSON валиден.** Один сломанный файл делает пустым соответствующий раздел, а не весь дашборд:
+1. **Run from `Dashboard/`.** Data paths are built from the process working directory: `DATA_ROOT` in `Dashboard/lib/data/paths.ts` is `process.cwd()/../Data`. Running from the project root points the dashboard one directory too high.
+2. **Check that files were created rather than left as templates.** `ls Data/*.json` — if you see only `*.example.json`, `setup.sh` did not complete.
+3. **Check that JSON is valid.** One broken file empties the corresponding section, not the whole dashboard:
 
    ```bash
-   for f in Data/*.json Data/*/*.json; do jq -e . "$f" >/dev/null || echo "битый: $f"; done
+   for f in Data/*.json Data/*/*.json; do jq -e . "$f" >/dev/null || echo "broken: $f"; done
    ```
 
-4. **Раздел WHOOP пуст.** Путь к кэшу метрик задан в `Dashboard/lib/data/paths.ts` константой `WHOOP_ROOT` и по умолчанию указывает на внешний каталог, которого у вас, скорее всего, нет. Остальные разделы от этого не страдают. Поправьте константу под своё расположение кэша или игнорируйте раздел.
+4. **WHOOP section is empty.** The metrics-cache path is set in `Dashboard/lib/data/paths.ts` by `WHOOP_ROOT` and points by default to an external directory you probably do not have. Other sections are unaffected. Adjust the constant to your cache location or ignore the section.
 
-### После клонирования нет каталогов `Cache/alerts` и `Archive/processed`
+### `Cache/alerts` and `Archive/processed` are missing after cloning
 
-Следствие устройства `.gitignore`: правила `Cache/*` и `Archive/*` игнорируют вложенные каталоги целиком, и `.gitkeep` внутри них в репозиторий не попадает. Git не умеет разыгнорить файл внутри проигнорированного каталога.
+This follows from the `.gitignore` design: `Cache/*` and `Archive/*` ignore nested directories completely, and `.gitkeep` inside them is not included in the repository. Git cannot unignore a file inside an ignored directory.
 
-Создайте руками:
+Create them manually:
 
 ```bash
 mkdir -p Cache/alerts Cache/sessions Archive/processed
 ```
 
-Скиллы и дашборд создают недостающие каталоги при записи сами, так что это скорее вопрос порядка, чем работоспособности.
+Skills and the dashboard create missing directories when writing, so this is mainly an ordering issue rather than a functionality issue.
 
-### Права доступа мешают работе
+### Permissions prevent operation
 
-`setup.sh` выполняет `chmod -R go-rwx Data` — каталог данных читает только владелец. Если вы работаете под другим пользователем или запускаете дашборд от другого аккаунта, доступа не будет. Это не баг, а намеренное ограничение: восстановить доступ можно, но подумайте, действительно ли вам нужен второй пользователь с доступом к медкарте.
+`setup.sh` runs `chmod -R go-rwx Data` — only the owner can read the data directory. If you work as another user or run the dashboard under another account, access will fail. This is intentional; access can be restored, but consider whether a second user truly needs access to the medical record.
 
 ---
 
-## Блок 10. Обновление до новой версии проекта
+## Block 10. Updating to a new project version
 
-Ваши данные и код проекта разделены физически, и обновление сводится к тому, чтобы заменить код, не тронув данные.
+Your data and the project code are physically separate, so an update replaces code without touching data.
 
-| Обновляется | Не трогается никогда |
-|-------------|----------------------|
+| Updated | Never touched |
+|---------|---------------|
 | `.claude/agents/`, `.claude/skills/`, `.claude/shared/`, `.claude/rules/`, `.claude/hooks/` | `Data/` |
-| `Dashboard/` — кроме `node_modules/` и `.next/` | `Cache/`, `Archive/`, `Inbox/`, `Goals/` |
+| `Dashboard/` — except `node_modules/` and `.next/` | `Cache/`, `Archive/`, `Inbox/`, `Goals/` |
 | `setup.sh`, `.gitignore`, `README.md`, `docs/`, `CLAUDE.md` | `.mcp.json`, `.claude/settings.json` |
 
-### Способ первый — копирование (рекомендуется)
+### Method one — copying (recommended)
 
-Не требует remote и потому не создаёт риска случайного push.
+This does not require a remote and therefore does not create accidental-push risk.
 
 ```bash
-# 1. Свежая версия в отдельный каталог
-git clone <репозиторий> /tmp/health-os-new
+# 1. Fresh version in a separate directory
+git clone <repository> /tmp/health-os-new
 
-# 2. Резервная копия данных — до всего остального
+# 2. Back up data before everything else
 tar czf ~/health-os-backup-$(date +%F).tar.gz Data Cache Archive Goals .mcp.json
 
-# 3. Замена кода
+# 3. Replace code
 cd ~/health-os
 rsync -a --delete /tmp/health-os-new/.claude/agents/  .claude/agents/
 rsync -a --delete /tmp/health-os-new/.claude/skills/  .claude/skills/
@@ -566,66 +561,66 @@ rsync -a --exclude 'node_modules/' --exclude '.next/' \
       /tmp/health-os-new/Dashboard/       Dashboard/
 cp /tmp/health-os-new/{setup.sh,.gitignore,README.md,INSTALL.md,CLAUDE.md} .
 
-# 4. Довести до рабочего состояния
+# 4. Bring it to a working state
 ./setup.sh
 cd Dashboard && npm install
 ```
 
-`--delete` в командах для `.claude/` нужен намеренно: если в новой версии скилл или агент удалили, старый файл должен уйти вместе с ним, иначе система будет ссылаться на то, чего больше нет в документации.
+`--delete` in the `.claude/` commands is intentional: if a skill or agent was removed in the new version, the old file must go too, otherwise the system will reference something no longer documented.
 
-`setup.sh` на шаге 4 доставит новые шаблоны данных, если в обновлении появились новые сущности, и не тронет существующие файлы.
+At step 4, `setup.sh` installs new data templates if the update introduced new entities and leaves existing files alone.
 
-### Способ второй — upstream без права push
+### Method two — upstream without push permission
 
-Для тех, кому привычнее git. Даёт нормальный `git log` обновлений, но требует дисциплины.
+For those more comfortable with git. This gives a proper update `git log` but requires discipline.
 
 ```bash
-git remote add upstream <репозиторий>
-git remote set-url --push upstream DISABLED   # push становится технически невозможен
+git remote add upstream <repository>
+git remote set-url --push upstream DISABLED   # push becomes technically impossible
 git fetch upstream
 git merge upstream/main
 ```
 
-Проверить, что предохранитель на месте:
+Check that the safeguard is present:
 
 ```bash
-git push upstream          # должно упасть с ошибкой про DISABLED
+git push upstream          # should fail with an error about DISABLED
 ```
 
-`setup.sh` при следующем запуске сообщит о наличии remote как об ошибке — в этой конфигурации это ожидаемо. Убедитесь, что push действительно отключён, и что в вашем локальном репозитории под контролем версий нет ничего из `Data/`, `Cache/` и `Archive/`:
+On the next run, `setup.sh` will report a remote as an error — that is expected in this configuration. Confirm that push is really disabled and that your local repository does not version anything from `Data/`, `Cache/`, or `Archive/`:
 
 ```bash
 git ls-files | grep -E '^(Data|Cache|Archive|Inbox)/'
 ```
 
-Вывод должен содержать только шаблоны `*.example.*`, `*.demo.*`, `README.md` и справочники системы.
+The output should contain only `*.example.*`, `*.demo.*`, `README.md`, and system registries.
 
-### После любого обновления
+### After any update
 
-1. `./setup.sh` — доставит новые шаблоны, проверит изоляцию.
-2. Прочитайте изменения в `.claude/shared/data-schemas.md`: если поменялась схема, старые файлы данных остаются валидными, но новые записи пойдут по новой схеме.
-3. Проверьте инварианты данных — команды в конце `data-schemas.md`, блок «Инварианты».
+1. `./setup.sh` — install new templates and check isolation.
+2. Read changes in `.claude/shared/data-schemas.md`: if the schema changed, old data files remain valid, but new records will use the new schema.
+3. Check data invariants — the commands at the end of `data-schemas.md`, in “Invariants.”
 
 ---
 
-## Блок 11. Удаление
+## Block 11. Removal
 
-Health-OS не устанавливает ничего за пределами своего каталога. Чтобы убрать систему, достаточно удалить каталог — но сначала решите, что делать с данными.
+Health-OS installs nothing outside its directory. To remove the system, delete the directory — but first decide what to do with the data.
 
 ```bash
-# Сохранить данные отдельно
+# Save data separately
 tar czf ~/health-data-$(date +%F).tar.gz Data Archive Goals
 
-# Удалить проект
+# Remove the project
 cd .. && rm -rf health-os
 ```
 
-Отдельно проверьте:
+Check separately:
 
-- `.claude/settings.json` — если вы добавляли хуки, записи ссылаются на удалённые скрипты;
-- глобальную конфигурацию MCP, если вы копировали серверы из `.mcp.json` в пользовательские настройки;
-- токены сервисов, которые вы выдавали интеграциям, — отзовите их, если больше не пользуетесь.
+- `.claude/settings.json` — if you added hooks, its entries point to deleted scripts;
+- global MCP configuration, if you copied servers from `.mcp.json` into user settings;
+- service tokens granted to integrations — revoke them if you no longer use them.
 
 ---
 
-⚕️ Система не ставит диагнозов и не заменяет врача. При признаках неотложного состояния обращайтесь в скорую помощь.
+⚕️ The system does not diagnose and does not replace a physician. If there are signs of an emergency, call emergency services.

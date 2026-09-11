@@ -1,15 +1,16 @@
 import type { LabFileData, LabMarker } from "@/lib/types/lab";
 
 /**
- * Сбор маркеров анализа из всех трёх поколений схемы.
+ * Collect markers from all three schema generations.
  *
- * Модуль намеренно свободен от `fs` и прочих серверных зависимостей: те же данные
- * разбирают и клиентские компоненты (`/api/labs/[file]` отдаёт файл как есть),
- * а импорт `lib/data/labs.ts` в клиент утянул бы за собой Node-модули и уронил сборку.
+ * This module intentionally has no `fs` or other server dependencies: client
+ * components also parse the same data (`/api/labs/[file]` returns the file as-is),
+ * while importing `lib/data/labs.ts` on the client would pull in Node modules and
+ * break the build.
  *
- * В Data/labs/ сосуществуют markers[] (v1), panels[].markers[] (v2) и
- * studies[].markers[] (v3) — чтение только корневого markers[] скрывает 28% базы,
- * включая всю партию 2026 года.
+ * Data/labs/ contains markers[] (v1), panels[].markers[] (v2), and
+ * studies[].markers[] (v3). Reading only the root markers[] hides 28% of the
+ * dataset, including the entire 2026 batch.
  */
 export function collectMarkers(lab: LabFileData | null | undefined): LabMarker[] {
   if (!lab) return [];

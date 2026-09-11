@@ -13,13 +13,13 @@ export async function PUT(
 
     const v = new Validator();
     if (!isFdiToothNumber(number)) {
-      v.add(`number: номер зуба по ISO 3950 (11–18, 21–28, 31–38, 41–48), получено «${number}»`);
+      v.add(`number: not an ISO 3950 tooth number (11–18, 21–28, 31–38, 41–48); received "${number}"`);
     }
-    // Статус обязателен: подставлять «healthy» по умолчанию нельзя — отсутствие
-    // записи о зубе означает «статус неизвестен», а не «здоров» (Блок 6)
+    // Status is required: do not default to "healthy" — a missing tooth record
+    // means "status unknown", not "healthy" (Block 6).
     v.requireEnum(updates?.status, "status", TOOTH_STATUSES);
     if (updates?.notes !== undefined && typeof updates.notes !== "string") {
-      v.add("notes: строка");
+      v.add("notes: string");
     }
     const invalid = v.response();
     if (invalid) return invalid;

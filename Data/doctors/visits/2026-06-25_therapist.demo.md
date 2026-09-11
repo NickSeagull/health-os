@@ -1,44 +1,48 @@
-# Приём терапевта — июнь 2026
+# Primary Care Visit — June 2026
 
-## Первичный приём — 2026-06-25
+## Initial appointment — 2026-06-25
 
-- **Дата:** 2026-06-25
-- **Врач:** Демо Терапевт
-- **Специальность:** терапевт
-- **Клиника:** Поликлиника по месту жительства, Ваш город
-- **Тип приёма:** первичный
+- **Date:** 2026-06-25
+- **Doctor:** Demo Primary Care Physician
+- **Specialty:** primary care
+- **Clinic:** Local outpatient clinic, Your city
+- **Appointment type:** Initial
 
-### Жалобы
+<!-- The English Date, Doctor, Specialty, and Clinic field labels, plus the
+specialty value, are used by the current dashboard parser and specialty
+matching. All explanatory text is in English. -->
 
-Снижение энергии во второй половине дня примерно с марта 2026. К лету стало заметно легче. Сон 7–8 часов, засыпание без труда.
+### Complaints
 
-### Объективно
+Reduced energy in the afternoon since approximately March 2026. Noticeably better by summer. Sleeps 7–8 hours, with no difficulty falling asleep.
 
-Состояние удовлетворительное. АД 118/76, пульс 62. Осмотр без особенностей.
+### Examination
 
-### Разбор анализов
+General condition satisfactory. BP 118/76, pulse 62. Examination unremarkable.
 
-Панель от 2026-06-18: ОАК, ферритин, B12, глюкоза, холестерин и ТТГ в референсе. Единственное отклонение — витамин D (25-OH) 24 нг/мл при норме 30–100, лёгкая недостаточность.
+### Lab review
 
-### Заключение
+Panel dated 2026-06-18: CBC, ferritin, B12, glucose, cholesterol, and TSH within reference intervals. The only abnormality is vitamin D (25-OH) at 24 ng/mL against a reference interval of 30–100: mild insufficiency.
 
-Данных за соматическую причину усталости по этой панели нет. Обсуждён вклад режима: около 15 минут утреннего дневного света, девять часов экрана, разброс времени отбоя между буднями и выходными.
+### Assessment
 
-### Назначения
+This panel provides no evidence of a somatic cause of fatigue. Discussed contributions from daily routine: approximately 15 minutes of morning daylight, nine hours of screen time, and differing weekday and weekend bedtimes.
 
-- Витамин D3 2000 МЕ в сутки, утром, с едой
-- Утренний дневной свет 20–30 минут
+### Prescriptions
 
-### Рекомендации
+- Vitamin D3, 2000 IU daily, in the morning with food
+- Morning daylight for 20–30 minutes
 
-- Выровнять время отбоя в будни и выходные
-- Вести дневник самочувствия две недели
+### Recommendations
+
+- Align weekday and weekend bedtimes
+- Keep a well-being journal for two weeks
 
 ### Follow-up
 
-- Контрольные анализы: 25(OH)D через 3 месяца — сентябрь 2026
-- Контрольный визит: по результатам анализа
+- Follow-up tests: 25(OH)D in 3 months—September 2026
+- Follow-up appointment: based on the lab result
 
 ---
 
-⚕️ Демо-протокол. Синтетический пример для первого запуска, не медицинский документ.
+⚕️ Demo visit note. A synthetic example for initial setup, not a medical document.

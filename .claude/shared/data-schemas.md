@@ -1,149 +1,149 @@
-# Схемы данных Health-OS
+# Health-OS data schemas
 
-> Единственный источник истины по структуре файлов в `Data/`.
-> Обязательный документ для скиллов `/labs`, `/inbox`, `/doctor`, `/dental`, `/vaccines`, `/body`, `/mental`, `/meds`, `/goals`, `/lab-order`, `/status`, `/traction`.
-
----
-
-## Зачем этот документ
-
-Каждый скилл держал собственную копию схемы, и все копии разошлись с тем, что реально лежит на диске. Скилл, следующий своей документации, не находил данные при чтении и создавал несовместимый файл при записи.
-
-**Правило:** схема описывается здесь один раз. Скилл ссылается на этот файл, а не переписывает схему у себя. При расхождении скилла и этого документа прав документ; при расхождении документа и реальных данных прав диск — документ надо обновить.
-
-Схемы ниже описывают форматы, которые система читает и пишет. При расхождении документа и реальных файлов на диске прав диск — документ надо обновить.
+> The only source of truth for the file structure in `Data/`.
+> Mandatory document for the skills `/labs`, `/inbox`, `/doctor`, `/dental`, `/vaccines`, `/body`, `/mental`, `/meds`, `/goals`, `/lab-order`, `/status`, `/traction`.
 
 ---
 
-## Блок 0. Общие правила записи
+## Why this document
 
-Действуют для всех файлов, если ниже явно не сказано иное.
+Each skill kept its own copy of the schema, and all copies diverged from what was actually on disk. A skill following its own documentation failed to find data when reading and created an incompatible file when writing.
 
-### Даты
+**Rule:** the schema is described once here. The skill refers to this file and does not rewrite the schema itself. If there is a discrepancy between the skill and this document, the document is correct; if there is a discrepancy between the document and the actual data on disk, the document must be updated.
 
-- Формат — ISO 8601: `YYYY-MM-DD`. Отметка времени — `YYYY-MM-DDTHH:MM:SS+03:00` (Москва).
-- **Дата не из будущего.** Если разобранная дата позже сегодняшней — не записывать, спросить пользователя. Исключение: плановые поля (`next_visit`, `deadline`, дата ревакцинации) — они и должны быть в будущем.
-- **Неизвестная дата** — `null`, а не выдуманная и не сегодняшняя. В `procedures.json` четыре записи с `date: null` — это допустимое состояние, а не ошибка.
-- **Период вместо даты** допустим только в имени файла визита: `2005-2012_cardio_childhood_hypertension.md`. В поле `date` индекса при этом лежит та же строка периода — `"2005-2012"`. Сортировка по такому полю выполняется по первым четырём символам.
-- **Приблизительная дата** — записывать наиболее вероятную и отметить в `notes`: «дата приблизительная».
+The schemas below describe the formats that the system reads and writes. If there is a discrepancy between the document and the actual files on disk, the document must be updated to match the disk.
 
-### Поле `version`
+---
 
-- Присутствует в каждом JSON-файле и **сохраняется при перезаписи**. Никогда не удалять и не сбрасывать.
-- Текущие значения: `1` почти везде, `2` — у `Data/goals/YYYY.json`.
-- Повышать `version` только при осознанной миграции структуры, с обновлением этого документа.
+## Block 0. General recording rules
 
-### Запись в массив, а не в корень
+Applies to all files unless otherwise explicitly stated below.
 
-Почти все файлы данных — обёртка `{version, <массив>}`. Новая запись добавляется **в массив**, объект в корне файла не создаётся. Ошибка «положил процедуру в корень вместо `procedures[]`» делает запись невидимой для всех чтений.
+### Dates
 
-Таблица «куда класть»:
+- Format - ISO 8601: `YYYY-MM-DD`. Timestamp - `YYYY-MM-DDTHH:MM:SS+03:00` (Moscow).
+- **The date is not from the future.** If the parsed date is later than today’s, do not write it down, ask the user. Exception: planned fields (`next_visit`, `deadline`, revaccination date) - they should be in the future.
+- **Unknown date** is `null`, not fictitious and not today. In `procedures.json`, the four entries with `date: null` are a valid condition, not an error.
+- **Period instead of date** is only allowed in the visit file name: `2005-2012_cardio_childhood_hypertension.md`. The `date` field of the index contains the same period line - `"2005-2012"`. Sorting by such a field is performed by the first four characters.
+- **Approximate date**—write down the most probable one and mark it in `notes`: “approximate date.”
 
-| Файл | Массив для новой записи |
+### Field `version`
+
+- Present in every JSON file and **preserved when overwritten**. Never delete or reset.
+- Current values: `1` almost everywhere, `2` - for `Data/goals/YYYY.json`.
+- Increase `version` only with a conscious migration of the structure, with the update of this document.
+
+### Write to an array, not to the root
+
+Almost all data files are wrapped with `{version, <array>}`. A new entry is added **to the array**, an object is not created at the root of the file. The error “put the procedure at the root instead of `procedures[]`” makes the record invisible to all reads.
+
+Table “where to put it”:
+
+| File | Array for new entry |
 |------|-------------------------|
 | `Data/labs/_index.json` | `analyses[]` |
 | `Data/doctors/contacts.json` | `doctors[]` |
 | `Data/doctors/visits/_index.json` | `visits[]` |
 | `Data/dental/procedures.json` | `procedures[]` |
-| `Data/vaccinations.json` | `vaccinations[]` либо `tuberculin_tests[]` |
-| `Data/medications/current.json` | `medications[]`, `supplements[]`, `topical[]` или `protocols[]` — см. Блок 11 |
+| `Data/vaccinations.json` | `vaccinations[]` or `tuberculin_tests[]` |
+| `Data/medications/current.json` | `medications[]`, `supplements[]`, `topical[]` or `protocols[]` - see Unit 11 |
 | `Data/hypotheses.json` | `hypotheses[]` |
-| `Data/goals/YYYY.json` | `directions[]`, внутри — `milestones[]` |
+| `Data/goals/YYYY.json` | `directions[]`, inside - `milestones[]` |
 
-`Data/body-metrics.csv`, `Data/mental/journal.jsonl`, `Data/costs/YYYY.jsonl` — append-only, дописывается строка в конец.
+`Data/body-metrics.csv`, `Data/mental/journal.jsonl`, `Data/costs/YYYY.jsonl` - append-only, the line is appended to the end.
 
-### Проверка дубликата
+### Duplicate check
 
-Перед записью проверить, нет ли уже такой записи. Ключ дубликата:
+Before recording, check to see if there is already such a record. Duplicate key:
 
-| Файл | Ключ дубликата |
+| File | Duplicate Key |
 |------|----------------|
-| Анализ | `date` + `type` |
-| Визит | `date` + `specialty` |
-| Прививка | `date` + `vaccine` |
-| Процедура | `date` + `type` + `teeth` |
-| Строка метрик | `date` |
-| Расход | `ts` + `type` + `description` |
-| Врач | `name` + `specialty` |
+| Analysis | `date` + `type` |
+| Visit | `date` + `specialty` |
+| Vaccination | `date` + `vaccine` |
+| Procedure | `date` + `type` + `teeth` |
+| Metrics string | `date` |
+| Consumption | `ts` + `type` + `description` |
+| Doctor | `name` + `specialty` |
 
-При совпадении — не записывать молча. Показать существующую запись и спросить: дополнить, заменить или отменить.
+If a duplicate is found, do not write silently. Show the existing entry and ask whether to add to it, replace it, or cancel.
 
-### Существующий файл с тем же именем
+### Existing file with the same name
 
-Имена вида `YYYY-MM-DD_[type].json` не уникальны сами по себе — за 2022-02-26 в `Data/labs/` лежит шесть файлов, за 2026-03-15 — четыре.
+Names like `YYYY-MM-DD_[type].json` are not unique in themselves - for 2022-02-26 there are six files in `Data/labs/`, for 2026-03-15 - four.
 
-Порядок при коллизии имени:
+Order for name collision:
 
-1. Прочитать существующий файл.
-2. Если это тот же анализ — предложить дополнить его, а не создавать второй.
-3. Если анализ другой — уточнить `[type]`, чтобы имя стало различимым: `2022-02-26_cbc.json` и `2022-02-26_biochemistry.json`, а не `..._1` и `..._2`.
-4. Числовой суффикс — последнее средство, и только с пояснением в `notes`.
+1. Read an existing file.
+2. If this is the same analysis, offer to supplement it, rather than create a second one.
+3. If the analysis is different, clarify `[type]` so that the name becomes distinguishable: `2022-02-26_cbc.json` and `2022-02-26_biochemistry.json`, and not `..._1` and `..._2`.
+4. Numeric suffix is a last resort, and only with an explanation in `notes`.
 
-**Молча перезаписывать существующий файл запрещено.**
+**Silently overwriting an existing file is prohibited.**
 
-### Пути
+### Paths
 
-- Все пути к данным начинаются с `Data/` — правило CLAUDE.md.
-- Единственное исключение — `pdf_path` внутри файлов анализов: он относителен к `Data/labs/` (см. Блок 1). При выводе пользователю разворачивать в полный: `Data/labs/pdfs/...`.
-- Ссылки на файлы в тексте — wikilinks: `[[Data/doctors/contacts]]`.
+- All data paths start with `Data/` - CLAUDE.md rule.
+- The only exception is `pdf_path` inside analysis files: it is relative to `Data/labs/` (see Block 1). When outputting to the user, expand to full: `Data/labs/pdfs/...`.
+- Links to files in the text - wikilinks: `[[Data/doctors/contacts]]`.
 
-### Единицы измерения
+### Units of measurement
 
-В данных уже есть конфликты: тестостерон записан и в нг/мл, и в нмоль/л; кортизол — в мкг/дл и нмоль/л; ферритин — в мкг/л и нг/мл; ТТГ — в мМЕ/л и мкМЕ/мл.
+There are already conflicts in the data: testosterone is recorded in both ng/ml and nmol/l; cortisol - in mcg/dl and nmol/l; ferritin - in mcg/l and ng/ml; TSH - in mIU/l and µIU/ml.
 
-- Единица **всегда** записывается вместе со значением, поле `unit` не опускается.
-- **Тренд по маркеру с разными единицами не строится** без явного пересчёта. Пересчитанные точки помечаются.
-- Референс записывается тот, что указан в бланке конкретной лаборатории, а не «общепринятый».
+- The unit is **always** written along with the value, the `unit` field is not omitted.
+- **A trend for a marker with different units is not built** without explicit recalculation. The recalculated points are marked.
+- The reference is the one indicated in the form of a specific laboratory, and not the “generally accepted” one.
 
-### Правдоподобие значения
+### Plausibility of value
 
-Простая проверка перед записью, чтобы опечатка не попала в тренд: вес 8.25 вместо 82.5, гемоглобин 15.8 вместо 158. При выходе значения за грубые физиологические границы — переспросить, а не записывать.
+A simple check before recording so that the typo does not become part of the trend: weight 8.25 instead of 82.5, hemoglobin 15.8 instead of 158. If the value goes beyond rough physiological limits, ask again and do not write it down.
 
-Отдельно: пороги из `.claude/shared/critical-values.md` проверяются **до** сохранения. Критическое значение останавливает обработку.
+Separately: thresholds from `.claude/shared/critical-values.md` are checked **before** saving. A critical value stops processing.
 
 ---
 
-## Блок 1. `Data/labs/*.json` — анализы
+## Block 1. `Data/labs/*.json` - laboratory results
 
-**Сосуществуют три схемы.** Это накопительный эффект: формат менялся со временем, старые файлы не переписывались. Читать нужно все три.
+**Three schemes coexist.** This is a cumulative effect: the format changed over time, old files were not rewritten. You need to read all three.
 
-### Правило чтения (обязательное)
+### Reading Rule (required)
 
-Маркеры всегда собираются объединением всех трёх источников:
+Markers are always collected by combining all three sources:
 
 ```
 markers[] + panels[].markers[] + studies[].markers[]
 ```
 
-Чтение одного варианта теряет часть истории: плоский `markers[]` преобладает в старых файлах, `panels[]` — в новых. Маркеры собираются объединением всех трёх источников.
+Reading one variant loses part of the history: flat `markers[]` prevails in old files, `panels[]` in new ones. Markers are collected by combining all three sources.
 
-jq-выражение для сбора всех маркеров одного файла:
+jq expression for collecting all markers of one file:
 
 ```bash
 jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.studies // [])[].markers // []] | add // [])] | add' file.json
 ```
 
-### Правило записи
+### Recording rule
 
-**Канон для новых записей — v2 (`panels[]`).** Существующие файлы v1 и v3 не мигрируются и не переписываются.
+**Canon for new entries is v2 (`panels[]`).** Existing v1 and v3 files are not migrated or overwritten.
 
-### v1 — плоский `markers[]` (ранний формат)
+### v1 - flat `markers[]` (early format)
 
 ```json
 {
  "version": 1,
  "date": "2025-02-17",
- "type": "ОАК + железо + витамины",
- "lab": "Гемотест",
+ "type": "CBC + iron + vitamins",
+ "lab": "Hemotest",
  "source": "historical_scan",
  "scanned_date": "2026-03-11",
- "original_file": "Результаты анализов.pdf",
- "summary": "Общий анализ крови в целом в норме. Два отклонения в лейкоцитарной формуле…",
+ "original_file": "Lab results.pdf",
+ "summary": "Complete blood count is generally normal. Two deviations in the leukocyte differential...",
  "markers": [
   {
-   "name": "Гемоглобин",
+   "name": "Hemoglobin",
    "value": 158,
-   "unit": "г/л",
+   "unit": "g/L",
    "reference_min": 132,
    "reference_max": 172,
    "status": "normal"
@@ -152,23 +152,23 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
 }
 ```
 
-Образец: `Data/labs/2025-02-17_cbc-iron-vitamins.json`.
+Sample: `Data/labs/2025-02-17_cbc-iron-vitamins.json`.
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `version` | number | да | `1` |
-| `date` | string | да | дата забора |
-| `type` | string | да | свободный текст, чаще по-русски |
-| `lab` | string | да | в v1 поле называется `lab`, **не** `laboratory` |
-| `source` | string | нет | `historical_scan` (37), `historical_photo` (7), `emias_protocol` (5) |
-| `scanned_date` | string | нет | когда оцифровано |
-| `original_file` | string | нет | имя исходного файла **до** переноса в Archive — исторически не резолвится, см. Блок 14 |
-| `original_files` | string[] | нет | вместо `original_file`, когда исходников несколько |
-| `summary` | string \| null | нет | **строка** связного текста, не объект |
-| `notes` | string | нет | |
-| `markers` | object[] | да | см. «Маркер» ниже |
+| `version` | number | yes | `1` |
+| `date` | string | yes | collection date |
+| `type` | string | yes | free text |
+| `lab` | string | yes | in v1 the field is called `lab`, **not** `laboratory` |
+| `source` | string | no | `historical_scan` (37), `historical_photo` (7), `emias_protocol` (5) |
+| `scanned_date` | string | no | when digitized |
+| `original_file` | string | no | name of the source file **before** transfer to Archive - historically not resolved, see Block 14 |
+| `original_files` | string[] | no | instead of `original_file`, when there are several sources |
+| `summary` | string \| null | no | **string** of connected text, not an object |
+| `notes` | string | no | |
+| `markers` | object[] | yes | see "Marker" below |
 
-### v2 — `panels[]` (4 файла, 2026-03-15) — канон для записи
+### v2 - `panels[]` (4 files, 2026-03-15) - canon for recording
 
 ```json
 {
@@ -176,19 +176,19 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
  "date": "2026-03-15",
  "analysis_date": "2026-03-16",
  "type": "cbc+thyroid+vitamins",
- "laboratory": "Гемотест (полное юридическое наименование и адрес подразделения — как в бланке)",
+ "laboratory": "Hemotest (full legal name and branch address, as shown on the report)",
  "order_number": "0000000",
  "pdf_path": "pdfs/2026-03-15_full-report.pdf",
  "summary": { "total": 28, "normal": 26, "low": 1, "high": 1, "critical": 0 },
- "notes": "Вторая партия результатов",
+ "notes": "Second batch of results",
  "panels": [
   {
    "panel": null,
    "markers": [
     {
-     "name": "Гемоглобин",
+     "name": "Hemoglobin",
      "value": 154,
-     "unit": "г/л",
+     "unit": "g/L",
      "reference_min": 132,
      "reference_max": 172,
      "status": "normal",
@@ -197,115 +197,119 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
    ]
   }
  ],
- "deviations": ["Витамин B12 повышен: 720 пг/мл (норма 191–663)"],
- "recommendations": ["B12 повышен — обсудить с гематологом"]
+ "deviations": ["Vitamin B12 elevated: 720 pg/mL (reference 191–663)"],
+ "recommendations": ["B12 is elevated — discuss with a hematologist"]
 }
 ```
 
-Образец: `Data/labs/2026-03-15_cbc-thyroid-vitamins.json`.
+Sample: `Data/labs/2026-03-15_cbc-thyroid-vitamins.json`.
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `date` | string | да | дата забора |
-| `analysis_date` | string | нет | дата готовности результата |
-| `type` | string | да | в v2 — латиницей через `+`: `cbc+thyroid+vitamins` |
-| `laboratory` | string | да | в v2 поле называется `laboratory`, **не** `lab` |
-| `order_number` | string | нет | номер заказа лаборатории |
-| `pdf_path` | string \| null | нет | **база — `Data/labs/`**, то есть `pdfs/x.pdf` → `Data/labs/pdfs/x.pdf` |
-| `summary` | object | нет | в v2 — объект счётчиков `{total, normal, low, high, critical}` |
-| `panels` | object[] | да | элемент: `{panel: string\|null, markers: []}`. `panel` во всех четырёх файлах `null` — панель без имени допустима |
-| `deviations` | string[] | нет | человекочитаемые формулировки отклонений |
-| `recommendations` | string[] | нет | |
-| `notes` | string | нет | |
+| `date` | string | yes | collection date |
+| `analysis_date` | string | no | date of readiness of the result |
+| `type` | string | yes | in v2 - Latin using `+`: `cbc+thyroid+vitamins` |
+| `laboratory` | string | yes | in v2 the field is called `laboratory`, **not** `lab` |
+| `order_number` | string | no | laboratory order number |
+| `pdf_path` | string \| null | no | **base - `Data/labs/`**, that is, `pdfs/x.pdf` → `Data/labs/pdfs/x.pdf` |
+| `summary` | object | no | in v2 - counter object `{total, normal, low, high, critical}` |
+| `panels` | object[] | yes | element: `{panel: string\|null, markers: []}`. `panel` in all four files `null` - panel without name is allowed |
+| `deviations` | string[] | no | human-readable wording of deviations |
+| `recommendations` | string[] | no | |
+| `notes` | string | no | |
 
-> **Внимание на `summary`.** Тип поля зависит от схемы: строка в v1, объект в v2, иногда `null` в файлах. При чтении проверять тип, при записи в v2 — объект счётчиков, при дополнении файла v1 — оставлять строкой.
+> **Attention to `summary`.** The field type depends on the schema: string in v1, object in v2, sometimes `null` in files. When reading, check the type, when writing to v2 - the counter object, when adding a file to v1 - leave it as a string.
 
-### v3 — `studies[]` (2 файла, урология 2022)
+### v3 — `studies[]` (2 files, urology 2022)
 
-Для документов, где результаты сгруппированы по исследованиям с разным материалом и разными исполнителями.
+For documents where the results are grouped according to studies with different materials and different performers.
 
 ```json
 {
  "version": 1,
  "date": "2022-07-11",
  "result_date": "2022-07-14",
- "type": "урология",
- "subtype": "комплексное обследование (ПЦР, биохимия, гормоны, ОАК, ОАМ)",
- "lab": "ФБУН ЦНИИ Эпидемиологии Роспотребнадзора",
- "lpu": "ООО Медэксперт Плюс",
- "doctor": "Петров Пётр Петрович",
+ "type": "urology",
+ "subtype": "comprehensive examination (PCR, biochemistry, hormones, CBC, urinalysis)",
+ "lab": "Central Research Institute of Epidemiology",
+ "lpu": "MedExpert Plus LLC",
+ "doctor": "Petr Petrov",
  "order": "DUM2723090",
  "source": "historical_scan",
  "scanned_date": "2026-03-11",
  "original_file": "DUM2723090.pdf",
- "summary": "Комплексное урологическое обследование…",
+ "summary": "Comprehensive urological examination…",
  "studies": [
   {
-   "name": "ПЦР, урогенитальные инфекции",
-   "material": "Соскоб/отделяемое из уретры",
-   "doctor": "Хромова Н. А.",
+   "name": "PCR, urogenital infections",
+   "material": "Urethral swab/discharge",
+   "doctor": "N. Khromova",
    "markers": [
-    { "name": "ДНК Chlamydia trachomatis", "value": "Не обнаружено", "status": "normal" }
+    { "name": "Chlamydia trachomatis DNA", "value": "Not detected", "status": "normal" }
    ]
   }
  ]
 }
 ```
 
-Образец: `Data/labs/2022-07-11_urology_comprehensive.json`. Новые файлы в этой схеме не создаются — при похожей структуре документа использовать v2, где `panel` = название исследования.
+Sample: `Data/labs/2022-07-11_urology_comprehensive.json`. New files are not created in this scheme - if the document structure is similar, use v2, where `panel` = name of the study.
 
-### Маркер
+### Marker
 
-Единый объект для всех трёх схем. Пять фактических вариантов набора ключей:
+A single object for all three schemes. Five actual keyset options:
 
-| Вариант | Ключи | Встречается |
+The dashboard's canonical marker labels are: `Hemoglobin`, `White blood cells`, `Platelets`, `ESR`, `Glucose`, `Creatinine`, `ALT`, `AST`, `Total cholesterol`, `LDL`, `HDL`, `Triglycerides`, `TSH`, `Free T4`, `Total testosterone`, `Cortisol`, `Vitamin D`, `Vitamin B12`, `Ferritin`, and `Iron`.
+
+The shared registry contains every UI canonical label and may include additional analytes. Identity-only entries omit unit metadata; preserve source laboratory units and verify them before comparison.
+
+| Option | Keys | Meets |
 |---------|-------|-------------|
-| базовый | `name, value, unit, reference_min, reference_max, status` | 307 |
-| с флагом | + `flag` | 54 (только v2) |
-| с заметкой | + `note` | 22 |
-| качественный | `name, value_text, unit, reference_text, status` | 4 |
-| с трактовкой | + `interpretation` | 2 |
+| basic | `name, value, unit, reference_min, reference_max, status` | 307 |
+| with flag | + `flag` | 54 (v2 only) |
+| with note | + `note` | 22 |
+| quality | `name, value_text, unit, reference_text, status` | 4 |
+| with interpretation | + `interpretation` | 2 |
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `name` | string | да | как в бланке лаборатории |
-| `value` | number \| string | да | строка для качественных результатов: `"Не обнаружено"`, `"C/T"` |
-| `value_text` | string | нет | вместо `value`, когда результат словесный и референс тоже словесный |
-| `unit` | string | да | не опускать даже при безразмерном результате — тогда `""` |
-| `reference_min` / `reference_max` | number \| null | нет | `null`, если односторонний референс |
-| `reference_text` | string | нет | словесный референс: `"Не обнаружено"` |
-| `status` | string | да | enum — см. ниже |
-| `flag` | null | нет | в v2 всегда `null`; поля не хватает смысла, новых значений не вводить |
-| `note` | string | нет | пояснение к конкретному маркеру |
-| `interpretation` | string | нет | трактовка результата из бланка |
+| `name` | string | yes | as in the laboratory form |
+| `value` | number\| string | yes | string for quality results: `"Not detected"`, `"C/T"` |
+| `value_text` | string | no | instead of `value`, when the result is verbal and the reference is also verbal |
+| `unit` | string | yes | do not omit even if the result is dimensionless - then `""` |
+| `reference_min` / `reference_max` | number\| null | no | `null` if one-way reference |
+| `reference_text` | string | no | verbal reference: `"Not detected"` |
+| `status` | string | yes | enum - see below |
+| `flag` | null | no | in v2 always `null`; fields lack meaning, do not enter new values ​​|
+| `note` | string | no | explanation for a specific marker |
+| `interpretation` | string | no | interpretation of the result from the form |
 
-### Enum статусов маркера
+### Enum marker statuses
 
 `normal` · `low` · `high` · `critical` · `variant` · `detected` · `deviation`
 
-| Статус | Когда | В данных |
+| Status | When | In data |
 |--------|-------|----------|
-| `normal` | в референсе | 403 |
-| `low` | ниже `reference_min` | 13 |
-| `high` | выше `reference_max` | 49 |
-| `critical` | сработал порог из `critical-values.md` | 0 — но статус обязателен к использованию |
-| `variant` | генетический полиморфизм: `C/T` | 1 |
-| `detected` | качественный тест положителен там, где норма «не обнаружено» | 2 |
-| `deviation` | качественное отклонение без числового референса: «лецитиновые зёрна умеренно» | 3 |
+| `normal` | in reference | 403 |
+| `low` | below `reference_min` | 13 |
+| `high` | above `reference_max` | 49 |
+| `critical` | threshold from `critical-values.md` triggered | 0 - but the status is required |
+| `variant` | genetic polymorphism: `C/T` | 1 |
+| `detected` | qualitative test is positive where the norm is “not detected” | 2 |
+| `deviation` | qualitative deviation without numerical reference: “moderate lecithin grains” | 3 |
 
-Иных значений не вводить.
+Do not enter other values.
 
-### Имя файла
+### File name
 
-`Data/labs/YYYY-MM-DD_[type].json`, `[type]` — латиницей, kebab-case.
+`Data/labs/YYYY-MM-DD_[type].json`, `[type]` - Latin, kebab-case.
 
-Реально встречающиеся `[type]` (по убыванию частоты): `inbody`, `cbc`, `biochemistry`, `hormones`, `comprehensive`, `covid-pcr`, `hiv`, `infection`, `serology`, `genetics`, `crp`, `aso`, `glucose`, `lipids`, `urinalysis`, `insulin`, `cortisol`, `acth`, `creatinine`, `urea`, `uric-acid`, `sodium`, `potassium`, `gfr`, `total-protein`, `microalbumin`, `vitamins`, `stool-analysis`, `protein-fractions`, `testosterone-vitd`, `rheumatoid-factor`, `hbsag`, `h-pylori-breath-test`, `covid-antibodies`, `covid-antigen`, `urology_comprehensive`, `urology_prostate-culture`.
+Actually occurring `[type]` (in descending frequency): `inbody`, `cbc`, `biochemistry`, `hormones`, `comprehensive`, `covid-pcr`, `hiv`, `infection`, `serology`, `genetics`, `crp`, `aso`, `glucose`, `lipids`, `urinalysis`, `insulin`, `cortisol`, `acth`, `creatinine`, `urea`, `uric-acid`, `sodium`, `potassium`, `gfr`, `total-protein`, `microalbumin`, `vitamins`, `stool-analysis`, `protein-fractions`, `testosterone-vitd`, `rheumatoid-factor`, `hbsag`, `h-pylori-breath-test`, `covid-antibodies`, `covid-antigen`, `urology_comprehensive`, `urology_prostate-culture`.
 
-Составной тип — через дефис: `cbc-iron-vitamins`, `cbc-ast`, `biochemistry-hormones`, `cbc-thyroid-vitamins`.
+Composite type - separated by a hyphen: `cbc-iron-vitamins`, `cbc-ast`, `biochemistry-hormones`, `cbc-thyroid-vitamins`.
 
 ---
 
-## Блок 2. `Data/labs/_index.json` — индекс анализов
+## Block 2. `Data/labs/_index.json` - analysis index
 
 ```json
 {
@@ -314,52 +318,52 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
   {
    "date": "2026-03-15",
    "file": "2026-03-15_cbc-thyroid-vitamins.json",
-   "type": "ОАК + щитовидная железа + витамины + ферритин",
-   "lab": "Гемотест",
+   "type": "CBC + thyroid + vitamins + ferritin",
+   "lab": "Hemotest",
    "markers_count": 28,
-   "flags": ["Витамин B12 high", "Нейтрофилы сегментоядерные % low"],
-   "notes": "Вторая партия. Лимфоциты 47.4% / 3.33 абс. — формально норма"
+   "flags": ["Vitamin B12 high", "Segmented neutrophils % low"],
+   "notes": "Second batch. Lymphocytes 47.4% / 3.33 absolute — formally normal"
   }
  ]
 }
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `date` | string | да | совпадает с `date` файла |
-| `file` | string | да | **имя файла без пути**, база — `Data/labs/` |
-| `type` | string | да | человекочитаемое название; в индексе бывает подробнее, чем в самом файле |
-| `lab` | string | да | краткое имя лаборатории: `Гемотест`, `Инвитро` |
-| `markers_count` | number | нет | суммарно по всем трём источникам маркеров; отсутствует у 2 записей |
-| `flags` | string[] | нет | строки вида `«Маркер status»` — только отклонения; пустой массив, если отклонений нет |
-| `notes` | string | нет | краткий вывод; есть у 4 записей |
+| `date` | string | yes | matches `date` file |
+| `file` | string | yes | **file name without path**, database - `Data/labs/` |
+| `type` | string | yes | human readable name; there is more detail in the index than in the file itself |
+| `lab` | string | yes | lab short name: `Hemotest`, `Invitro` |
+| `markers_count` | number | no | total for all three sources of markers; missing from 2 entries |
+| `flags` | string[] | no | lines like `"Marker status"` - only deviations; empty array if there are no deviations |
+| `notes` | string | no | short conclusion; 4 entries have |
 
-Верхнеуровневых `generated` и `total` здесь **нет** — в отличие от `visits/_index.json`.
+There are **no** top-level `generated` and `total` here, unlike `visits/_index.json`.
 
-### Служебные файлы в `Data/labs/`
+### Service files in `Data/labs/`
 
-Файлы, имя которых начинается с подчёркивания, — **служебные, не анализы**, и в индекс не входят:
+Files whose names begin with an underscore are **service, not analysis**, and are not included in the index:
 
-| Файл | Назначение |
+| File | Destination |
 |------|------------|
-| `_index.json` | индекс анализов (этот блок) |
-| `_marker-aliases.json` | словарь канонических имён маркеров, синонимов и коэффициентов пересчёта единиц |
+| `_index.json` | analysis index (this block) |
+| `_marker-aliases.json` | dictionary of canonical marker names, synonyms and unit conversion factors |
 
-**Инвариант:** число записей в `analyses[]` равно числу `*.json` в `Data/labs/`, не начинающихся с подчёркивания. Сейчас 60/60. Проверка:
+**Invariant:** the number of entries in `analyses[]` is equal to the number of `*.json` in `Data/labs/` that do not begin with an underscore. Now it's 60/60. Check:
 
 ```bash
 [ "$(ls Data/labs/*.json | grep -vc '/_')" = "$(jq '.analyses|length' Data/labs/_index.json)" ] && echo OK
 ```
 
-Сортировка — по `date` по возрастанию.
+Sorting is by `date` ascending.
 
 ---
 
-## Блок 3. `Data/labs/*_inbody.json` — состав тела
+## Block 3. `Data/labs/*_inbody.json` - body composition
 
-Отдельная схема, семь файлов, `type: "body_composition"`. Индексируются в `labs/_index.json` с `type: "Состав тела (InBody270)"`.
+Separate scheme, seven files, `type: "body_composition"`. Indexed in `labs/_index.json` with `type: "Body composition (InBody270)"`.
 
-**Владелец записи — `/inbox` (импорт) и `/labs` (ручной ввод). `/body` только читает.** Дублирование этих величин в `body-metrics.csv` допустимо для сводного тренда, но CSV-строка помечается в `notes`: `InBody270. Оценка 80/100. Висцеральный жир 5. WHR 0.84`.
+**Record owner is `/inbox` (import) and `/labs` (manual entry). `/body` reads only.** Duplicating these values ​​in `body-metrics.csv` is acceptable for a summary trend, but the CSV row is marked in `notes`: `InBody270. Score 80/100. Visceral fat 5. WHR 0.84`.
 
 ```json
 {
@@ -401,27 +405,27 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
   "right_leg_kg": 11.56, "right_leg_pct": 108.2,
   "left_leg_kg": 11.48, "left_leg_pct": 107.5
  },
- "segmental_fat_mass": { "…": "та же структура, что segmental_lean_mass" },
+ "segmental_fat_mass": { "…": "same structure as segmental_lean_mass" },
  "recommended_calories_kcal": 3038
 }
 ```
 
-Образец: `Data/labs/2025-10-31_inbody.json`. `notes` — опционально (есть у 5 из 7). Маркеров в смысле Блока 1 у InBody нет — `markers_count` в индексе отсутствует.
+Sample: `Data/labs/2025-10-31_inbody.json`. `notes` - optional (5 out of 7 have it). InBody has no markers in the sense of Block 1 - `markers_count` is not in the index.
 
-Соответствие полей InBody и колонок `body-metrics.csv`: `composition.weight_kg` → `weight_kg`, `subject.height_cm` → `height_cm`, `metrics.bmi` → `bmi`, `metrics.body_fat_pct` → `body_fat_pct`, `metrics.skeletal_muscle_mass_kg` → `muscle_mass_kg`.
+Correspondence between InBody fields and `body-metrics.csv` columns: `composition.weight_kg` → `weight_kg`, `subject.height_cm` → `height_cm`, `metrics.bmi` → `bmi`, `metrics.body_fat_pct` → `body_fat_pct`, `metrics.skeletal_muscle_mass_kg` → `muscle_mass_kg`.
 
 ---
 
-## Блок 4. `Data/doctors/contacts.json` — врачи
+## Block 4. `Data/doctors/contacts.json` - doctors
 
 ```json
 {
  "version": 1,
  "doctors": [
   {
-   "name": "Иванов Иван Иванович",
-   "specialty": "травматолог-ортопед, к.м.н.",
-   "clinic": "Городской реабилитационный центр, ул. Примерная, 1",
+ "name": "Ivanov Ivan Ivanovich",
+ "specialty": "orthopedic traumatologist, MD",
+ "clinic": "City Rehabilitation Center, 1 Example Street",
    "phone": "+7 (900) 000-00-00",
    "period": "2010",
    "status": "historical"
@@ -430,30 +434,30 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
 }
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `name` | string | да | ФИО как в документе |
-| `specialty` | string | да | свободный текст, по-русски, со степенью если есть |
-| `clinic` | string | да | название и адрес |
-| `phone` | string | нет | есть у 2 из 7 |
-| `period` | string | да | год или диапазон: `"2010"`, `"2001-2003"` |
-| `status` | string | да | у всех семи — `historical`. Для действующего врача — `active` |
+| `name` | string | yes | Full name as in the document |
+| `specialty` | string | yes | free text, with a degree if available |
+| `clinic` | string | yes | name and address |
+| `phone` | string | no | 2 out of 7 have it |
+| `period` | string | yes | year or range: `"2010"`, `"2001-2003"` |
+| `status` | string | yes | all seven have `historical`. For an active doctor - `active` |
 
-### Идентификация врача — составной ключ
+### Doctor Identification - Composite Key
 
-**Поля `id` в данных нет** ни у одного из семи врачей. Ссылка `doc_XX` не резолвится нигде.
+**The `id` field is not in the data** for any of the seven doctors. The `doc_XX` link is not resolved anywhere.
 
-**Решение: идентификатор врача — пара `name + specialty`.** Миграции данных не требует.
+**Solution: doctor identifier - pair `name + specialty`.** Does not require data migration.
 
-- Скиллы ссылаются на врача этой парой, а не по `id`.
-- Поле `doctor_id` встречается в `Data/dental/procedures.json` и `Data/medications/current.json` — везде `null`. Оно **не заполняется**. При необходимости связать запись с врачом используется пара полей `doctor` (ФИО строкой) и, если нужно, `specialty` — как это уже сделано в `visits/_index.json` и в JSON-визитах.
-- Поля `last_visit` в `contacts.json` нет и заводить его не нужно: последний визит вычисляется из `Data/doctors/visits/_index.json` — максимальная `date` среди записей с этим `doctor`.
+- Skills refer to the doctor by this pair, and not by `id`.
+- The `doctor_id` field is found in `Data/dental/procedures.json` and `Data/medications/current.json` - everywhere `null`. It is **not filled in**. If it is necessary to associate a record with a doctor, a pair of fields `doctor` (full name string) and, if necessary, `specialty` are used - as has already been done in `visits/_index.json` and in JSON visits.
+- There is no field `last_visit` in `contacts.json` and there is no need to create it: the last visit is calculated from `Data/doctors/visits/_index.json` - the maximum `date` among records with this `doctor`.
 
-Файла `Data/doctors/_index.json` **не существует**. Роль справочника выполняет `contacts.json`, роль индекса визитов — `visits/_index.json`.
+The file `Data/doctors/_index.json` **does not exist**. The role of the directory is performed by `contacts.json`, the role of the visit index is `visits/_index.json`.
 
 ---
 
-## Блок 5. `Data/doctors/visits/` — визиты
+## Block 5. `Data/doctors/visits/` - visits
 
 ### `_index.json`
 
@@ -467,98 +471,98 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
    "date": "2010-06-10",
    "file": "2010-06-10_orthopedist.json",
    "format": "json",
-   "specialty": "травматолог-ортопед",
-   "doctor": "Иванов Иван Иванович, к.м.н.",
-   "clinic": "Городской реабилитационный центр (ООО), ул. Примерная, 1",
-   "brief": "Консультация ортопеда: сколиоз, цервикоцефалгия, плоскостопие; назначены ЛФК, массаж, физиолечение"
+   "specialty": "orthopedic traumatologist",
+   "doctor": "Ivanov Ivan Ivanovich, MD",
+   "clinic": "City Rehabilitation Center LLC, 1 Example Street",
+   "brief": "Orthopedist consultation: scoliosis, cervicogenic headache, flat feet; prescribed therapeutic exercise, massage, and physical therapy"
   }
  ]
 }
 ```
 
-Все 65 записей имеют ровно набор `date, file, format, specialty, doctor, clinic, brief` — обязательны все семь. `doctor` может быть `null` (врач в документе не указан), но ключ присутствует.
+All 65 records have exactly the set `date, file, format, specialty, doctor, clinic, brief` - all seven are required. `doctor` may be `null` (the doctor is not specified in the document), but the key is present.
 
-| Поле | Тип | Комментарий |
+| Field | Type | Comment |
 |------|-----|-------------|
-| `date` | string | ISO-дата либо период `"2005-2012"` |
-| `file` | string | имя файла без пути, база — `Data/doctors/visits/` |
-| `format` | string | `md` (61) или `json` (4) — должен совпадать с расширением `file` |
-| `specialty` | string | по-русски; допускается составная: `"кардиология / неврология"` |
-| `doctor` | string \| null | ФИО; допускается перечисление нескольких |
+| `date` | string | ISO date or period `"2005-2012"` |
+| `file` | string | file name without path, base - `Data/doctors/visits/` |
+| `format` | string | `md` (61) or `json` (4) - must match the extension `file` |
+| `specialty` | string | free text; compound allowed: `"cardiology / neurology"` |
+| `doctor` | string \| null | Full name; it is allowed to list several |
 | `clinic` | string | |
-| `brief` | string | одно предложение о сути визита |
+| `brief` | string | one sentence about the essence of the visit |
 
-Верхнеуровневые `generated` (дата пересборки индекса) и `total` — **обязательны**, `total` равен длине `visits[]`. Сейчас 65/65.
+Top-level `generated` (index rebuild date) and `total` are **required**, `total` is equal to the length of `visits[]`. Now 65/65.
 
-### Конвенция имён файлов
+### File naming convention
 
 `YYYY-MM-DD_[specialty][_type].(md|json)`
 
-- `[specialty]` — латиницей, kebab-case: `cardio`, `neuro`, `therapist`, `urology`, `ent`, `gastro`, `dermatology`, `endocrinology`, `ophthalmologist`, `orthopedist`, `nephrology`, `coloproctology`, `physiotherapy`.
-- `[_type]` — опционально, тип документа: `consultation`, `ecg`, `echokg`, `smad`, `holter`, `eeg`, `mri-brain`, `ct-brain`, `xray-cervical`, `xray_sinuses`, `duplex-bca`, `ultrasound_thyroid`, `ultrasound_abdominal`, `fgds`, `preexam`, `summary`.
-- **Оба расширения легитимны.** `.md` — для протоколов, читаемых глазами и связанных wikilinks (61 файл). `.json` — для структурированных импортов. Правило «визиты только в Markdown» **отменено** — поле `format` в индексе существует именно потому, что форматов два. Новые визиты — в `.md`, если нет причины делать иначе.
-- **Неизвестная дата:** если известен только год — `YYYY_[specialty].md`; если известен период — `YYYY-YYYY_[specialty]_[описание].md` (образец: `2005-2012_cardio_childhood_hypertension.md`). Дату не выдумывать и не подставлять сегодняшнюю. В индекс кладётся та же строка, что в имени файла.
+- `[specialty]` - Latin, kebab-case: `cardio`, `neuro`, `therapist`, `urology`, `ent`, `gastro`, `dermatology`, `endocrinology`, `ophthalmologist`, `orthopedist`, `nephrology`, `coloproctology`, `physiotherapy`.
+- `[_type]` - optional, document type: `consultation`, `ecg`, `echokg`, `smad`, `holter`, `eeg`, `mri-brain`, `ct-brain`, `xray-cervical`, `xray_sinuses`, `duplex-bca`, `ultrasound_thyroid`, `ultrasound_abdominal`, `fgds`, `preexam`, `summary`.
+- **Both extensions are legitimate.** `.md` - for eye-readable protocols and linked wikilinks (61 files). `.json` - for structured imports. The “visits only in Markdown” rule **cancelled** - the `format` field in the index exists precisely because there are two formats. New visits are to `.md`, unless there is a reason to do otherwise.
+- **Unknown date:** if only the year is known - `YYYY_[specialty].md`; if the period is known - `YYYY-YYYY_[specialty]_[description].md` (sample: `2005-2012_cardio_childhood_hypertension.md`). Do not invent a date or substitute today’s date. The index contains the same string as in the file name.
 
-### Схема JSON-визита
+### JSON visit schema
 
 ```json
 {
  "version": 1,
  "date": "2014-03-20",
- "type": "консультация",
- "specialty": "отоларинголог",
+ "type": "consultation",
+ "specialty": "otolaryngologist",
  "doctor": null,
- "clinic": "Городская поликлиника №1",
+ "clinic": "City Polyclinic No. 1",
  "card_number": "000000",
- "reason": "частые ангины",
- "findings": ["Гиперемия задней стенки глотки"],
- "diagnosis": ["Хронический тонзиллит компенсированной формы"],
+ "reason": "frequent sore throats",
+ "findings": ["Hyperemia of the posterior pharyngeal wall"],
+ "diagnosis": ["Chronic compensated tonsillitis"],
  "prescriptions": [
-  { "drug": "Имудон", "dose": "1 т. 6 р/д рассасывать", "duration": "20 дней" }
+  { "drug": "Imudon", "dose": "1 tablet six times daily, dissolve in the mouth", "duration": "20 days" }
  ],
  "follow_up": null,
  "source": "Inbox/IMG_2392-2393 (Cache/inbox-batches/batch-11.md)"
 }
 ```
 
-`card_number` — опционально. `findings` и `diagnosis` — массивы строк. `prescriptions[]` — объекты с обязательным `drug`, опциональными `dose` и `duration`.
+`card_number` - optional. `findings` and `diagnosis` are arrays of strings. `prescriptions[]` - objects with mandatory `drug`, optional `dose` and `duration`.
 
-### Структура Markdown-визита
+### Structure of a Markdown visit
 
-Заголовок, затем метаданные списком, затем разделы. Фактический образец — `Data/doctors/visits/2021-08-14_cardio_consultation.md`:
+Title, then list metadata, then sections. The actual sample is `Data/doctors/visits/2021-08-14_cardio_consultation.md`:
 
 ```markdown
-# Заключения кардиолога — август 2021
+# Cardiologist's findings - August 2021
 
-## Первичный приём — 2021-08-14
+## Initial appointment - 2021-08-14
 
-- **Дата:** 2021-08-14
-- **Врач:** Сидоров Сергей Сергеевич
-- **Клиника:** ООО «Лечебно-диагностический центр»
-- **Номер карты:** 000000
-- **Тип приёма:** первичный
+- **Date:** 2021-08-14
+- **Doctor:** Sidorov Sergey Sergeevich
+- **Clinic:** LLC “Treatment and Diagnostic Center”
+- **Card number:** 000000
+- **Visit type:** initial
 
-### Клинический диагноз
-### План обследования
-### Назначения
-### Рекомендации
+### Clinical diagnosis
+### Examination plan
+### Prescriptions
+### Recommendations
 ```
 
-Один файл может содержать несколько приёмов одного специалиста за близкие даты — тогда каждый приём отдельным разделом второго уровня.
+One file can contain several appointments of one specialist for close dates - then each appointment is a separate section of the second level.
 
-### `Data/doctors/prep/` — подготовка к приёму
+### `Data/doctors/prep/` — preparation for an appointment
 
-**Фактическая конвенция: `Data/doctors/prep/[specialty].md` — без даты.** На диске `hematologist.md` и `neurologist.md`.
+**Actual convention: `Data/doctors/prep/[specialty].md` - no date.** On disk `hematologist.md` and `neurologist.md`.
 
-Причина: файл подготовки — рабочий документ к ближайшему визиту, а не архивная запись. Прежняя конвенция с датой отвергнута практикой.
+Reason: the preparation file is a working document for the next visit, and not an archival record. The previous convention with a date has been rejected by practice.
 
-**Правило перезаписи:** при повторной подготовке к тому же специалисту файл **перезаписывается** целиком, актуальными данными. Прежнюю версию сохранять не нужно — история визита остаётся в `visits/`. Перед перезаписью сообщить пользователю, что предыдущая подготовка будет заменена.
+**Rewrite rule:** when preparing again for the same specialist, the file is **rewritten** entirely, with current data. There is no need to save the previous version - the visit history remains in `visits/`. Before overwriting, inform the user that the previous preparation will be replaced.
 
-`[specialty]` — латиницей, kebab-case, совпадает с именем агента-специалиста из `.claude/agents/` там, где такой есть.
+`[specialty]` - in Latin, kebab-case, matches the name of the specialist agent from `.claude/agents/` where one exists.
 
 ---
 
-## Блок 6. `Data/dental/tooth-map.json` — карта зубов
+## Block 6. `Data/dental/tooth-map.json` - teeth map
 
 ```json
 {
@@ -566,8 +570,8 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
  "dentist_id": "",
  "next_visit": null,
  "teeth": {
-  "16": { "status": "extracted", "notes": "Удалён при первом лечении брекетами" },
-  "26": { "status": "extracted", "notes": "Удалён при первом лечении брекетами" }
+  "16": { "status": "extracted", "notes": "Extracted during the first course of braces" },
+  "26": { "status": "extracted", "notes": "Extracted during the first course of braces" }
  },
  "summary": {
   "total": 32, "healthy": 0, "filled": 0, "crowned": 0,
@@ -575,7 +579,7 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
  },
  "imaging": [
   {
-   "type": "КЛКТ (конусно-лучевая КТ)",
+   "type": "CBCT (cone-beam CT)",
    "date": "2023-09-29",
    "format": "DICOM",
    "files": 478,
@@ -585,42 +589,42 @@ jq '[(.markers // []), ([(.panels // [])[].markers // []] | add // []), ([(.stud
    "notes": "FOV 10x8.5"
   }
  ],
- "notes": "Брекеты дважды. Один зуб нуждается в коронке…"
+ "notes": "Braces twice. One tooth needs a crown…"
 }
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `dentist_id` | string | нет | пустая строка, наследие. **Не заполнять** — идентификация врача по паре `name + specialty`, Блок 4 |
-| `next_visit` | string \| null | да | ISO-дата планового визита |
-| `teeth` | object | да | **разрежен** — ключи только у зубов с непустым статусом |
-| `summary` | object | да | восемь счётчиков, формула ниже |
-| `imaging` | object[] | нет | снимки: `type, date, format, files, size_mb, location, viewer, notes` |
-| `notes` | string | нет | свободный текст о состоянии |
+| `dentist_id` | string | no | empty string, legacy. **Do not fill in** - identification of the doctor by pair `name + specialty`, Block 4 |
+| `next_visit` | string \| null | yes | ISO date of planned visit |
+| `teeth` | object | yes | **sparse** - keys only for teeth with non-empty status |
+| `summary` | object | yes | eight counters, formula below |
+| `imaging` | object[] | no | snapshots: `type, date, format, files, size_mb, location, viewer, notes` |
+| `notes` | string | no | free text about the status |
 
-### `teeth` разрежен
+### `teeth` sparse
 
-Ключ — номер зуба строкой по ISO 3950 (FDI). Присутствуют **только** зубы с известным ненормальным статусом: сейчас `16` и `26`. Отсутствие ключа означает **«статус неизвестен»**, а не «здоров».
+The key is the tooth number in a line according to ISO 3950 (FDI). The **only** teeth with known abnormal status are present: currently `16` and `26`. The absence of a key means **"status unknown"**, not "healthy".
 
-При отрисовке карты зуб без ключа показывается как `❔` (неизвестно), не как `✅`. Восьмёрки (18, 28, 38, 48) удалены — это зафиксировано в `notes`, но не в `teeth`; при первом обновлении карты их следует внести явно со статусом `extracted`.
+When rendering the map, a tooth without a key is shown as `❔` (unknown), not as `✅`. Eights (18, 28, 38, 48) have been removed - this is fixed in `notes`, but not in `teeth`; When updating the card for the first time, they should be entered explicitly with the status `extracted`.
 
-Статусы зуба: `healthy` · `filled` · `crowned` · `implant` · `extracted` · `needs_treatment` · `root_canal`.
+Tooth statuses: `healthy` · `filled` · `crowned` · `implant` · `extracted` · `needs_treatment` · `root_canal`.
 
-### Формула `summary`
+### Formula `summary`
 
 ```
-summary.total     = 32 — константа, число позиций зубной формулы
-summary.<status>    = число ключей в teeth со значением status == <status>
-summary.healthy    = число ключей со статусом healthy (НЕ 32 минус остальные)
+summary.total = 32 — constant, the number of positions in the dental formula
+summary.<status> = number of keys in teeth with value status == <status>
+summary.healthy = number of keys with healthy status (NOT 32 minus the rest)
 ```
 
-Инвариант: сумма всех статусных счётчиков равна `len(teeth)`, а **не** `total`. Сейчас `extracted: 2` при `len(teeth) == 2` — верно. Разница `total − Σстатусов` = число зубов с неизвестным статусом, её выводить отдельной строкой: «Статус неизвестен: 30».
+Invariant: the sum of all status counters is equal to `len(teeth)`, and **not** `total`. Now `extracted: 2` with `len(teeth) == 2` is correct. Difference `total − Σ statuses` = number of teeth with unknown status; display it in a separate line: “Status unknown: 30.”
 
-Пересчёт выполняется после каждого изменения `teeth`.
+Recalculation is performed after each change to `teeth`.
 
 ---
 
-## Блок 7. `Data/dental/procedures.json` — процедуры
+## Block 7. `Data/dental/procedures.json` - procedures
 
 ```json
 {
@@ -630,34 +634,34 @@ summary.healthy    = число ключей со статусом healthy (НЕ
    "date": null,
    "teeth": ["16", "26"],
    "type": "extraction",
-   "description": "Удаление двух шестёрок при первом ортодонтическом лечении",
+   "description": "Removal of two sixes during the first orthodontic treatment",
    "doctor_id": null,
-   "notes": "Неудачное решение — образовались дырки"
+   "notes": "Unsuccessful treatment — gaps developed"
   }
  ]
 }
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `date` | string \| null | да | `null` допустим — дата неизвестна, так у всех четырёх записей |
-| `teeth` | string[] | да | номера FDI строками; пустой массив, если процедура не привязана к зубам (брекеты) |
-| `type` | string | да | enum ниже |
-| `description` | string | да | что именно делали |
-| `doctor_id` | null | да | ключ присутствует, значение `null`. **Не заполнять**, см. Блок 4 |
-| `notes` | string | да | допустима пустая строка |
+| `date` | string \| null | yes | `null` is acceptable - the date is unknown, so all four records have |
+| `teeth` | string[] | yes | FDI numbers in strings; empty array if the procedure is not tied to teeth (braces) |
+| `type` | string | yes | enum below |
+| `description` | string | yes | what exactly did they do |
+| `doctor_id` | null | yes | the key is present, the value is `null`. **Leave blank**, see Unit 4 |
+| `notes` | string | yes | empty string allowed |
 
-**Поле `type` — enum:** `filling` · `extraction` · `crown` · `implant` · `cleaning` · `root_canal` · `whitening` · `orthodontics`
+**Field `type` - enum:** `filling` · `extraction` · `crown` · `implant` · `cleaning` · `root_canal` · `whitening` · `orthodontics`
 
-`orthodontics` используется в двух записях из четырёх — брекеты. Пропуск его в enum приводил к записи с несуществующим типом.
+`orthodontics` is used in two of the four entries - brackets. Omitting it in enum resulted in an entry with a non-existent type.
 
-**Поля `cost` нет и заводить его не нужно.** Расходы на стоматологию идут в `Data/costs/YYYY.jsonl` с `type: "dental"` — единый учёт со всеми остальными тратами, Блок 10.
+**There is no field `cost` and there is no need to create it.** Dental expenses go to `Data/costs/YYYY.jsonl` with `type: "dental"` - a single accounting with all other expenses, Block 10.
 
-Дубликат: `date` + `type` + `teeth`.
+Duplicate: `date` + `type` + `teeth`.
 
 ---
 
-## Блок 8. `Data/vaccinations.json` — прививки
+## Block 8. `Data/vaccinations.json` - vaccinations
 
 ```json
 {
@@ -666,149 +670,149 @@ summary.healthy    = число ключей со статусом healthy (НЕ
   {
    "date": "2021-10-08",
    "vaccine": "COVID-19",
-   "dose": "I этап",
-   "clinic": "Городская поликлиника №1",
-   "doctor": "Иванова И. И.",
-   "notes": "0.5 мл"
+   "dose": "Stage I",
+   "clinic": "City Polyclinic No. 1",
+   "doctor": "I. Ivanova",
+ "notes": "0.5 mL"
   }
  ],
  "tuberculin_tests": [
-  { "date": "2016-04-19", "type": "Диаскинтест", "result": "отрицательная" }
+  { "date": "2016-04-19", "type": "Diaskintest", "result": "negative" }
  ],
  "schedule": [],
- "source": "Прививочный сертификат (форма 156/у-93), COVID-протоколы, детская медкарта"
+ "source": "Vaccination certificate (form 156/u-93), COVID protocols, child medical record"
 }
 ```
 
-### `vaccinations[]` — 31 запись
+### `vaccinations[]` - 31 entries
 
-| Поле | Тип | Обяз. | Есть в данных |
+| Field | Type | Obligation | Available in data |
 |------|-----|-------|---------------|
-| `date` | string | да | 31/31 |
-| `vaccine` | string | да | 31/31 — название вакцины или препарата вместе: `"Грипп (Совигрипп)"`, `"Менингококк (Менактра)"` |
-| `dose` | string | да | 31/31 — свободный текст: `"первичная"`, `"бустер"`, `"ревакцинация"`, `"сезонная"`, `"I этап"`, `"II этап"`, `"1"`, `"2"`, `"3"` |
-| `clinic` | string | нет | 3/31 |
-| `notes` | string | нет | 14/31 |
-| `doctor` | string | нет | 2/31 |
+| `date` | string | yes | 31/31 |
+| `vaccine` | string | yes | 31/31 - name of the vaccine or drug together: `"Flu (Sovigripp)"`, `"Meningococcal (Menactra)"` |
+| `dose` | string | yes | 31/31 - free text: `"primary"`, `"booster"`, `"revaccination"`, `"seasonal"`, `"Stage I"`, `"Stage II"`, `"1"`, `"2"`, `"3"` |
+| `clinic` | string | no | 3/31 |
+| `notes` | string | no | 14/31 |
+| `doctor` | string | no | 2/31 |
 
-**Полей `product`, `batch`, `revaccination_date` в данных нет.** Не заводить: препарат пишется внутри `vaccine` в скобках, серия не фиксировалась, срок ревакцинации вычисляется, а не хранится (Блок 8.1).
+**Fields `product`, `batch`, `revaccination_date` are not in the data.** Do not enter: the drug is written inside `vaccine` in parentheses, the series was not recorded, the revaccination period is calculated and not stored (Block 8.1).
 
-`"Не определена"` — легитимное значение `vaccine`, когда по документу вакцина не восстановлена (2 записи); детали — в `notes`.
+`"Unidentified"` — legitimate value of `vaccine`, when the vaccine cannot be identified from the document (2 entries); details - in `notes`.
 
-### `tuberculin_tests[]` — 9 записей
+### `tuberculin_tests[]` - 9 entries
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `date` | string | да | |
-| `type` | string | да | `"р. Манту"` (8) либо `"Диаскинтест"` (1) |
-| `result` | string | да | `"отрицательная"`, `"2 мм"`, `"неразборчиво"` |
+| `date` | string | yes | |
+| `type` | string | yes | `"Mantoux test"` (8) or `"Diaskintest"` (1) |
+| `result` | string | yes | `"negative"`, `"2 mm"`, `"illegible"` |
 
-Это **не прививки**, а диагностические пробы. В таблицу прививок не смешивать, показывать отдельным разделом.
+These are **not vaccinations**, but diagnostic tests. Do not mix in the vaccination table, show it in a separate section.
 
-### `schedule[]` и `source`
+### `schedule[]` and `source`
 
-- `schedule[]` — **пуст**. Задуман как список запланированных ревакцинаций с задачами в Todoist. Заполняется только тем, что подтвердил пользователь; вычисленные сроки туда автоматически не пишутся.
-- `source` — string, откуда взяты данные. Обязателен, обновляется при добавлении нового источника.
+- `schedule[]` - **empty**. Designed as a list of scheduled revaccinations with tasks in Todoist. Filled only with what the user has confirmed; The calculated deadlines are not automatically written there.
+- `source` — string where the data is taken from. Required, updated when a new source is added.
 
-### Сортировка
+### Sorting
 
-Массив в файле **сгруппирован по вакцине**, а не отсортирован по дате: АКДС 1–3, затем полиомиелит 1–3, грипп 2006/2008/2024 подряд. Порядок в файле сохранять как есть — переупорядочивание массива не даёт ничего, кроме шумного диффа.
+The array in the file is **grouped by vaccine**, and not sorted by date: DTP 1–3, then polio 1–3, influenza 2006/2008/2024 in a row. Keep the order in the file as it is - reordering the array gives nothing but noisy diff.
 
-**При выводе пользователю всегда сортировать по `date` по убыванию** (свежие сверху). Группировку по вакцине применять только там, где она запрошена явно.
+**When outputting to the user, always sort by `date` in descending order** (newest on top). Grouping by vaccine should only be used where it is explicitly requested.
 
 ---
 
-## Блок 9. `Data/body-metrics.csv` — метрики тела
+## Block 9. `Data/body-metrics.csv` - body metrics
 
-Одиннадцать колонок, UTF-8, заголовок в первой строке, 20 строк данных.
+Eleven columns, UTF-8, header on first line, 20 lines of data.
 
 ```csv
 date,weight_kg,height_cm,bmi,body_fat_pct,muscle_mass_kg,systolic,diastolic,heart_rate,waist_cm,notes
-2025-10-31,82.2,191,22.5,15.8,39.1,,,,,InBody270. Оценка 80/100. Висцеральный жир 5. WHR 0.84
-2026-03-11,84,191,23.0,,,,,,,Onboarding. Набор массы (профицит с сентября 2025)
+2025-10-31,82.2,191,22.5,15.8,39.1,,,,,InBody270. Score 80/100. Visceral fat 5. WHR 0.84
+2026-03-11,84,191,23.0,,,,,,,Onboarding. Weight gain (surplus since September 2025)
 ```
 
-| Колонка | Тип | Комментарий |
+| Column | Type | Comment |
 |---------|-----|-------------|
-| `date` | ISO-дата | ключ строки |
+| `date` | ISO date | row key |
 | `weight_kg` | number | |
-| `height_cm` | number | брать из `Data/profile.json` → `basic.height_cm` (191), а не оставлять пустым |
-| `bmi` | number | `weight_kg / (height_cm/100)²`, округление до одного знака |
-| `body_fat_pct` | number | обычно только в строках из InBody |
-| `muscle_mass_kg` | number | то же |
-| `systolic` / `diastolic` | number | давление |
-| `heart_rate` | number | пульс |
+| `height_cm` | number | take from `Data/profile.json` → `basic.height_cm` (191), rather than leave empty |
+| `bmi` | number | `weight_kg / (height_cm/100)²`, round to one digit |
+| `body_fat_pct` | number | usually only in lines from InBody |
+| `muscle_mass_kg` | number | same |
+| `systolic` / `diastolic` | number | pressure |
+| `heart_rate` | number | pulse |
 | `waist_cm` | number | |
-| `notes` | string | свободный текст |
+| `notes` | string | free text |
 
-Пустое значение — **пустое поле между запятыми**, не `null` и не `-`.
+An empty value is **empty field between commas**, not `null` or `-`.
 
-### Экранирование запятых
+### Escape commas
 
-В `notes` запятая встречается часто. Правило: **если значение содержит запятую, кавычку или перевод строки — обернуть в двойные кавычки**, внутренние кавычки удвоить (RFC 4180).
+In `notes` the comma appears frequently. Rule: **if the value contains a comma, a quotation mark or a newline, wrap it in double quotes**, double the inner quotes (RFC 4180).
 
 ```csv
-2026-03-21,82.5,191,22.6,,,120,80,65,,"Утро, натощак"
+2026-03-21,82.5,191,22.6,,,120,80,65,,"Morning, fasting"
 ```
 
-Строка без экранирования даёт 12 полей при 11 колонках и ломает разбор всего файла.
+A line without escaping gives 12 fields with 11 columns and breaks parsing of the entire file.
 
-> ⚠️ **Инвариант уже нарушен.** Строка 2 файла содержит незакавыченную запятую в заметке и разбирается как 12 полей:
+> ⚠️ **The invariant is already broken.** Line 2 of the file contains an unquoted comma in the note and is parsed as 12 fields:
 > ```
-> 1990-01-01,3.7,55,,,,,,,,Рождение. Роддом №1, город
+> 1990-01-01,3.7,55,,,,,,,,,Birth. Maternity hospital No. 1, city
 > ```
-> Исправление — обернуть заметку в кавычки: `…,,"Рождение. Роддом №1, город"`. Значения при этом не меняются.
+> The fix is to wrap the note in quotes: `…,,"Birth. Maternity hospital No. 1, city"`. The values ​​do not change.
 
-**Проверка после записи:** во всех строках одинаковое число полей.
+**Check after recording:** all lines have the same number of fields.
 
 ```bash
-awk -F',' 'NF!=11 {print NR": "NF" полей: "$0}' Data/body-metrics.csv
+awk -F',' 'NF!=11 {print NR": "NF" fields: "$0}' Data/body-metrics.csv
 ```
 
-Не должно вывести ничего. Строки с закавыченными полями `awk` по разделителю посчитает неверно — их проверять парсером CSV, а не этой командой.
+It shouldn't output anything. Lines with quoted fields will be counted incorrectly by `awk` delimiter - they should be checked by the CSV parser, not by this command.
 
-Порядок строк — по `date` по возрастанию, новая строка дописывается в конец.
+The order of the lines is `date` in ascending order, a new line is appended to the end.
 
 ---
 
-## Блок 10. `Data/costs/YYYY.jsonl` — расходы
+## Block 10. `Data/costs/YYYY.jsonl` - expenses
 
-Append-only JSONL, одна трата — одна строка. **Файл сейчас пуст (0 байт) при 65 записанных визитах** — учёт не вёлся. Схема жила только внутри `/doctor`; здесь она задаётся как единственный источник, на неё ссылаются `/doctor`, `/dental`, `/lab-order`, `/status`, `/traction`.
+Append-only JSONL, one expense per line. **The file is now empty (0 bytes) with 65 recorded visits** - no records were kept. The workflow lived only inside `/doctor`; here it is specified as the only source, and it is referenced by `/doctor`, `/dental`, `/lab-order`, `/status`, and `/traction`.
 
 ```jsonl
-{"ts":"2026-03-20","kr":"KR5.5","type":"visit","description":"Гематолог — первичная консультация","payment":"private","cost_rub":4500,"clinic":"Гемотест","visit_ref":"2026-03-20_hematology.md"}
-{"ts":"2026-03-15","kr":"KR5.0","type":"lab","description":"ОАК + щитовидная железа + витамины, 28 маркеров","payment":"private","cost_rub":7800,"clinic":"Гемотест","visit_ref":"2026-03-15_cbc-thyroid-vitamins.json"}
+{"ts":"2026-03-20","kr":"KR5.5","type":"visit","description":"Hematologist — initial appointment","payment":"private","cost_rub":4500,"clinic":"Hemotest","visit_ref":"2026-03-20_hematology.md"}
+{"ts":"2026-03-15","kr":"KR5.0","type":"lab","description":"CBC + thyroid gland + vitamins, 28 markers","payment":"private","cost_rub":7800,"clinic":"Hemotest","visit_ref":"2026-03-15_cbc-thyroid-vitamins.json"}
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `ts` | string | да | ISO-дата траты |
-| `kr` | string \| null | да | `KR5.X` — берётся из `Data/goals/YYYY.json` → `directions[].kr` того направления, к которому относится трата. Если направление не определяется — `null`, а не выдуманный KR |
-| `type` | string | да | `visit` · `lab` · `imaging` · `procedure` · `dental` · `medication` · `supplement` · `other` |
-| `description` | string | да | что именно оплачено |
-| `payment` | string | да | `oms` (бесплатно по полису) или `private` |
-| `cost_rub` | number | да | целое, рубли. Для `oms` — `0` |
-| `clinic` | string | да | где оплачено |
-| `visit_ref` | string \| null | нет | имя файла визита или анализа без пути |
+| `ts` | string | yes | ISO spend date |
+| `kr` | string \| null | yes | `KR5.X` - taken from `Data/goals/YYYY.json` → `directions[].kr` of the direction to which the spending relates. If the direction is not determined - `null`, not the fictitious KR |
+| `type` | string | yes | `visit` · `lab` · `imaging` · `procedure` · `dental` · `medication` · `supplement` · `other` |
+| `description` | string | yes | what exactly was paid |
+| `payment` | string | yes | `oms` (free with policy) or `private` |
+| `cost_rub` | number | yes | whole, rubles. For `oms` - `0` |
+| `clinic` | string | yes | where paid |
+| `visit_ref` | string \| null | no | visit or analysis file name without path |
 
-### Как определить `kr`
+### How to determine `kr`
 
-По специальности или типу услуги найти в `Data/goals/YYYY.json` → `directions[]` запись с подходящим `area`. У каждого направления есть `kr` вида `KR5.0`…`KR5.N`. Если трата не ложится ни в одно — `kr: null`.
+By specialty or type of service, find in `Data/goals/YYYY.json` → `directions[]` an entry with a suitable `area`. Each direction has `kr` of the form `KR5.0`…`KR5.N`. If the waste does not fall into any of them - `kr: null`.
 
-### Что обновлять вместе с записью
+### What to update with the entry
 
-1. Строка в `2026.jsonl`.
-2. Если трата закрывает milestone — `milestones[].cost_actual_rub` в `goals/YYYY.json`.
-3. Пересчитать `directions[].cost_actual_rub` — сумма `cost_actual_rub` его milestones.
-4. Пересчитать `cost_summary.total_actual_rub` и `cost_summary.by_phase[*].actual`.
+1. String in `2026.jsonl`.
+2. If the spending closes a milestone - `milestones[].cost_actual_rub` in `goals/YYYY.json`.
+3. Recalculate `directions[].cost_actual_rub` — the sum of `cost_actual_rub` its milestones.
+4. Recalculate `cost_summary.total_actual_rub` and `cost_summary.by_phase[*].actual`.
 
-Дубликат: `ts` + `type` + `description`.
+Duplicate: `ts` + `type` + `description`.
 
 ---
 
-## Блок 11. `Data/medications/current.json` — лекарства, БАДы, наружное, протоколы
+## Block 11. `Data/medications/current.json` - medications, dietary supplements, external, protocols
 
-**Четыре независимых массива.** Ошибка выбора массива — самая частая при записи из `/inbox`.
+**Four independent arrays.** Array selection error is the most common one when writing from `/inbox`.
 
 ```json
 {
@@ -820,106 +824,106 @@ Append-only JSONL, одна трата — одна строка. **Файл с�
 }
 ```
 
-| Массив | Что кладём | Префикс `id` | Сейчас |
+| Array | What do we put | Prefix `id` | Now |
 |--------|-----------|--------------|--------|
-| `medications[]` | рецептурные и безрецептурные лекарства внутрь | `med_NN` | 1 |
-| `supplements[]` | БАДы, витамины, минералы | `sup_NN` | 5 |
-| `topical[]` | наружное: кремы, мази, спреи, капли | `top_NN` | 1 |
-| `protocols[]` | схемы лечения из нескольких препаратов с этапами | `prot_NN` | 0 |
+| `medications[]` | prescription and over-the-counter medications by mouth | `med_NN` | 1 |
+| `supplements[]` | Dietary supplements, vitamins, minerals | `sup_NN` | 5 |
+| `topical[]` | external: creams, ointments, sprays, drops, gels | `top_NN` | 1 |
+| `protocols[]` | multi-drug treatment regimens with stages | `prot_NN` | 0 |
 
-`id` — инкрементальный в пределах своего массива, с ведущим нулём: `med_01`, `sup_02`.
+`id` - incremental within its array, with leading zero: `med_01`, `sup_02`.
 
 ### `medications[]`
 
 ```json
 {
  "id": "med_01",
- "name": "Некст (ибупрофен + парацетамол)",
- "dosage": "стандартная",
- "frequency": "раз в неделю",
+ "name": "Next (ibuprofen + paracetamol)",
+ "dosage": "standard",
+ "frequency": "once a week",
  "timing": [],
  "with_food": true,
- "reason": "Головная боль (мигрень)",
+ "reason": "Headache (migraine)",
  "doctor_id": null,
  "started": null,
  "until": null,
  "side_effects": [],
  "status": "active",
- "notes": "Самоназначение"
+ "notes": "Self-prescribed"
 }
 ```
 
-Все тринадцать ключей присутствуют. `timing[]` — из `"утро"`, `"день"`, `"вечер"`, `"ночь"`. `doctor_id` — всегда `null`, не заполнять (Блок 4); назначившего врача писать в `notes`. `started` / `until` — ISO-дата, `null` либо приблизительная форма `"~2026-02"`.
+All thirteen keys are present. `timing[]` uses `"morning"`, `"day"`, `"evening"`, and `"night"`. `doctor_id` is always `null`; do not fill it in (Block 4). Put the prescribing doctor in `notes`. `started` / `until` are ISO dates, `null`, or an approximate form such as `"~2026-02"`.
 
 ### `supplements[]`
 
 ```json
 {
  "id": "sup_01",
- "name": "Магний глицинат",
+ "name": "Magnesium glycinate",
  "brand": "NOW",
- "dosage": "2 таблетки/день",
- "frequency": "ежедневно",
- "timing": ["день"],
- "reason": "общее здоровье, нервная система",
+ "dosage": "2 tablets/day",
+ "frequency": "daily",
+ "timing": ["day"],
+ "reason": "general health, nervous system",
  "started": "~2026-02",
  "status": "active",
- "notes": "опционально"
+ "notes": "optional"
 }
 ```
 
-Десять ключей, `notes` опционален (есть у 1 из 5). `brand` обязателен, допускается `null`.
+Ten keys, `notes` is optional (1 out of 5 has them). `brand` is required, `null` is allowed.
 
 ### `topical[]`
 
 ```json
 {
  "id": "top_01",
- "name": "Крем для лица",
- "type": "крем",
- "frequency": "раз в 2 недели, при обострениях",
- "reason": "дерматит/псориаз на лице",
+ "name": "Face cream",
+ "type": "cream",
+ "frequency": "once every 2 weeks, during flares",
+ "reason": "dermatitis/psoriasis on the face",
  "status": "as_needed"
 }
 ```
 
-Шесть ключей. `type` — `крем`, `мазь`, `спрей`, `капли`, `гель`.
+Six keys. `type` is `cream`, `ointment`, `spray`, `drops`, `gel`, or the generic `topical` value when the form is unspecified.
 
-### `status` — общий enum
+### `status` - general enum
 
 `active` · `as_needed` · `paused` · `finished`
 
-Завершённые курсы переносятся в `Data/medications/history.json` той же структурой.
+Completed courses are transferred to `Data/medications/history.json` using the same structure.
 
-**Правило `/inbox`:** рецепт из документа никогда не добавляется молча. Сначала подтверждение пользователя, затем запись — с явным указанием, в какой из четырёх массивов кладём.
+**Rule `/inbox`:** A recipe from a document is never added silently. First, confirmation from the user, then a record - with an explicit indication of which of the four arrays we are putting in.
 
 ---
 
-## Блок 12. `Data/mental/journal.jsonl` — журнал состояния
+## Block 12. `Data/mental/journal.jsonl` - status log
 
-Append-only JSONL, одна запись — одна строка.
+Append-only JSONL, one record - one line.
 
 ```jsonl
-{"ts":"2026-03-14T12:00:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":8,"notes":"Постоянная тревога о будущем. Хронически уставший","tags":["onboarding"]}
+{"ts":"2026-03-14T12:00:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":8,"notes":"Persistent anxiety about the future. Chronically tired","tags":["onboarding"]}
 ```
 
-| Поле | Тип | Обяз. | Комментарий |
+| Field | Type | Obligation | Comment |
 |------|-----|-------|-------------|
-| `ts` | string | да | отметка времени с зоной `+03:00`, не просто дата |
-| `mood` | number | да | 1–10 |
-| `energy` | number | да | 1–10 |
-| `stress` | number | да | 1–10, где 10 — максимальный стресс |
-| `sleep_quality` | number | да | 1–10 |
-| `notes` | string | да | свободный текст, допускается пустая строка |
-| `tags` | string[] | да | допускается пустой массив |
+| `ts` | string | yes | timestamp with zone `+03:00`, not just date |
+| `mood` | number | yes | 1–10 |
+| `energy` | number | yes | 1–10 |
+| `stress` | number | yes | 1–10, where 10 is maximum stress |
+| `sleep_quality` | number | yes | 1–10 |
+| `notes` | string | yes | free text, empty line allowed |
+| `tags` | string[] | yes | empty array allowed |
 
-**Поле `notes` всегда читается на красные флаги** по Блоку 4 документа `.claude/shared/critical-values.md` — до любого разбора корреляций. Это не опциональная проверка.
+**The `notes` field is always read for red flags** according to Block 4 of the `.claude/shared/critical-values.md` document - before any analysis of correlations. This is not an optional check.
 
-За одни сутки допустимо несколько записей — ключом является `ts`, не дата.
+Several records are allowed in one day - the key is `ts`, not the date.
 
 ---
 
-## Блок 13. `Data/goals/YYYY.json` и `Data/hypotheses.json`
+## Block 13. `Data/goals/YYYY.json` and `Data/hypotheses.json`
 
 ### `goals/YYYY.json` — `version: 2`
 
@@ -928,23 +932,23 @@ Append-only JSONL, одна запись — одна строка.
  "version": 2,
  "okr_ref": "O5",
  "phases": [
-  { "id": "phase_1", "name": "Срочное", "period": "2026-Q1–Q2 (март–май)",
+  { "id": "phase_1", "name": "Urgent", "period": "2026-Q1–Q2 (March–May)",
    "priority": "high", "directions": ["KR5.0", "KR5.1", "KR5.5", "KR5.3"] }
  ],
  "directions": [
   {
-   "area": "Общее самочувствие",
+   "area": "General well-being",
    "kr": "KR5.0",
    "phase": "phase_1",
    "status": "investigating",
-   "goal": "Найти причину хронической усталости",
+   "goal": "Find the cause of chronic fatigue",
    "last_activity": "2025-04-02",
    "cost_estimate_rub": 5000,
    "cost_actual_rub": 0,
    "milestones": [
     {
      "id": "kr5.0_m1",
-     "title": "Направление от терапевта к гематологу (ОМС)",
+     "title": "Referral from a general practitioner to a hematologist (OMS)",
      "type": "visit",
      "status": "not_started",
      "deadline": "2026-04-01",
@@ -953,7 +957,7 @@ Append-only JSONL, одна запись — одна строка.
      "cost_actual_rub": null,
      "todoist_task_id": "6g93Pp8PQW7hfQ35",
      "depends_on": [],
-     "notes": "Терапевт ГП выдаёт направление"
+     "notes": "Primary care physician issues a referral"
     }
    ],
    "related_visits": [],
@@ -977,17 +981,17 @@ Append-only JSONL, одна запись — одна строка.
 }
 ```
 
-У всех направлений один и тот же набор из одиннадцати ключей. Фазы задают порядок работы: срочное, плановое, отложенное.
+All directions have the same set of eleven keys. Phases define the order of work: urgent, planned, deferred.
 
 - `milestones[].type` — `visit` · `lab` · `procedure` · `imaging` · `decision`.
 - `milestones[].status` — `not_started` · `in_progress` · `completed` · `blocked` · `cancelled`.
 - `directions[].status` — `investigating` · `in_progress` · `monitoring` · `resolved` · `not_started`.
-- `related_labs[]` и `related_visits[]` — **имена файлов без пути**, базы `Data/labs/` и `Data/doctors/visits/` соответственно.
-- `todoist_task_id` — строковый ID задачи или `null`.
-- `depends_on[]` — массив `milestones[].id` внутри того же направления.
-- `fitness_target.target_weight_kg` = `null` — цель не задана. При `null` **не выдумывать целевой вес**: показывать тренд без цели и предложить задать.
+- `related_labs[]` and `related_visits[]` - **file names without path**, bases `Data/labs/` and `Data/doctors/visits/` respectively.
+- `todoist_task_id` — string task ID or `null`.
+- `depends_on[]` is an array of `milestones[].id` inside the same direction.
+- `fitness_target.target_weight_kg` = `null` - the target is not specified. With `null` **do not invent a target weight**: show a trend without a goal and offer to set it.
 
-**Milestone linkage** после записи анализа или визита: найти направление по `area`/специальности, найти milestone нужного `type` со статусом не `completed`, предложить закрыть, при подтверждении обновить `status`, `last_activity`, `related_labs[]` / `related_visits[]`, `cost_actual_rub` и пересчитать `cost_summary`.
+**Milestone linkage** after recording an analysis or visit: find the direction for `area`/specialty, find the milestone of the desired `type` with the status not `completed`, offer to close, upon confirmation, update `status`, `last_activity`, `related_labs[]` / `related_visits[]`, `cost_actual_rub` and recalculate `cost_summary`.
 
 ### `hypotheses.json`
 
@@ -1000,94 +1004,94 @@ Append-only JSONL, одна запись — одна строка.
  "hypotheses": [
   {
    "id": "H1",
-   "title": "АИТ → хроническая иммунная активация → усталость + лимфоцитоз",
+   "title": "AIT → chronic immune activation → fatigue + lymphocytosis",
    "status": "strong",
    "confidence": "high",
-   "evidence_for": ["Анти-ТПО 27.3 (норма <10) — подтверждённый АИТ"],
-   "evidence_against": ["Анти-ТПО 27.3 — невысокий титр"],
-   "next_steps": ["Пересдать анти-ТПО — оценить тренд"],
+   "evidence_for": ["Anti-TPO 27.3 (reference <10) — confirmed autoimmune thyroiditis"],
+   "evidence_against": ["Anti-TPO 27.3 — low titer"],
+   "next_steps": ["Repeat anti-TPO — assess the trend"],
    "related_kr": ["KR5.5"]
   }
  ]
 }
 ```
 
-`id` — `H1`, `H2`, … `status` — `strong` · `moderate` · `weak` · `refuted` · `confirmed`. `confidence` — `high` · `medium-high` · `medium` · `low`. `related_kr[]` — значения `directions[].kr`.
+`id` - `H1`, `H2`, ... `status` - `strong` · `moderate` · `weak` · `refuted` · `confirmed`. `confidence` - `high` · `medium-high` · `medium` · `low`. `related_kr[]` - values ​​of `directions[].kr`.
 
-Поле `updated` обновляется при любом изменении массива.
+The `updated` field is updated whenever the array changes.
 
 ---
 
-## Блок 14. Ссылки на исходные документы
+## Block 14. Links to source documents
 
-### Проблема
+### Problem
 
-`original_file` хранит имя **до** переноса в Archive. `/inbox` при переносе переименовывает файл, обратная ссылка не обновляется. Результат: часть значений `original_file` не резолвятся ни в один файл в `Archive/`.
+`original_file` stores the name **before** transfer to Archive. `/inbox` renames the file when transferred, the backlink is not updated. Result: some of the values ​​of `original_file` are not resolved into any file in `Archive/`.
 
-### Правило
+### Rule
 
-При переносе оригинала в Archive в JSON записывается **финальный путь**:
+When transferring the original to Archive, the **final path** is written in JSON:
 
-| Поле | Что содержит | База |
+| Field | What contains | Base |
 |------|--------------|------|
-| `original_file` | имя файла, каким его дал пользователь — для опознания | нет базы, это исторический ярлык |
-| `archive_path` | **фактический путь после переноса** | корень проекта |
+| `original_file` | file name as the user gave it - for identification | no base, this is a historical label |
+| `archive_path` | **actual path after transfer** | project root |
 
 ```json
 {
- "original_file": "Результаты анализов.pdf",
- "archive_path": "Archive/processed/labs/2025-02-17_lab_результаты-анализов.pdf"
+ "original_file": "Lab results.pdf",
+ "archive_path": "Archive/processed/labs/2025-02-17_lab-results.pdf"
 }
 ```
 
-`archive_path` обязателен для всех новых записей, создаваемых `/inbox`. Существующие записи не переписываются задним числом без отдельной задачи.
+`archive_path` is required for all new records created by `/inbox`. Existing records are not overwritten retroactively without a separate task.
 
-### Обратные ссылки
+### Backlinks
 
-При переносе или переименовании файла **проверять и обновлять ссылки на него в `Data/**`**. Известный случай: `Data/dental/tooth-map.json` → `imaging[0].location` указывал в `Inbox/dental/ct_jaws/`, тогда как DICOM-серия из 479 файлов лежит в `Archive/processed/dental/YYYY-MM-DD_ct_jaws_dicom`.
+When moving or renaming a file, **check and update links to it in `Data/**`**. Known case: `Data/dental/tooth-map.json` → `imaging[0].location` pointed to `Inbox/dental/ct_jaws/`, while a DICOM series of 479 files lies in `Archive/processed/dental/YYYY-MM-DD_ct_jaws_dicom`.
 
-Поиск ссылок перед переносом:
+Search for links before transferring:
 
 ```bash
-grep -rl "имя-или-путь-файла" Data/
+grep -rl "file-name-or-path" Data/
 ```
 
-### Директории Archive
+### Archive Directories
 
-`Archive/processed/` разложен по категориям: `labs` (47), `visits` (31), `_duplicates` (25), `cardiology` (13), `imaging` (13), `body-composition` (7), `covid` (3), `dental` (2), `dispensary` (2), `neurology` (1), `historical` (1), `misc` (0).
+`Archive/processed/` is divided into categories: `labs` (47), `visits` (31), `_duplicates` (25), `cardiology` (13), `imaging` (13), `body-composition` (7), `covid` (3), `dental` (2), `dispensary` (2), `neurology` (1), `historical` (1), `misc` (0).
 
-`Archive/childhood/` и `Archive/past-labs/` — исходники для режима «оцифруй историю», сейчас пусты.
+`Archive/childhood/` and `Archive/past-labs/` - source codes for the “digitize history” mode, are now empty.
 
-`Data/labs/pdfs/` — отдельное хранилище: PDF, на которые ссылается `pdf_path` из файлов v2, лежат **здесь**, а не в `Archive/`. Это исключение из маршрутизации `/inbox`, оно осознанное: отчёт лаборатории привязан к записи анализа, а не к архиву.
+`Data/labs/pdfs/` is a separate repository: PDFs referenced by `pdf_path` from v2 files are **here**, not in `Archive/`. This is an exception to `/inbox` routing, it is deliberate: the laboratory report is tied to the analysis record, and not to the archive.
 
-`Data/labs/archive/` — пустая директория без назначения. Не использовать.
+`Data/labs/archive/` is an empty directory with no destination. Do not use.
 
 ---
 
-## Блок 15. Инварианты
+## Block 15. Invariants
 
-Проверяются при любой записи в соответствующую область.
+They are checked for any entry into the corresponding area.
 
-| Инвариант | Проверка | Состояние |
+| Invariant | Check | State |
 |-----------|----------|-----------|
-| `labs/_index.json` полон | `ls Data/labs/*.json \| grep -vc '/_'` = `jq '.analyses\|length' Data/labs/_index.json` | 60/60 ✅ |
-| `visits/_index.json` полон | число файлов в `Data/doctors/visits/` минус `_index.json` = `.total` = `len(.visits)` | 65/65 ✅ |
-| `visits/_index.json` согласован | `.total` == `len(.visits)`; `.format` каждого элемента совпадает с расширением `.file` | ✅ |
-| CSV однороден | `awk -F',' 'NF!=11 {print NR}' Data/body-metrics.csv` → пусто | ⚠️ нарушен строкой 2, Блок 9 |
-| `tooth-map.summary` | Σ статусных счётчиков == `len(teeth)`; `total` == 32 | ✅ |
-| `goals.cost_summary` | `total_actual_rub` == Σ `directions[].cost_actual_rub` == Σ строк `costs/YYYY.jsonl` | ✅ (всё по нулям, `costs` пуст) |
-| `version` сохранён | ни один JSON не потерял поле `version` | ✅ |
-| Даты не из будущего | кроме `next_visit`, `deadline` и плановых дат ревакцинации | ✅ |
+| `labs/_index.json` is full | `ls Data/labs/*.json \| grep -vc '/_'` = `jq '.analyses\|length' Data/labs/_index.json` | 60/60 ✅ |
+| `visits/_index.json` is full | number of files in `Data/doctors/visits/` minus `_index.json` = `.total` = `len(.visits)` | 65/65 ✅ |
+| `visits/_index.json` agreed | `.total` == `len(.visits)`; `.format` of each element matches the extension `.file` | ✅ |
+| CSV is homogeneous | `awk -F',' 'NF!=11 {print NR}' Data/body-metrics.csv` → empty | ⚠️ violated by line 2, Unit 9 |
+| `tooth-map.summary` | Σ status counters == `len(teeth)`; `total` == 32 | ✅ |
+| `goals.cost_summary` | `total_actual_rub` == Σ `directions[].cost_actual_rub` == Σ lines `costs/YYYY.jsonl` | ✅ (all zeros, `costs` is empty) |
+| `version` saved | no JSON lost `version` field | ✅ |
+| Dates not from the future | except `next_visit`, `deadline` and planned revaccination dates | ✅ |
 
-Проверка всех инвариантов разом:
+Checking all invariants at once:
 
 ```bash
 [ "$(ls Data/labs/*.json | grep -vc '/_')" = "$(jq '.analyses|length' Data/labs/_index.json)" ] && echo "labs ✅" || echo "labs ⚠️"
 [ "$(ls Data/doctors/visits/ | grep -vc _index)" = "$(jq '.total' Data/doctors/visits/_index.json)" ] && echo "visits ✅" || echo "visits ⚠️"
-awk -F',' 'NF!=11 {print "CSV ⚠️ строка "NR}' Data/body-metrics.csv
+awk -F',' 'NF!=11 {print "CSV ⚠️ line "NR}' Data/body-metrics.csv
 jq '([.summary | to_entries[] | select(.key != "total") |.value] | add) == (.teeth | length)' Data/dental/tooth-map.json
 ```
 
 ---
 
-⚕️ Документ описывает структуру хранения, а не медицинское содержание данных. Для решений о лечении обратитесь к врачу.
+⚕️ The document describes the storage structure, not the medical content of the data. Consult your doctor for treatment decisions.

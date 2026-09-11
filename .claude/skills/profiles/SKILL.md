@@ -1,157 +1,156 @@
 ---
 name: profiles
 description: |
-  Профили членов семьи: создание, переключение, список, удаление.
-  Триггеры: «профили», «переключись на», «профиль жены», «добавь профиль», «чей профиль», «switch profile»
+  Family member profiles: create, switch, list, delete.
+  Triggers: “profiles”, “switch to”, “wife profile”, “add profile”, “whose profile”, “switch profile”
 ---
 
-# Profiles — управление профилями членов семьи
+# Profiles - manage profiles of family members
 
-## Назначение
+## Purpose
 
-Система ведёт медкарты нескольких человек. Этот скилл создаёт профили,
-переключает активный и показывает, чьи данные сейчас в работе.
+The system maintains medical records for several people. This skill creates profiles,
+switches the active profile, and shows whose data is currently in use.
 
-Рамка: `.claude/shared/profile-resolution.md` — читается первой.
+Frame: `.claude/shared/profile-resolution.md` - read first.
 
 ---
 
 ## Workflow
 
-### Показать список
+### Show list
 
-Прочитать `Data/profiles/_active.json` и каталоги `Data/profiles/*/`.
-Для каждого — `profile.json` → имя, возраст, пол, связь.
+Read `Data/profiles/_active.json` and `Data/profiles/*/` catalogs.
+For everyone, read `profile.json` → name, age, biological sex, and relationship.
 
 ```
-Профили:
+Profiles:
 
-  ▶ owner      Владелец        М, 34 года      активный
-    wife       Супруга         Ж, 32 года
-    son        Сын             М, 8 лет        педиатрический режим
+  ▶ owner Owner M, 34 years old active
+    wife Spouse F, 32 years old
+    son Son M, 8 years old pediatric regimen
 
-Переключиться: /profiles переключись на wife
+Switch: /profiles switch to wife
 ```
 
-Возраст вычисляется из `date_of_birth` в момент обращения, не хранится.
+Age is calculated from `date_of_birth` at the time of access and is not stored.
 
 ---
 
-### Переключить активный профиль
+### Switch active profile
 
-1. Проверить, что профиль существует. Нет — показать список и остановиться
-2. **Подтвердить у пользователя**: «Переключаю активный профиль на «Супруга».
-   Все последующие чтения и записи пойдут в её карту. Продолжить?»
-3. Обновить `Data/profiles/_active.json`: поле `active`, `switched_at`,
-   добавить запись в `history[]`
-4. Подтвердить сменившимся состоянием:
+1. Check that the profile exists. If it does not, show the list and stop
+2. **Confirm with the user**: “I am switching the active profile to “Spouse.”
+   All subsequent readings and writes will go to her card. Should I continue?
+3. Update `Data/profiles/_active.json`: field `active`, `switched_at`,
+   add an entry to `history[]`
+4. Confirm the changed state:
 
 ```
-Активный профиль: Супруга (wife)
-  Ж, 32 года · 4 анализа · 2 визита · последняя запись 12.07.2026
+Active profile: Spouse
+  F, 32 years · 4 tests · 2 visits · last entry 07/12/2026
 ```
 
-Молча не переключать никогда — пользователь должен знать, в чью карту
-пойдёт следующая запись.
+Never switch silently: the user must know whose record will receive the next entry.
 
 ---
 
-### Разовое обращение без переключения
+### One-time access without switching
 
-«Покажи анализы сына» при активном профиле владельца — прочитать данные
-профиля `son`, **не меняя активный**. Обязательно назвать это явно:
+For “Show your son’s tests” when the owner’s profile is active, read the data
+from profile `son`, **without changing the active profile**. State this explicitly:
 
 ```
-Смотрю профиль сына (активный остаётся — владелец)
+I look at my son’s profile (the owner remains active)
 ```
 
-Разовое обращение — только на чтение. Любая **запись** требует либо
-переключения, либо явного подтверждения целевого профиля.
+One-time access is read-only. Any **write** requires either switching profiles
+or explicitly confirming the target profile.
 
 ---
 
-### Создать профиль
+### Create a profile
 
-Спросить по очереди:
+Ask in turn:
 
-1. **Идентификатор** — латиница, цифры, дефис, 2–32 символа.
-   Предложить по связи: `wife`, `son`, `daughter`, `mother`, `father`.
-   **Фамилию и полное имя в идентификатор не класть** — он попадает в пути
-   файлов и в вывод. Проверить, что не занят
-2. **Отображаемое имя** — как обращаться
-3. **Связь** — `self` · `spouse` · `child` · `parent` · `other`
-4. **Дата рождения** — ISO 8601. Обязательна: от неё зависят референсы,
-   скрининг и педиатрический режим
-5. **Пол** — по `.claude/shared/sex-specific.md`: `sex` для медицинских
-   выводов, при необходимости `gender_identity` и `hormone_therapy`
-6. **Основание ведения профиля** — см. ниже
+1. **Identifier** - Latin, numbers, hyphen, 2–32 characters.
+   Suggest based on the relationship: `wife`, `son`, `daughter`, `mother`, `father`.
+   **Do not put a last name or full name in the identifier** - it appears in file
+   paths and output. Check that the identifier is unused
+2. **Display name** - how to address the person
+3. **Relationship** - `self` · `spouse` · `child` · `parent` · `other`
+4. **Date of birth** - ISO 8601. Mandatory: references depend on it,
+   screening and pediatric regimen
+5. **Biological sex** - according to `.claude/shared/sex-specific.md`: use `sex`
+   for clinical reasoning; if relevant, also record `gender_identity` and `hormone_therapy`
+6. **Basis for maintaining a profile** - see below
 
-Затем создать каталог `Data/profiles/<id>/` со структурой из Блока 5
-рамки и развернуть шаблоны. Активный профиль **не менять** — предложить
-переключиться отдельным шагом.
+Then create a directory `Data/profiles/<id>/` with the structure from Block 5
+of the framework and expand the templates. Do not change the active profile;
+suggest switching in a separate step.
 
-#### Основание (`consent`)
+#### Base (`consent`)
 
-Для профиля, отличного от владельца, поле обязательно:
+For a profile other than the owner, the field is required:
 
-| Связь | `basis` | Что подтверждается |
+| Relationship | `basis` | What is confirmed |
 |-------|---------|--------------------|
-| Свой | `self` | — |
-| Взрослый член семьи | `informed` | Человек знает, что его медданные ведутся в этой системе |
-| Ребёнок или недееспособный | `legal_guardian` | Вы законный представитель |
+| Self | `self` | — |
+| Adult family member | `informed` | A person knows that his medical data is maintained in this system |
+| Child or legally incapacitated person | `legal_guardian` | Are you the legal representative? |
 
-Спросить прямо, без формализма:
+Ask directly, without ceremony:
 
-> Профиль другого человека — вопрос не технический. Супруга знает, что её
-> анализы будут храниться и разбираться здесь? Для ребёнка — вы законный
-> представитель?
+> A profile for another person is not merely a technical question. Does your
+> spouse know that their test results will be stored and analyzed here? For a child,
+> are you the legal representative?
 
-Отказ отвечать — не создавать профиль. Поле ничего не доказывает
-юридически; оно существует, чтобы вопрос был задан осознанно.
+Refusal to answer - do not create a profile. The field proves nothing
+legally; it exists so that the question can be asked consciously.
 
-Записать:
+Write down:
 
 ```json
 "consent": {
   "basis": "informed",
   "recorded_at": "2026-08-06",
-  "note": "супруга уведомлена, ведение по её просьбе"
+  "note": "spouse notified, maintained at her request"
 }
 ```
 
-#### Если профиль детский
+#### If the profile is for children
 
-При возрасте младше 18 сказать прямо, что включается педиатрический
-контур и чем он отличается:
+If the person is under 18, say directly that pediatric mode is enabled
+and explain how it differs:
 
 ```
-Профиль детский — включён педиатрический режим.
+Children’s profile — pediatric mode is enabled.
 
-  Референсы берутся по возрасту, а не взрослые: у растущего ребёнка
-  щелочная фосфатаза втрое выше взрослой нормы, и это норма.
-  Рост и вес читаются перцентилями, прививки — по возрастному календарю.
+  Reference ranges are age-specific rather than adult ranges: in a growing child,
+  alkaline phosphatase can be three times the adult norm, and that can be normal.
+  Height and weight are interpreted by percentiles; vaccinations follow the age-based calendar.
 
-  Разбор ведёт педиатр; профильные специалисты подключаются, но
-  взрослые интервалы к анализам не применяют.
+  A pediatrician leads the assessment; other specialists may be involved, but
+  adult reference intervals are not applied to test results.
 ```
 
 ---
 
-### Удалить профиль
+### Delete profile
 
-Удаление необратимо и уничтожает всю медкарту человека.
+Deletion is irreversible and destroys the person’s entire medical record.
 
-1. Показать, что именно будет удалено: количество анализов, визитов,
-   протоколов, размер каталога
-2. Потребовать ввести идентификатор профиля вручную — не «да»
-3. Предложить сначала сделать копию каталога и **дождаться подтверждения,
-   что копия сделана**
-4. Активный профиль удалить нельзя — сначала переключиться на другой
-5. Профиль владельца удалить нельзя
+1. Show what exactly will be deleted: the number of tests, visits,
+   protocols, directory size
+2. Require the user to enter the profile ID manually; this is not a simple “yes”
+3. Offer to first make a copy of the catalog and **wait for confirmation,
+   that a copy has been made**
+4. Do not delete the active profile; switch to another profile first
+5. The owner's profile cannot be deleted
 
 ---
 
-## Формат `_active.json`
+## Format `_active.json`
 
 ```json
 {
@@ -165,23 +164,23 @@ description: |
 }
 ```
 
-`history[]` — последние 20 переключений. Нужна, чтобы восстановить, в чей
-профиль ушла запись, если ошибка обнаружилась позже.
+`history[]` stores the last 20 switches. It allows the system to determine which
+profile received an entry if an error is discovered later.
 
 ---
 
-## Правила
+## Rules
 
-- **Рамка `profile-resolution.md` читается до всего остального**
-- Переключение — только с подтверждением, никогда молча
-- Разовое обращение к чужому профилю — только чтение, и всегда с оговоркой
-- Идентификатор без фамилии и полного имени
-- Дата рождения обязательна: без неё не работают ни референсы, ни скрининг
-- `consent` обязателен для всех профилей, кроме владельца
-- Данные профилей не смешиваются: наследственность идёт через
-  `family_history`, а не через чтение чужих карт
-- Удаление — с ручным вводом идентификатора и предложением копии
-- Критерий завершения: `_active.json` валиден, у каждого профиля есть
-  `profile.json` с датой рождения и полом, `check-integrity.py` проходит
+- **The frame `profile-resolution.md` is read before everything else**
+- Switching - only with confirmation, never silently
+- One-time access to someone else’s profile - read only, and always with a reservation
+- Identifier without a last name or full name
+- Date of birth is required: without it, reference ranges and screening do not work
+- `consent` is required for all profiles except the owner
+- Profile data is not mixed: hereditary data goes through
+  `family_history`, and not through reading other people's cards
+- Deletion - with manual entry of the identifier and the offer of a copy
+- Completion criterion: `_active.json` is valid, each profile has
+  `profile.json` with date of birth and biological sex, and `check-integrity.py` passes
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *Information is for reference only. Consult your physician for treatment decisions.*

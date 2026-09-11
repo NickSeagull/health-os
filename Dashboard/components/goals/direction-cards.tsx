@@ -56,11 +56,11 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
       );
       if (!res.ok) throw new Error();
       toast.success(
-        newStatus === "completed" ? "Milestone завершён" : "Milestone возвращён"
+        newStatus === "completed" ? "Milestone completed" : "Milestone reopened"
       );
       mutate("/api/goals");
     } catch {
-      toast.error("Ошибка обновления");
+      toast.error("Update failed");
     }
   }
 
@@ -75,11 +75,11 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
         }
       );
       if (!res.ok) throw new Error();
-      toast.success("Заметка сохранена");
+      toast.success("Note saved");
       mutate("/api/goals");
       setEditingNotes(false);
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
   }
 
@@ -94,11 +94,11 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
         }
       );
       if (!res.ok) throw new Error();
-      toast.success("Стоимость обновлена");
+      toast.success("Cost updated");
       mutate("/api/goals");
       setEditingCost(false);
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
   }
 
@@ -124,7 +124,7 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
           <StatusBadge status={milestone.status} />
           {milestone.oms_available && (
             <Badge variant="outline" className="text-xs">
-              ОМС
+              OMS
             </Badge>
           )}
         </div>
@@ -137,7 +137,7 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="h-7 text-xs"
-                placeholder="Заметка..."
+                placeholder="Note..."
                 onKeyDown={(e) => e.key === "Enter" && saveNotes()}
               />
               <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={saveNotes}>
@@ -157,7 +157,7 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
               className="text-xs text-muted-foreground hover:text-foreground"
               onClick={() => setEditingNotes(true)}
             >
-              {milestone.notes || "+ заметка"}
+              {milestone.notes || "+ note"}
             </button>
           )}
         </div>
@@ -194,7 +194,7 @@ function MilestoneRow({ milestone }: { milestone: Milestone }) {
             >
               {milestone.cost_actual_rub
                 ? formatRub(milestone.cost_actual_rub)
-                : "+ стоимость"}
+                : "+ cost"}
             </button>
           )}
         </div>
@@ -225,9 +225,9 @@ export function DirectionCards() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Направления</CardTitle>
+        <CardTitle>Areas</CardTitle>
         <CardDescription>
-          {goals.directions.length} направлений здоровья
+          {goals.directions.length} health areas
         </CardDescription>
       </CardHeader>
       <CardContent>

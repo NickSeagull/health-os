@@ -7,7 +7,7 @@ import { DentalProcedureTimeline } from "@/components/dental/dental-procedure-ti
 export default function DentalPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Зубы" description="Карта зубов, процедуры" />
+      <PageHeader title="Dental" description="Tooth map and procedures" />
       <ToothMapSvg />
       <DentalProcedureTimeline />
     </div>

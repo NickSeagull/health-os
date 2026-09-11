@@ -1,31 +1,31 @@
 import { NextResponse } from "next/server";
 
 /**
- * Проверки входных данных для мутирующих роутов.
+ * Input validation for mutating routes.
  *
- * До появления этого модуля роуты писали в Data/ всё, что пришло в теле запроса:
- * дата из будущего, вес 8.25 вместо 82.5, статус, которого нет в enum, — всё
- * попадало на диск молча и всплывало потом как «сломанный тренд» или битый инвариант.
- * Схемы, на которые опираются проверки, описаны в .claude/shared/data-schemas.md.
+ * Before this module existed, routes wrote everything from the request body to Data/:
+ * a future date, weight 8.25 instead of 82.5, or a status outside the enum could all
+ * reach disk silently and surface later as a broken trend or invariant.
+ * The schemas used by these checks are described in .claude/shared/data-schemas.md.
  */
 
 /**
- * Москва с 2014 года живёт на фиксированном UTC+3 без перехода на летнее время,
- * поэтому смещение задано константой, а не вычисляется через Intl.
+ * Since 2014, Moscow has used fixed UTC+3 without daylight saving time,
+ * so the offset is a constant rather than being computed through Intl.
  */
 const MSK_OFFSET_MS = 3 * 60 * 60 * 1000;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
-/** Сегодняшняя дата по Москве — точка отсчёта для «не из будущего» */
+/** Today's date in Moscow, used as the reference for "not in the future". */
 export function todayMoscow(): string {
   return new Date(Date.now() + MSK_OFFSET_MS).toISOString().slice(0, 10);
 }
 
 /**
- * Календарно существующая дата YYYY-MM-DD.
- * Одной регулярки мало: она пропускает 2026-02-31 и 2026-13-01.
+ * A calendar-valid YYYY-MM-DD date.
+ * A regular expression alone is insufficient: it allows 2026-02-31 and 2026-13-01.
  */
 export function isIsoDate(value: unknown): value is string {
   if (typeof value !== "string" || !ISO_DATE.test(value)) return false;
@@ -49,34 +49,34 @@ export function isIsoTimestamp(value: unknown): value is string {
 }
 
 /**
- * Приводит отметку времени к московской зоне: Блок 12 data-schemas.md требует
- * `+03:00`, а браузер отдаёт UTC («…Z»). Момент времени при этом не меняется.
+ * Convert a timestamp to Moscow time: Block 12 of data-schemas.md requires
+ * `+03:00`, while browsers send UTC ("…Z"). The instant does not change.
  */
 export function toMoscowTimestamp(value: string): string {
   const shifted = new Date(new Date(value).getTime() + MSK_OFFSET_MS);
   return shifted.toISOString().replace(/\.\d+Z$/, "+03:00");
 }
 
-/** Грубые физиологические границы: ловят опечатку в разряде, а не ставят диагноз */
+/** Broad physiological bounds catch order-of-magnitude typos; they do not diagnose. */
 export const RANGES = {
-  weight_kg: { min: 30, max: 250, label: "вес (кг)" },
-  height_cm: { min: 50, max: 250, label: "рост (см)" },
-  bmi: { min: 8, max: 100, label: "ИМТ" },
-  body_fat_pct: { min: 1, max: 70, label: "процент жира" },
-  muscle_mass_kg: { min: 10, max: 120, label: "мышечная масса (кг)" },
-  systolic: { min: 70, max: 250, label: "систолическое давление" },
-  diastolic: { min: 40, max: 150, label: "диастолическое давление" },
-  heart_rate: { min: 30, max: 220, label: "пульс" },
-  waist_cm: { min: 30, max: 250, label: "объём талии (см)" },
-  score_1_10: { min: 1, max: 10, label: "оценка" },
-  cost_rub: { min: 0, max: 100_000_000, label: "сумма (₽)" },
+  weight_kg: { min: 30, max: 250, label: "weight (kg)" },
+  height_cm: { min: 50, max: 250, label: "height (cm)" },
+  bmi: { min: 8, max: 100, label: "BMI" },
+  body_fat_pct: { min: 1, max: 70, label: "body fat percentage" },
+  muscle_mass_kg: { min: 10, max: 120, label: "muscle mass (kg)" },
+  systolic: { min: 70, max: 250, label: "systolic blood pressure" },
+  diastolic: { min: 40, max: 150, label: "diastolic blood pressure" },
+  heart_rate: { min: 30, max: 220, label: "heart rate" },
+  waist_cm: { min: 30, max: 250, label: "waist circumference (cm)" },
+  score_1_10: { min: 1, max: 10, label: "score" },
+  cost_rub: { min: 0, max: 100_000_000, label: "amount (RUB)" },
 } as const;
 
 export type RangeKey = keyof typeof RANGES;
 
 /**
- * Копит ошибки, чтобы вернуть их разом, а не по одной за запрос.
- * Пустое/отсутствующее значение необязательного поля ошибкой не считается.
+ * Accumulate errors so they can be returned together rather than one per request.
+ * An empty or missing optional value is not an error.
  */
 export class Validator {
   private errors: string[] = [];
@@ -86,45 +86,45 @@ export class Validator {
     return this;
   }
 
-  /** Обязательная непустая строка */
+  /** Required non-empty string. */
   requireString(value: unknown, field: string): this {
     if (typeof value !== "string" || value.trim() === "") {
-      this.add(`${field}: обязательное поле, непустая строка`);
+      this.add(`${field}: required non-empty string`);
     }
     return this;
   }
 
-  /** Обязательная дата YYYY-MM-DD, по умолчанию не из будущего */
+  /** Required YYYY-MM-DD date; by default, it cannot be in the future. */
   requireDate(value: unknown, field: string, allowFuture = false): this {
     if (!isIsoDate(value)) {
-      this.add(`${field}: дата в формате YYYY-MM-DD`);
+      this.add(`${field}: date must use YYYY-MM-DD format`);
     } else if (!allowFuture && isFutureDate(value)) {
-      this.add(`${field}: дата из будущего (${value}), сегодня ${todayMoscow()}`);
+      this.add(`${field}: date is in the future (${value}); today is ${todayMoscow()}`);
     }
     return this;
   }
 
-  /** Дата, которую допустимо не указывать или указать как null */
+  /** Date that may be omitted or set to null. */
   optionalDate(value: unknown, field: string, allowFuture = false): this {
     if (value === undefined || value === null || value === "") return this;
     return this.requireDate(value, field, allowFuture);
   }
 
-  /** Число в грубых физиологических границах; undefined/null/"" пропускаются */
+  /** Number within broad physiological bounds; undefined, null, and "" are allowed. */
   optionalNumber(value: unknown, field: string, range: RangeKey): this {
     if (value === undefined || value === null || value === "") return this;
     const { min, max, label } = RANGES[range];
     if (typeof value !== "number" || !Number.isFinite(value)) {
-      this.add(`${field}: должно быть числом`);
+      this.add(`${field}: must be a number`);
     } else if (value < min || value > max) {
-      this.add(`${field}: ${value} вне диапазона ${min}–${max} (${label})`);
+      this.add(`${field}: ${value} is outside the ${min}–${max} range (${label})`);
     }
     return this;
   }
 
   requireNumber(value: unknown, field: string, range: RangeKey): this {
     if (value === undefined || value === null || value === "") {
-      this.add(`${field}: обязательное поле`);
+      this.add(`${field}: required field`);
       return this;
     }
     return this.optionalNumber(value, field, range);
@@ -136,7 +136,7 @@ export class Validator {
     allowed: readonly T[]
   ): this {
     if (typeof value !== "string" || !allowed.includes(value as T)) {
-      this.add(`${field}: допустимые значения — ${allowed.join(", ")}`);
+      this.add(`${field}: allowed values are ${allowed.join(", ")}`);
     }
     return this;
   }
@@ -152,7 +152,7 @@ export class Validator {
 
   requireArray(value: unknown, field: string): this {
     if (!Array.isArray(value)) {
-      this.add(`${field}: должно быть массивом`);
+      this.add(`${field}: must be an array`);
     }
     return this;
   }
@@ -166,7 +166,7 @@ export class Validator {
     return this.errors.length === 0;
   }
 
-  /** Ответ 400 со списком всех проблем сразу, либо null, если проверки прошли */
+  /** Return a 400 with all problems, or null when validation succeeds. */
   response(): NextResponse | null {
     if (this.ok) return null;
     return NextResponse.json(
@@ -181,12 +181,12 @@ export function badRequest(error: string): NextResponse {
 }
 
 /**
- * Параметр маршрута `[file]` обязан быть именно именем файла: без разделителей
- * и переходов вверх.
+ * The `[file]` route parameter must be a filename, with no separators or
+ * parent-directory traversal.
  *
- * `resolveWithin` такой путь всё равно отвергнет, но бросив исключение — наружу
- * уходила пятисотка с внутренним текстом «path escapes base directory».
- * Отказ во входных данных — это 400, а не сбой сервера.
+ * `resolveWithin` would reject this path anyway, but throwing an exception would
+ * expose a 500 with the internal message "path escapes base directory".
+ * Invalid input should produce 400, not a server failure.
  */
 export function isPlainFilename(value: unknown): value is string {
   if (typeof value !== "string" || value === "") return false;
@@ -203,7 +203,7 @@ export function isPlainFilename(value: unknown): value is string {
   return !/[\\/]/.test(decoded);
 }
 
-/** 409 — запись уже существует. Молча перезаписывать данные запрещено (Блок 0) */
+/** 409: the record already exists. Silent overwrites are forbidden (Block 0). */
 export function conflict(
   error: string,
   extra?: Record<string, unknown>
@@ -212,24 +212,12 @@ export function conflict(
 }
 
 /**
- * Латинский kebab-case для имени файла. Кириллица транслитерируется:
- * все 60 существующих файлов в Data/labs/ и все визиты названы латиницей,
- * а прежняя регулярка оставляла русские буквы как есть.
+ * Latin kebab-case for filenames. Existing lab files and visits use Latin names;
+ * non-Latin input is removed by the slugifier rather than retained as an identifier.
  */
-const TRANSLIT: Record<string, string> = {
-  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh",
-  з: "z", и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o",
-  п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts",
-  ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu",
-  я: "ya",
-};
-
 export function slugify(value: string): string {
   return value
     .toLowerCase()
-    .split("")
-    .map((ch) => TRANSLIT[ch] ?? ch)
-    .join("")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);

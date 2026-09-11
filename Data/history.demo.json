@@ -4,34 +4,34 @@
   "surgeries": [
     {
       "date": "2011-08-02",
-      "name": "Аппендэктомия",
-      "clinic": "Городская больница, Ваш город",
-      "outcome": "без осложнений",
-      "notes": "Лапароскопически"
+      "name": "Appendectomy",
+      "clinic": "City hospital, Your city",
+      "outcome": "without complications",
+      "notes": "Laparoscopically"
     }
   ],
   "hospitalizations": [
     {
       "date_start": "2011-08-02",
       "date_end": "2011-08-08",
-      "reason": "Острый аппендицит",
-      "clinic": "Городская больница, Ваш город",
-      "notes": "Шесть дней, выписан в удовлетворительном состоянии"
+      "reason": "Acute appendicitis",
+      "clinic": "City hospital, Your city",
+      "notes": "Six days; discharged in satisfactory condition"
     }
   ],
   "injuries": [
     {
       "date": "2015-01-20",
-      "description": "Перелом лучевой кости левой руки",
-      "treatment": "Гипс 5 недель, функция восстановлена полностью",
-      "notes": "Падение на льду"
+      "description": "Fracture of the left radius",
+      "treatment": "Cast for five weeks; function fully restored",
+      "notes": "Fall on ice"
     }
   ],
   "significant_events": [
     {
       "date": "2019-09-01",
-      "event": "Переезд в другой город",
-      "notes": "Смена климата и часового пояса — якорь для хронологии симптомов"
+      "event": "Move to another city",
+      "notes": "Change of climate and time zone — an anchor for symptom chronology"
     }
   ]
 }

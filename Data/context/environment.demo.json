@@ -1,123 +1,123 @@
 {
   "version": 1,
   "updated": "2026-07-05",
-  "purpose": "Внешний контекст жизни: география, климат, жильё, работа, стресс. Читается всеми AI-специалистами до того, как искать редкую патологию — среда и режим объясняют находку чаще и дешевле.",
+  "purpose": "External life context: geography, climate, housing, work, and stress. All AI specialists read this before searching for rare pathology; environment and routine explain findings more often and at lower cost.",
   "location": {
-    "city": "Ваш город",
-    "district": "Ваш район",
+    "city": "Your city",
+    "district": "Your district",
     "street": "",
     "nearest_metro": "",
-    "country": "Ваша страна",
+    "country": "Your country",
     "latitude": null,
     "longitude": null,
     "since": "2019-09-01",
     "previous_locations": [
       {
-        "city": "Город до переезда",
+        "city": "City before the move",
         "period": "1992–2019",
-        "note": "Другой часовой пояс и более мягкая зима"
+        "note": "Different time zone and milder winter"
       }
     ]
   },
   "healthcare_access": {
-    "insurance": "государственная страховка по месту жительства",
+    "insurance": "Public health insurance in the place of residence",
     "dms": false,
     "dms_details": null,
-    "travel_readiness": "готов ездить в пределах часа",
+    "travel_readiness": "Willing to travel for up to an hour",
     "max_travel_time_min": 60,
-    "preferred_transport": "общественный транспорт",
-    "notes": "Плановые визиты — в будни во второй половине дня"
+    "preferred_transport": "Public transport",
+    "notes": "Routine visits on weekday afternoons"
   },
   "climate": {
-    "type": "умеренный континентальный",
+    "type": "Temperate continental",
     "derived_facts": [
-      "Короткий световой день с ноября по февраль — вероятен сезонный спад витамина D и настроения",
-      "Отопительный сезон около шести месяцев — сухой воздух в помещении, сухость слизистых зимой",
-      "Точность выводов по световому дню зависит от широты: заполните location.latitude, чтобы этот блок считался под ваш город, а не по общему шаблону"
+      "Short daylight from November through February — seasonal declines in vitamin D and mood are possible",
+      "Heating season lasts about six months — dry indoor air and dry mucous membranes in winter",
+      "Daylight conclusions depend on latitude: fill in location.latitude so this section is calculated for your city rather than a generic template"
     ],
-    "seasonal_pattern_observed": "Снижение энергии с декабря по март, летом жалоб меньше"
+    "seasonal_pattern_observed": "Energy decreases from December through March; fewer complaints in summer"
   },
   "air_and_water": {
-    "air_quality": "городской фон, отдельных источников загрязнения рядом нет",
-    "traffic_proximity": "крупная магистраль в 500 м",
-    "green_space_nearby": "парк в 10 минутах пешком",
-    "tap_water": "жёсткая",
-    "water_filter": "фильтр-кувшин",
+    "air_quality": "Urban background; no individual pollution sources nearby",
+    "traffic_proximity": "Major road 500 m away",
+    "green_space_nearby": "Park 10 minutes away on foot",
+    "tap_water": "Hard",
+    "water_filter": "Filter jug",
     "notes": ""
   },
   "housing": {
-    "type": "квартира в многоэтажном доме",
+    "type": "Apartment in a high-rise building",
     "floor": 7,
-    "windows_orientation": "запад",
-    "heating": "центральное",
-    "humidity_winter": "низкая, около 25–30 %",
-    "noise": "умеренный шум с улицы",
-    "pets": "нет",
-    "mold_or_damp": "нет",
-    "notes": "Западные окна — мало утреннего света в спальне"
+    "windows_orientation": "West",
+    "heating": "Central",
+    "humidity_winter": "Low, about 25–30%",
+    "noise": "Moderate street noise",
+    "pets": "none",
+    "mold_or_damp": "none",
+    "notes": "West-facing windows — little morning light in the bedroom"
   },
   "work": {
-    "field": "офисная работа, ИТ",
-    "posture": "сидя за компьютером",
-    "schedule": "будни, 10:00–19:00",
+    "field": "Office work, IT",
+    "posture": "Sitting at a computer",
+    "schedule": "Weekdays, 10:00–19:00",
     "screen_hours_per_day": 9,
-    "remote_or_office": "гибрид, 3 дня в офисе",
-    "cognitive_load": "высокая",
-    "deadline_pressure": "умеренная, пики в конце квартала",
+    "remote_or_office": "Hybrid, three days in the office",
+    "cognitive_load": "High",
+    "deadline_pressure": "Moderate, with peaks at the end of each quarter",
     "commute": {
-      "mode": "метро и пешком",
+      "mode": "Metro and walking",
       "duration_min": 45,
-      "notes": "Около 20 минут пешком в день"
+      "notes": "About 20 minutes of walking per day"
     },
     "health_implications": [
-      "Девять часов экрана в день — нагрузка на зрение и вероятная сухость глаз",
-      "Сидячая поза полный день — фактор риска для шеи и поясницы",
-      "Мало утреннего дневного света в будни — вклад в сдвиг циркадного ритма"
+      "Nine hours of screen time per day — eye strain and possible dry eyes",
+      "Sitting all day — a risk factor for the neck and lower back",
+      "Little morning daylight on weekdays — a contributor to circadian rhythm shift"
     ]
   },
   "circadian_context": {
-    "chronotype": "умеренно вечерний",
+    "chronotype": "Moderately evening-oriented",
     "timezone": "UTC+3",
     "daylight_exposure_morning_min": 15,
-    "evening_light": "яркий свет и экраны до 23:00",
+    "evening_light": "Bright light and screens until 23:00",
     "shift_work": false,
-    "travel_across_timezones": "редко, 1–2 раза в год",
-    "notes": "В выходные отбой и подъём сдвигаются примерно на час"
+    "travel_across_timezones": "Rarely, 1–2 times per year",
+    "notes": "Bedtime and wake time shift by about one hour on weekends"
   },
   "stress_context": {
     "main_stressors": [
-      "Рабочие дедлайны в конце квартала",
-      "Ощущение нехватки времени на отдых"
+      "Work deadlines at the end of each quarter",
+      "Feeling short of time for rest"
     ],
-    "financial_stress": "низкий",
-    "work_stress_level": "умеренный",
+    "financial_stress": "Low",
+    "work_stress_level": "Moderate",
     "social_support": {
-      "family": "поддерживающая",
-      "friends": "регулярное общение",
-      "partner": "есть",
+      "family": "Supportive",
+      "friends": "Regular contact",
+      "partner": "Present",
       "notes": ""
     },
     "life_events_recent": [
-      "Смена проекта на работе весной 2026"
+      "Changed work project in spring 2026"
     ],
     "chronology_anchors": [
       {
         "year": 2019,
         "age": 27,
-        "event": "Переезд в другой город",
-        "context_at_the_time": "Смена климата и часового пояса",
+        "event": "Move to another city",
+        "context_at_the_time": "Change of climate and time zone",
         "needs_clarification": false
       },
       {
         "year": 2026,
         "age": 34,
-        "event": "Смена проекта на работе, рост нагрузки",
-        "context_at_the_time": "Совпало по времени с жалобой на снижение энергии",
+        "event": "Work project change and increased workload",
+        "context_at_the_time": "Coincided with the onset of reduced energy",
         "needs_clarification": true
       }
     ]
   },
   "_needs_input": [
-    "location.latitude и location.longitude — не заполнены намеренно: подставьте координаты своего города, от широты зависят выводы по световому дню и витамину D"
+    "location.latitude and location.longitude are intentionally blank: enter your city coordinates; daylight and vitamin D conclusions depend on latitude"
   ]
 }

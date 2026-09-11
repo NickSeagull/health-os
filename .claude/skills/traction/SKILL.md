@@ -1,152 +1,152 @@
 ---
 name: traction
 description: |
-  Периодический обзор прогресса по всем направлениям здоровья. Traction-план со статусами и next actions.
-  Триггеры: «прогресс лечения», «traction», «статус здоровья», «health status»
+  Periodic review of progress in all areas of health. Traction plan with statuses and next actions.
+  Triggers: “treatment progress”, “traction”, “health status”, “health status”
 ---
 
-# Health Traction — обзор прогресса (v2)
+# Health Traction - Progress Review (v2)
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading and writing, determine the active profile by
+>`.claude/shared/profile-resolution.md`. Short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before recording, tell whose profile it goes to.
 
-## Назначение
+## Purpose
 
-Регулярный обзор прогресса по всем направлениям здоровья с persistence. Запускать раз в неделю/месяц или по запросу. Каждый ревью сохраняется как snapshot.
+Regular review of progress in all areas of health with persistence. Run once a week/month or upon request. Each review is saved as a snapshot.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### 1. Сбор данных (параллельно)
+### 1. Data collection (in parallel)
 
-Прочитать через Read tool:
-- `Data/goals/YYYY.json` (v2) — направления, фазы, milestones
-- `Data/traction/reviews.jsonl` — предыдущие snapshots
-- `Data/costs/YYYY.jsonl` — расходы
-- `Data/doctors/visits/_index.json` — последние визиты
-- `Data/labs/_index.json` — последние анализы
-- `Data/medications/current.json` — активные курсы
-- `Data/body-metrics.csv` — метрики тела
+Read via Read tool:
+- `Data/goals/YYYY.json` (v2) - directions, phases, milestones
+- `Data/traction/reviews.jsonl` — previous snapshots
+- `Data/costs/YYYY.jsonl` - expenses
+- `Data/doctors/visits/_index.json` - last visits
+- `Data/labs/_index.json` - latest tests
+- `Data/medications/current.json` - active courses
+- `Data/body-metrics.csv` - body metrics
 
-### 2. Diff с предыдущим ревью
+### 2. Diff with previous review
 
-Если `reviews.jsonl` не пустой — загрузить последний snapshot и показать diff:
+If `reviews.jsonl` is not empty, load the latest snapshot and show diff:
 
 ```
-### Что изменилось с прошлого ревью (YYYY-MM-DD)
+### What has changed since the last review (YYYY-MM-DD)
 
-| Направление | Было | Стало | Δ milestones |
+| Direction | Was | Became | Δ milestones |
 |-------------|------|-------|-------------|
-| KR5.4 Стоматология | in_progress (1/6) | in_progress (2/6) | +1 ✅ |
-| KR5.0 Гематолог | investigating (0/4) | in_progress (1/4) | +1 ✅ |
+| KR5.4 Dentistry | in_progress (1/6) | in_progress (2/6) | +1 ✅ |
+| KR5.0 Hematologist | investigating (0/4) | in_progress (1/4) | +1 ✅ |
 
-Новые расходы за период: 7 000 ₽
+New expenses for the period: 7,000 ₽
 ```
 
-### 3. Traction-таблица по фазам
+### 3. Traction table by phases
 
 ```
-## Фаза 1. Срочное (март–апрель)
+## Phase 1. Urgent (March–April)
 
-| KR | Направление | Статус | Milestones | Последнее | Следующий | Дедлайн | 💰 |
+| KR | Direction | Status | Milestones | Latest | Next | Deadline | 💰 |
 |----|-------------|--------|------------|-----------|-----------|---------|-----|
-| 5.0 | Гематолог | 🟡 | 0/4 | — | Направление | 01.04 | 0/5k |
-| 5.1 | Урология | 🔴 | 0/4 | 02.2024 | Записаться | 01.04 | 0/8k |
-| 5.5 | Гормоны | 🔴 | 0/3 | 08.2024 | Анализы | 01.04 | 0/10k |
+| 5.0 | Hematologist | 🟡 | 0/4 | — | Direction | 01.04 | 0/5k |
+| 5.1 | Urology | 🔴 | 0/4 | 02.2024 | Sign up | 01.04 | 0/8k |
+| 5.5 | Hormones | 🔴 | 0/3 | 08.2024 | Tests | 01.04 | 0/10k |
 
-## Фаза 2. Плановое ...
-## Фаза 3. Поддержка ...
+## Phase 2. Planned...
+## Phase 3. Support...
 ```
 
-### 4. Просроченные milestones
+### 4. Overdue milestones
 
 ```
-⚠️ Просроченные:
-- KR5.0_m1: Направление от терапевта — дедлайн 01.04, прошло X дней
-- KR5.1_m1: Записаться к урологу — дедлайн 01.04
+⚠️Overdue:
+- KR5.0_m1: Referral from a general practitioner - deadline 01.04, X days have passed
+- KR5.1_m1: Book a urology appointment - deadline 01.04
 
-Предложить: перенести дедлайн? Создать задачу в Todoist?
+Suggest: move the deadline? Create a task in Todoist?
 ```
 
-### 5. Застойные направления
+### 5. Stagnant directions
 
-Если `last_activity` > 14 дней и status не monitoring/resolved:
+If `last_activity` > 14 days and status is not monitoring/resolved:
 ```
-🔻 Застой (>2 недель без активности):
-- KR5.10 Ортопедия — последняя активность: 2010-06-10 (!)
-- KR5.11 Ментальное — нет активности
+🔻 Stagnation (>2 weeks without activity):
+- KR5.10 Orthopedics - the last activity: 2010-06-10 (!)
+- KR5.11 Mental - no activity
 ```
 
-### 6. Лекарства — статус курсов
+### 6. Medicines - course status
 
-Если есть активные курсы с `until`:
+If there are active courses with `until`:
 ```
-💊 Курсы:
-| Препарат | Осталось | Дозировка | Врач |
+💊 Courses:
+| Drug | Remaining | Dosage | Doctor |
 |----------|----------|-----------|------|
 ```
 
-Постоянный приём: [список]
+Ongoing medications: [list]
 
-### 7. Сводка расходов
+### 7. Cost Summary
 
-Из `Data/costs/YYYY.jsonl`:
+From `Data/costs/YYYY.jsonl`:
 ```
-💰 Расходы за период / за всё время:
-| Период | ОМС | Частно | Итого |
+💰 Expenses for the period / for all time:
+| Period | OMS | Privately | Total |
 |--------|-----|--------|-------|
-| Эта неделя | 0 | 5 000 | 5 000 |
-| Всего 2026 | 0 | 12 000 | 12 000 |
+| This week | 0 | 5,000 | 5,000 |
+| Total 2026 | 0 | 12,000 | 12,000 |
 
-По направлениям: KR5.4 — 7 000, KR5.2 — 5 000
+By directions: KR5.4 - 7,000, KR5.2 - 5,000
 ```
 
-### 8. Рекомендации
+### 8. Recommendations
 
-На основе собранных данных:
-- Что делать в первую очередь (по фазе и приоритету)
-- Какие milestones можно закрыть
-- Какие дедлайны приближаются
+Based on the collected data:
+- What to do first (by phase and priority)
+- What milestones can be closed
+- What deadlines are approaching?
 
-### 9. Сохранение snapshot
+### 9. Saving snapshot
 
-После обзора → append в `Data/traction/reviews.jsonl`:
+After review → append to `Data/traction/reviews.jsonl`:
 
 ```jsonl
-{"ts":"2026-03-14T...","type":"weekly","period":"2026-W11","directions_summary":[{"kr":"KR5.0","status":"investigating","milestones_done":0,"milestones_total":4,"last_activity":"2025-04-02","cost_actual":0}],"fitness":{"workouts_this_month":0,"target":12},"cost_this_period_rub":0,"cost_total_rub":0,"highlights":["Создана v2 модель целей"],"blockers":["Нет записи к гематологу"]}
+{"ts":"2026-03-14T...","type":"weekly","period":"2026-W11","directions_summary":[{"kr":"KR5.0","status":"investigating","milestones_done":0,"milestones_total":4, "last_activity":"2025-04-02","cost_actual":0}],"fitness":{"workouts_this_month":0,"target":12},"cost_this_period_rub":0,"cost_total_rub":0,"highlights":["Created v2 target model"],"blockers":["No entry for hematologist"]}
 ```
 
-### 10. Обновление данных
+### 10. Data update
 
-После обсуждения с пользователем:
-- Обновить `Data/goals/YYYY.json` — статусы, milestones
-- Создать задачи в Todoist (если согласовано)
-- Создать события в Google Calendar (если есть даты)
-- Пересгенерировать `Goals/health-goals.md` из `Data/goals/YYYY.json`
+After discussion with the user:
+- Update `Data/goals/YYYY.json` - statuses, milestones
+- Create tasks in Todoist (if agreed)
+- Create events in Google Calendar (if there are dates)
+- Regenerate `Goals/health-goals.md` from `Data/goals/YYYY.json`
 
-### 11. Recurring задача
+### 11. Recurring task
 
-При первом запуске предложить:
-- Создать recurring задачу в Todoist: «Traction-ревью здоровья» (каждое воскресенье)
+When you first start, suggest:
+- Create a recurring task in Todoist: “Traction health review” (every Sunday)
 
-## Интеграция с WHOOP
+## Integration with WHOOP
 
-Если доступен WHOOP:
-- Подтянуть данные за последнюю неделю
-- Показать: avg recovery, тренировки, sleep quality
-- Прогресс по KR5.6 (12+ тренировок/мес)
+If WHOOP is available:
+- Pull up data for the last week
+- Show: avg recovery, workouts, sleep quality
+- Progress on KR5.6 (12+ workouts/month)
 
-## Правила
+## Rules
 
-- Показывать ФАКТЫ, не домыслы
-- Если данных нет — «нет данных», не выдумывать
-- Всегда сохранять snapshot после ревью
-- Стоимость: два пути (ОМС / частно)
-- Disclaimer: «Рекомендации носят информационный характер»
+- Show FACTS, not speculation
+- If there is no data - “no data”, do not invent
+- Always save snapshot after review
+- Cost: two ways (OMS / private)
+- Disclaimer: “Recommendations are for informational purposes”
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *Information is for reference only. Consult your physician for treatment decisions.*

@@ -24,14 +24,14 @@ export async function PUT(
   try {
     const { file } = await params;
     if (!isPlainFilename(file)) {
-      return badRequest("file: имя файла без пути");
+      return badRequest("file: filename without a path");
     }
 
     const body = (await request.json()) as Partial<LabFileData>;
 
-    // Правка идёт поверх существующего файла: тело запроса перезаписывало его
-    // целиком, снося поля, о которых роут не знает — pdf_path, deviations,
-    // order_number, а у файлов v3 ещё и studies[] со всеми маркерами
+    // Apply edits over the existing file: replacing it with the request body would
+    // remove fields the route does not know about — pdf_path, deviations, order_number,
+    // and, in v3 files, studies[] with all of its markers.
     const existing = await readLabFile(file);
     if (!existing) {
       return NextResponse.json({ error: "Lab file not found" }, { status: 404 });
@@ -44,14 +44,14 @@ export async function PUT(
     v.optionalDate(body?.scanned_date, "scanned_date");
     if (body?.type !== undefined) v.requireString(body.type, "type");
 
-    // Маркеры проверяем во всех трёх поколениях схемы разом
+    // Validate markers across all three schema generations together.
     const incoming: LabMarker[] = collectMarkers(body as LabFileData);
     incoming.forEach((m, i) => {
       if (typeof m?.name !== "string" || m.name.trim() === "") {
-        v.add(`markers[${i}].name: обязательное поле`);
+        v.add(`markers[${i}].name: required field`);
       }
       if (m?.value === undefined && m?.value_text === undefined) {
-        v.add(`markers[${i}]: нужно value либо value_text`);
+        v.add(`markers[${i}]: value or value_text is required`);
       }
       v.requireEnum(m?.status, `markers[${i}].status`, MARKER_STATUSES);
     });
@@ -62,7 +62,7 @@ export async function PUT(
     const merged: LabFileData = {
       ...existing,
       ...body,
-      // version никогда не сбрасывается и не удаляется (Блок 0)
+      // Never reset or remove version (Block 0).
       version: existing.version ?? 1,
     };
 

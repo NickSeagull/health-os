@@ -1,45 +1,45 @@
 import type { MoodEntry } from "@/lib/types/mood";
 
 /**
- * Красные флаги психического состояния — Блок 4 `.claude/shared/critical-values.md`.
+ * Mental-health red flags — Block 4 of `.claude/shared/critical-values.md`.
  *
- * Блок имеет абсолютный приоритет: при срабатывании обычный разбор останавливается.
- * Дашборд пишет в `Data/mental/journal.jsonl` напрямую, минуя скилл `/mental`,
- * поэтому проверку приходится дублировать здесь — иначе запись уходит на диск,
- * и система на неё никак не отвечает.
+ * This block has absolute priority: when triggered, normal analysis stops.
+ * The dashboard writes directly to `Data/mental/journal.jsonl`, bypassing the
+ * `/mental` skill, so the check must be repeated here; otherwise an entry would
+ * be written to disk without any system response.
  */
 
-/** Формулировки, при которых остановка обязательна, включая косвенные */
+/** Phrases requiring an immediate stop, including indirect statements. */
 const RED_FLAG_PATTERNS: RegExp[] = [
-  /суицид|покончить с собой|убить себя|свести счёты с жизнью/i,
-  /не хочу (жить|просыпаться|существовать)/i,
-  /(всем|им|ей|ему) будет лучше без меня/i,
-  /нет смысла (жить|дальше|продолжать)|жить незачем/i,
-  /(режу|порезал|резал|причинить себе)\s*себ|самоповреждени|селфхарм/i,
-  /хочу (умереть|исчезнуть навсегда)/i,
+  /suicid|kill myself|end my life|take my own life/i,
+  /i (?:don't|do not|don’t) want to (live|wake up|exist)/i,
+  /(everyone|everybody|they|she|he) will be better off without me/i,
+  /there is no point (in living|in going on|in continuing)|no reason to live/i,
+  /\b(cut|cutting|hurt|harm)\s+(myself|my self)\b|self[- ]harm/i,
+  /i want to (die|disappear forever)/i,
 ];
 
 export const CRISIS_HELP_TEXT = [
-  "Судя по записи, тебе сейчас тяжело. Это не то, с чем стоит справляться в одиночку.",
+  "Your entry suggests that you are having a hard time right now. You do not have to handle this alone.",
   "",
-  "Куда обратиться прямо сейчас:",
-  "• 112 — единый номер экстренных служб, круглосуточно",
-  "• 103 — скорая помощь",
+  "Where to get help right now:",
+  "• 112 — general emergency number, available 24/7",
+  "• 103 — ambulance service",
   "",
-  "Психологическая помощь (Россия):",
-  "• 8 (495) 051 с мобильного, 051 с городского — экстренная психологическая помощь МЧС, круглосуточно, для взрослых",
-  "• 8-800-2000-122 — Детский телефон доверия: для детей, подростков и их родителей",
+  "Psychological support (Russia):",
+  "• 8 (495) 051 from a mobile phone, 051 from a landline — EMERCOM emergency psychological support, available 24/7 for adults",
+  "• 8-800-2000-122 — Child Helpline for children, teenagers, and their parents",
   "",
-  "В другой стране — найдите местную линию: findahelpline.com либо befrienders.org",
+  "Elsewhere — find a local helpline at findahelpline.com or befrienders.org",
   "",
-  "Если есть мысли о причинении себе вреда — позвони сейчас, не откладывая.",
+  "If you are thinking about harming yourself, call now; do not wait.",
 ].join("\n");
 
 /**
- * Возвращает список сработавших признаков либо null.
+ * Return the triggered indicators, or null.
  *
- * `history` должна включать саму запись — пороги «падение за сутки» и «низкое
- * настроение семь дней» считаются по журналу, а не по одной точке.
+ * `history` must include the current entry: the "drop within 24 hours" and
+ * "low mood for seven days" thresholds are computed from the journal, not one point.
  */
 export function isMoodCrisis(
   entry: MoodEntry,
@@ -48,11 +48,11 @@ export function isMoodCrisis(
   const reasons: string[] = [];
 
   if (entry.mood <= 2) {
-    reasons.push(`настроение ${entry.mood} по десятибалльной шкале`);
+    reasons.push(`mood ${entry.mood} on a ten-point scale`);
   }
 
   if (entry.notes && RED_FLAG_PATTERNS.some((re) => re.test(entry.notes))) {
-    reasons.push("в заметке есть формулировка, требующая немедленного внимания");
+    reasons.push("the notes contain a statement requiring immediate attention");
   }
 
   const sorted = [...history]
@@ -61,18 +61,18 @@ export function isMoodCrisis(
 
   const entryTime = new Date(entry.ts).getTime();
 
-  // Падение настроения на 4 и более пункта за сутки
+  // Mood drop of 4 or more points within 24 hours.
   const dayAgo = entryTime - 24 * 60 * 60 * 1000;
   for (const prev of sorted) {
     const t = new Date(prev.ts).getTime();
     if (t < dayAgo || t >= entryTime) continue;
     if (prev.mood - entry.mood >= 4) {
-      reasons.push(`настроение упало с ${prev.mood} до ${entry.mood} за сутки`);
+      reasons.push(`mood fell from ${prev.mood} to ${entry.mood} within 24 hours`);
       break;
     }
   }
 
-  // Настроение ≤ 4 устойчиво семь дней и более
+  // Mood ≤ 4 for seven consecutive days or more.
   const weekAgo = entryTime - 7 * 24 * 60 * 60 * 1000;
   const lastWeek = sorted.filter((e) => new Date(e.ts).getTime() >= weekAgo);
   if (
@@ -80,7 +80,7 @@ export function isMoodCrisis(
     lastWeek.every((e) => e.mood <= 4) &&
     new Date(lastWeek[0].ts).getTime() <= entryTime - 6 * 24 * 60 * 60 * 1000
   ) {
-    reasons.push("настроение не поднимается выше 4 уже неделю");
+    reasons.push("mood has not risen above 4 for a week");
   }
 
   return reasons.length ? reasons : null;

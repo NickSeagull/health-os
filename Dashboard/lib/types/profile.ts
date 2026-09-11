@@ -58,14 +58,14 @@ export interface Complaint {
 }
 
 /**
- * Типы выведены из фактического `Data/profile.json`, а не из ожиданий.
+ * Types are derived from the actual `Data/profile.json`, not assumptions.
  *
- * Четыре поля были описаны неверно, и React молча съедал значения:
- * `smoking.cigarettes` там `false`, а не строка — на экране было «Сигареты: »;
- * `nutrition.tracking` там `true` — на экране «дефицит (сушка) · true»;
- * `sleep.duration_hours` там «7-8 (стабильно)» — «(7-8 (стабильно)ч)»;
- * `nutrition.history` там строка, а не массив. `safeReadJson<T>` — это каст без
- * валидации, поэтому tsc не видел ни одного из четырёх расхождений.
+ * Four fields were typed incorrectly, and React silently consumed their values:
+ * `smoking.cigarettes` is `false`, not a string, so the screen showed "Cigarettes: ";
+ * `nutrition.tracking` is `true`, so it showed "deficit (cutting) · true";
+ * `sleep.duration_hours` is "7-8 (stable)", so it showed "(7-8 (stable)h)";
+ * `nutrition.history` is a string, not an array. `safeReadJson<T>` only casts
+ * without validation, so tsc detected none of these four mismatches.
  */
 export interface Lifestyle {
   exercise: {
@@ -93,12 +93,12 @@ export interface Lifestyle {
     notes: string;
   };
   work: string;
-  /** Блоки, добавленные позже онбординга. Все четыре пока с `null` внутри */
+  /** Blocks added after onboarding; all four currently contain `null` values. */
   caffeine?: CaffeineBlock;
   hydration?: HydrationBlock;
   screen_and_light?: ScreenLightBlock;
   sleep_regularity?: SleepRegularityBlock;
-  /** Список того, что не заполнено — служебное поле профиля */
+  /** List of missing fields; an internal profile field. */
   _needs_input?: string[];
 }
 

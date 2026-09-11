@@ -1,212 +1,212 @@
 ---
 name: wrap-up
 description: |
-  Завершение сессии health-os: session log, active-context, checkpoint, MEMORY.md, Goals/health-goals.md, очистка breadcrumb и коммит. Закрывает сессию целиком — не для сохранения отдельного файла или анализа.
-  Триггеры: «заверши сессию», «сохрани сессию», «wrap up», «закончили», «закрываем сессию»
+  Ending a health-os session: session log, active-context, checkpoint, MEMORY.md, Goals/health-goals.md, clearing breadcrumb and commit. Closes the entire session - not for saving a single file or analysis.
+  Triggers: “end session”, “save session”, “wrap up”, “finished”, “close session”
 ---
 
-# Wrap-up — завершение сессии
+# Wrap-up - end the session
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading and writing, determine the active profile by
+>`.claude/shared/profile-resolution.md`. Short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before recording, tell whose profile it goes to.
 
-## Назначение
+## Purpose
 
-Сохранить контекст сессии в MEMORY.md, сделать коммит. Без push (нет remote).
+Save the session context in MEMORY.md, make a commit. No push (no remote).
 
 ## Workflow
 
-### 1. Собрать итоги сессии
+### 1. Collect session results
 
-Механизм — не по памяти, а по состоянию репозитория:
+The mechanism is not from memory, but from the state of the repository:
 
 ```bash
 git status --short
 git diff --stat HEAD
 ```
 
-По этому выводу определить:
-- Какие файлы изменились (`git status --short`) и насколько (`git diff --stat HEAD`)
-- Какие направления затронуты — по путям изменённых файлов (`Data/labs/` → анализы, `Data/doctors/` → визиты и т.д.)
-- Какие решения приняты — из хода сессии
-- Что осталось открытым
+From this conclusion determine:
+- Which files have changed (`git status --short`) and by how much (`git diff --stat HEAD`)
+- Which areas are affected - along the paths of the changed files (`Data/labs/` → analyses, `Data/doctors/` → visits, etc.)
+- What decisions were made - from the session
+- What's left open?
 
-### 2. Создать session log
+### 2. Create a session log
 
-Создать файл `Cache/sessions/YYYY-MM-DD_HH-MM.md`:
+Create file `Cache/sessions/YYYY-MM-DD_HH-MM.md`:
 
 ```markdown
-# Сессия YYYY-MM-DD HH:MM
+# Session YYYY-MM-DD HH:MM
 
-- **Длительность:** ~X мин
-- **Направления:** [затронутые KR/направления]
+- **Duration:** ~X min
+- **Directions:** [affected KR/directions]
 
-## Что сделано
+## What's done
 
-- [действие 1]
-- [действие 2]
+- [action 1]
+- [action 2]
 
-## Изменённые файлы
+## Changed files
 
-- [список ключевых файлов]
+- [list of key files]
 
-## Решения
+## Solutions
 
-- [решение 1 — почему]
+- [solution 1 - why]
 
-## Открытые вопросы
+## Open questions
 
-- [что осталось нерешённым]
+- [what remains unresolved]
 ```
 
-### 3. Обновить active-context
+### 3. Update active-context
 
-Перезаписать `Cache/active-context.md`:
+Overwrite `Cache/active-context.md`:
 
 ```markdown
 # Active Context — Health-OS
 
-## Последняя сессия
+## Last session
 
-- **Дата:** YYYY-MM-DD
-- **Что сделано:** [краткий список]
-- **Изменённые файлы:** [список]
+- **Date:** YYYY-MM-DD
+- **What has been done:** [short list]
+- **Changed files:** [list]
 
-### Предыдущие сессии
+### Previous sessions
 
-- [предыдущие 2–3 сессии — одной строкой каждая]
+- [previous 2–3 sessions - one line each]
 
-## Текущие задачи
+## Current tasks
 
-| # | Задача | Статус | Контекст |
+| # | Problem | Status | Context |
 |---|--------|--------|----------|
-| 1 | [задача] | in_progress/waiting/next | [контекст] |
+| 1 | [task] | in_progress/waiting/next | [context] |
 
-## Текущий фокус
+## Current focus
 
-- [на чём сейчас сосредоточена работа]
+- [what the work is currently focused on]
 
-## Ожидания к следующей сессии
+## Expectations for the next session
 
-- [что должно произойти до следующего входа]
+- [what should happen before the next login]
 
-## Следующие шаги
+## Next steps
 
-- [конкретные действия на следующую сессию]
+- [specific actions for the next session]
 
-## Блокеры
+## Blockers
 
-- [что мешает прогрессу, если есть]
+- [what prevents progress, if any]
 ```
 
-### 4. Обновить checkpoint
+### 4. Update checkpoint
 
-Обновить `Cache/checkpoint.yml`:
-- Если многошаговая задача **завершена** → `active: false`, обнулить поля
-- Если задача **не завершена** → оставить `active: true`, обновить `current_step`, `context`, `last_updated`
-- Если не было многошаговой задачи → не трогать
+Update `Cache/checkpoint.yml`:
+- If the multi-step task is **completed** → `active: false`, reset the fields
+- If the task is **not completed** → leave `active: true`, update `current_step`, `context`, `last_updated`
+- If there was no multi-step task → do not touch
 
-### 5. Обновить MEMORY.md
+### 5. Update MEMORY.md
 
-Обновить следующие секции (БЕЗ «Последняя сессия» — она в active-context):
+Update the following sections (WITHOUT “Last session” - it is in the active-context):
 
-**«Активные треды»** — обновить если изменились:
-- Добавить новые направления
-- Обновить статусы
-- Убрать завершённые
+**"Active threads"** - update if changed:
+- Add new directions
+- Update statuses
+- Remove completed
 
-**«Открытые вопросы»** — обновить:
-- Добавить новые
-- Убрать решённые
+**"Open questions"** - update:
+- Add new
+- Remove solved ones
 
-**«Ближайшие действия»** — обновить:
-- Что нужно сделать в следующей сессии
-- Ожидаемые визиты, анализы
+**"Next actions"** - update:
+- What needs to be done in the next session
+- Expected visits, tests
 
-### 6. Обновить Goals/health-goals.md
+### 6. Update Goals/health-goals.md
 
-Пересгенерировать локальный файл целей из живых данных:
+Regenerate local targets file from live data:
 
-**`Goals/health-goals.md`** — обновить из:
-- `Data/goals/YYYY.json` (v2) → все KR из `directions[]` (число направлений читать из файла, не задавать константой), фазы, milestones чекбоксы, расходы
+**`Goals/health-goals.md`** - update from:
+- `Data/goals/YYYY.json` (v2) → all KR from `directions[]` (number of directions read from file, do not set as a constant), phases, milestones checkboxes, expenses
 
-Генерировать полностью, не патчить.
+Generate the file in full; do not patch it.
 
-### 7. Очистить breadcrumb
+### 7. Clear breadcrumb
 
-Удаляется **только breadcrumb текущей сессии**. Массовая чистка запрещена: в `.claude/hooks/pending-sessions/` лежат следы других сессий, в том числе работающих параллельно прямо сейчас, и они — единственный вход для `/recover-sessions`.
+**only the breadcrumb of the current session** is deleted. Mass cleaning is prohibited: `.claude/hooks/pending-sessions/` contains traces of other sessions, including those running in parallel right now, and they are the only input for `/recover-sessions`.
 
-**Если `session_id` текущей сессии известен:**
-- Удалить `.claude/hooks/pending-sessions/{session_id}.json`
-- Удалить `.claude/hooks/session-start-{session_id}.tmp`, если он существует. Отсутствие файла — норма, не ошибка
+**If `session_id` of the current session is known:**
+- Remove `.claude/hooks/pending-sessions/{session_id}.json`
+- Remove `.claude/hooks/session-start-{session_id}.tmp` if it exists. Missing file is normal, not an error
 
-**Если `session_id` неизвестен:**
-- **Не удалять ничего.** Не по дате, не по времени изменения, не «все за сегодня»
-- Сообщить пользователю:
+**If `session_id` is unknown:**
+- **Do not delete anything.** Not by date, not by time of change, not “everything for today”
+- Tell the user:
   ```
-  ⚠️ Breadcrumb не очищен — ID текущей сессии неизвестен.
-     Удалять файлы по дате нельзя: рядом могут лежать breadcrumbs других сессий.
-     Разобрать накопившееся: /recover-sessions
+  ⚠️ Breadcrumb has not been cleared - the current session ID is unknown.
+     You cannot delete files by date: breadcrumbs from other sessions may lie nearby.
+     Recover the accumulated: /recover-sessions
   ```
 
-Чистка чужих breadcrumbs — зона ответственности `/recover-sessions`, а не этого скилла.
+Cleaning other people's breadcrumbs is the responsibility of `/recover-sessions`, not this skill.
 
-### 8. Проверка целостности перед коммитом
+### 8. Checking integrity before committing
 
 ```bash
 python3 .claude/scripts/check-integrity.py
 ```
 
-Коммитить сломанные данные хуже, чем не коммитить: дефект фиксируется в истории и переживает сессию.
+Committing broken data is worse than not committing: the defect is recorded in history and survives the session.
 
-- Всё пройдено — идти дальше молча
-- Есть проблемы — показать их и спросить, чинить сейчас или коммитить как есть. Решение за пользователем: часть расхождений возникает в середине незавершённой работы и это нормально
-- Скрипт недоступен — отметить одной строкой и продолжить
+- Everything is over - move on in silence
+- If there are problems, show them and ask whether to fix them now or commit them as is. The decision is up to the user: some discrepancies occur in the middle of unfinished work and this is normal
+- The script is not available - mark one line and continue
 
-### 9. Коммит
+### 9. Commit
 
-Сначала проверить, есть ли что коммитить:
+First check if there is anything to commit:
 
 ```bash
 git status --porcelain
 ```
 
-**Если вывод пуст** — изменений нет. Коммит не делать (`git commit` завершится ошибкой «nothing to commit»), в подтверждении написать «Коммит: не требуется — изменений нет». Это не ошибка сессии.
+**If the output is empty** - there are no changes. Do not commit (`git commit` will end with the error “nothing to commit”), in the confirmation write “Commit: not required - no changes.” This is not a session error.
 
-**Если вывод непуст:**
+**If the output is not empty:**
 
 ```bash
 git add -A
-git commit -m "[тип]: краткое описание"
+git commit -m "[type]: short description"
 ```
 
-Типы: `feat`, `docs`, `fix`, `refactor`
+Types: `feat`, `docs`, `fix`, `refactor`
 
-**НЕ делать push** — проект только локальный.
+**DO NOT push** - the project is local only.
 
-### 10. Подтверждение
+### 10. Confirmation
 
 ```
-✅ Сессия завершена
+✅ Session ended
 - Session log: Cache/sessions/YYYY-MM-DD_HH-MM.md
-- Active context обновлён
-- Checkpoint: [деактивирован / обновлён (задача X, шаг Y/Z) / не было]
-- MEMORY.md обновлён
-- Goals/health-goals.md обновлён
-- Breadcrumb: [очищен / не очищен — session_id неизвестен, см. /recover-sessions]
-- Коммит: [hash] — [message] / не требуется — изменений нет
-- Изменено файлов: N
+- Active context updated
+- Checkpoint: [deactivated / updated (task X, step Y/Z) / was not]
+- MEMORY.md updated
+- Goals/health-goals.md updated
+- Breadcrumb: [cleared / not cleared - session_id unknown, see /recover-sessions]
+- Commit: [hash] - [message] / not required - no changes
+- Changed files: N
 ```
 
-Каждая строка отражает фактический результат шага. Не писать «очищен», если шаг 7 ушёл в ветку «неизвестен», и не писать про коммит, если его не было.
+Each line reflects the actual result of the step. Do not write “cleaned” if step 7 went into the “unknown” branch, and do not write about the commit if it did not exist.
 
-## Правила
+## Rules
 
-- **Медданные не покидают каталог проекта** — запись PHI куда-либо вовне запрещена. Наружу, если это вообще нужно, идут только агрегаты: количества, статусы, метрики. Никаких названий препаратов, диагнозов, аллергенов, ФИО и дат рождения
-- **Только свой breadcrumb** — удаление чужих или удаление по дате запрещено при любых обстоятельствах
-- **Скилл закрывает сессию целиком** — если пользователь просит сохранить конкретный файл, анализ или заметку, это не `/wrap-up`. Запускать только на явное завершение сессии
-- Порядок шагов зафиксирован в CLAUDE.md и менять его нельзя: лог → active-context → checkpoint → MEMORY → Goals → breadcrumb → проверка целостности → коммит
+- **Medical data does not leave the project directory** - recording PHI anywhere outside is prohibited. If this is needed at all, only aggregates go outside: quantities, statuses, metrics. No names of drugs, diagnoses, allergens, full names or dates of birth
+- **Only your own breadcrumb** - deleting others or deleting by date is prohibited under any circumstances
+- **Skill closes the entire session** - if the user asks to save a specific file, analysis or note, this is not `/wrap-up`. Run only on explicit session termination
+- The order of steps is fixed in CLAUDE.md and cannot be changed: log → active-context → checkpoint → MEMORY → Goals → breadcrumb → integrity check → commit
 
-**Критерий завершения:** session log создан; `Cache/active-context.md` содержит все шесть обязательных секций из `.claude/rules/active-context.md`; `Cache/checkpoint.yml` приведён в соответствие фактическому состоянию задачи; MEMORY.md и `Goals/health-goals.md` обновлены; breadcrumb либо удалён по известному `session_id`, либо явно оставлен с сообщением пользователю; коммит сделан либо честно помечен как не требующийся; отчёт шага 10 отражает реальные результаты каждого шага.
+**Completion criteria:** session log created; `Cache/active-context.md` contains all six required sections from `.claude/rules/active-context.md`; `Cache/checkpoint.yml` is brought into line with the actual state of the task; MEMORY.md and `Goals/health-goals.md` updated; breadcrumb was either deleted by the well-known `session_id`, or was explicitly left with a message to the user; the commit is made or honestly marked as not required; The step 10 report reflects the actual results of each step.

@@ -35,21 +35,21 @@ export function StrainOverview() {
     <Card>
       <CardHeader>
         <CardTitle>Strain</CardTitle>
-        <CardDescription>Нагрузка сегодня</CardDescription>
+        <CardDescription>Today's strain</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-40 w-full" />
         ) : strain == null ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-3xl font-bold">{strain.toFixed(1)}</p>
-                <p className="text-xs text-muted-foreground">из 21.0</p>
+                <p className="text-xs text-muted-foreground">of 21.0</p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold">{calories}</p>
@@ -65,7 +65,7 @@ export function StrainOverview() {
             {data?.activities && data.activities.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Активности
+                  Activities
                 </p>
                 {data.activities.map((a, i) => (
                   <div

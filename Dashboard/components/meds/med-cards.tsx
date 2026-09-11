@@ -97,11 +97,11 @@ function EditMedDialog({
         body: JSON.stringify(updated),
       });
       if (!res.ok) throw new Error();
-      toast.success("Препарат обновлён");
+      toast.success("Medication updated");
       mutate("/api/meds");
       setOpen(false);
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
   }
 
@@ -116,11 +116,11 @@ function EditMedDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
       });
-      toast.success("Курс завершён");
+      toast.success("Course completed");
       mutate("/api/meds");
       setOpen(false);
     } catch {
-      toast.error("Ошибка");
+      toast.error("Something went wrong");
     }
   }
 
@@ -133,22 +133,22 @@ function EditMedDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Редактировать: {med.name}</DialogTitle>
+          <DialogTitle>Edit: {med.name}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Название</Label><Input {...register("name")} /></div>
-            <div><Label>Дозировка</Label><Input {...register("dosage")} /></div>
-            <div><Label>Частота</Label><Input {...register("frequency")} /></div>
-            <div><Label>Время (через запятую)</Label><Input {...register("timing")} placeholder="утро, вечер" /></div>
+            <div><Label>Name</Label><Input {...register("name")} /></div>
+            <div><Label>Dosage</Label><Input {...register("dosage")} /></div>
+            <div><Label>Frequency</Label><Input {...register("frequency")} /></div>
+            <div><Label>Timing (comma-separated)</Label><Input {...register("timing")} placeholder="morning, evening" /></div>
           </div>
-          <div><Label>Причина</Label><Input {...register("reason")} /></div>
-          <div><Label>Заметки</Label><Textarea {...register("notes")} rows={2} /></div>
+          <div><Label>Reason</Label><Input {...register("reason")} /></div>
+          <div><Label>Notes</Label><Textarea {...register("notes")} rows={2} /></div>
           <div className="flex gap-2">
-            <Button type="submit" className="flex-1">Сохранить</Button>
+            <Button type="submit" className="flex-1">Save</Button>
             <Button type="button" variant="outline" onClick={archiveMed}>
               <Archive className="h-3 w-3 mr-1" />
-              Завершить курс
+              Complete course
             </Button>
           </div>
         </form>
@@ -185,7 +185,7 @@ function AddMedDialog({
         side_effects: [],
         notes: data.notes ?? "",
       }),
-      ...(category === "topical" && { type: "наружное" }),
+      ...(category === "topical" && { type: "topical" }),
     };
     (updated[category] as unknown[]).push(newItem);
     try {
@@ -194,12 +194,12 @@ function AddMedDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
       });
-      toast.success("Препарат добавлен");
+      toast.success("Medication added");
       mutate("/api/meds");
       reset();
       setOpen(false);
     } catch {
-      toast.error("Ошибка добавления");
+      toast.error("Could not add medication");
     }
   }
 
@@ -208,22 +208,22 @@ function AddMedDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <Plus className="h-3 w-3 mr-1" />
-          Добавить
+          Add
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Новый препарат</DialogTitle>
+          <DialogTitle>New medication</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Название</Label><Input {...register("name")} /></div>
-            <div><Label>Дозировка</Label><Input {...register("dosage")} /></div>
-            <div><Label>Частота</Label><Input {...register("frequency")} /></div>
-            <div><Label>Время</Label><Input {...register("timing")} placeholder="утро, вечер" /></div>
+            <div><Label>Name</Label><Input {...register("name")} /></div>
+            <div><Label>Dosage</Label><Input {...register("dosage")} /></div>
+            <div><Label>Frequency</Label><Input {...register("frequency")} /></div>
+            <div><Label>Timing</Label><Input {...register("timing")} placeholder="morning, evening" /></div>
           </div>
-          <div><Label>Причина</Label><Input {...register("reason")} /></div>
-          <Button type="submit" className="w-full">Добавить</Button>
+          <div><Label>Reason</Label><Input {...register("reason")} /></div>
+          <Button type="submit" className="w-full">Add</Button>
         </form>
       </DialogContent>
     </Dialog>
@@ -239,15 +239,15 @@ export function MedCards() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Препараты</CardTitle>
-        <CardDescription>Детальный список</CardDescription>
+        <CardTitle>Medications</CardTitle>
+        <CardDescription>Detailed list</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="medications">
           <TabsList>
-            <TabsTrigger value="medications">Лекарства ({meds.medications.length})</TabsTrigger>
-            <TabsTrigger value="supplements">БАДы ({meds.supplements.length})</TabsTrigger>
-            <TabsTrigger value="topical">Наружные ({meds.topical.length})</TabsTrigger>
+            <TabsTrigger value="medications">Medications ({meds.medications.length})</TabsTrigger>
+            <TabsTrigger value="supplements">Supplements ({meds.supplements.length})</TabsTrigger>
+            <TabsTrigger value="topical">Topical ({meds.topical.length})</TabsTrigger>
           </TabsList>
 
           {(["medications", "supplements", "topical"] as const).map((cat) => (
@@ -266,10 +266,10 @@ export function MedCards() {
                       </div>
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      {"dosage" in m && <p>Дозировка: {m.dosage}</p>}
-                      <p>Частота: {m.frequency}</p>
-                      <p>Причина: {m.reason}</p>
-                      {"started" in m && <p>С {formatDate((m as Medication).started)}</p>}
+                      {"dosage" in m && <p>Dosage: {m.dosage}</p>}
+                      <p>Frequency: {m.frequency}</p>
+                      <p>Reason: {m.reason}</p>
+                      {"started" in m && <p>Started: {formatDate((m as Medication).started)}</p>}
                     </div>
                     {"timing" in m && (m as Medication).timing.length > 0 && (
                       <div className="flex gap-1 mt-2">

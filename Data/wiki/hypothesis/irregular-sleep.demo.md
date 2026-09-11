@@ -1,6 +1,6 @@
 ---
 type: hypothesis
-title: Нерегулярный режим сна как причина дневной сонливости
+title: Irregular sleep schedule as a cause of daytime sleepiness
 slug: irregular-sleep
 status: suspected
 created: 2026-02-18
@@ -9,11 +9,11 @@ sources:
   - context/environment.json
 ---
 
-Время отхода ко сну смещается на выходных более чем на два часа — социальный
-джетлаг. Даёт дневную сонливость при достаточной суммарной длительности сна
-[уровень B].
+Bedtime shifts by more than two hours on weekends: social jet lag.
+This causes daytime sleepiness despite sufficient total sleep duration
+[evidence level B].
 
-Объясняет [[symptom/low-energy]] без участия дефицитов и конкурирует с
+Explains [[symptom/low-energy]] without deficiencies and competes with
 [[hypothesis/vitamin-d-deficiency]].
 
-Проверяется две недели стабильного отхода ко сну без изменения добавок.
+Tested through two weeks of consistent bedtimes without changing supplements.

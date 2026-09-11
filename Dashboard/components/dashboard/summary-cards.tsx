@@ -26,32 +26,32 @@ export function SummaryCards() {
 
   const cards = [
     {
-      title: "Вес / BMI",
+      title: "Weight / BMI",
       value: lastMetric
-        ? `${lastMetric.weight_kg} кг / ${lastMetric.bmi ?? "—"}`
+        ? `${lastMetric.weight_kg} kg / ${lastMetric.bmi ?? "—"}`
         : "—",
       icon: Activity,
-      description: lastMetric ? `Последнее: ${lastMetric.date}` : "",
+      description: lastMetric ? `Latest: ${lastMetric.date}` : "",
     },
     {
-      title: "Возраст",
-      value: profile ? `${calcAge(profile.basic.date_of_birth)} лет` : "—",
+      title: "Age",
+      value: profile ? `${calcAge(profile.basic.date_of_birth)} years` : "—",
       icon: Heart,
       description: profile?.basic.blood_type
-        ? `Группа крови: ${profile.basic.blood_type}`
+        ? `Blood type: ${profile.basic.blood_type}`
         : "",
     },
     {
-      title: "Активные KR",
+      title: "Active KRs",
       value: activeDirections ?? "—",
       icon: Target,
-      description: goals ? `Из ${goals.directions.length} направлений` : "",
+      description: goals ? `Of ${goals.directions.length} areas` : "",
     },
     {
-      title: "Препараты",
+      title: "Medications",
       value: activeMeds ?? "—",
       icon: Pill,
-      description: "Лекарства + БАДы",
+      description: "Medications + supplements",
     },
   ];
 

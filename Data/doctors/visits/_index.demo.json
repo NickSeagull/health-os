@@ -7,10 +7,10 @@
       "date": "2026-06-25",
       "file": "2026-06-25_therapist.md",
       "format": "md",
-      "specialty": "терапевт",
-      "doctor": "Демо Терапевт",
-      "clinic": "Поликлиника по месту жительства, Ваш город",
-      "brief": "Плановый приём по поводу сниженной энергии: осмотр без особенностей, разобраны анализы, назначен витамин D и контроль через 3 месяца"
+      "specialty": "primary care",
+      "doctor": "Demo Primary Care Physician",
+      "clinic": "Local outpatient clinic, Your city",
+      "brief": "Routine visit for reduced energy: examination unremarkable, test results reviewed, vitamin D prescribed, and follow-up planned in three months"
     }
   ]
 }

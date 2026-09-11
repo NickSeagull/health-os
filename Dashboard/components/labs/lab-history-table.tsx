@@ -47,8 +47,8 @@ export function LabHistoryTable() {
   const [labFilter, setLabFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
-  // Панель детали читала только detail.markers — у анализов v2 и v3 его нет,
-  // и вместо таблицы показывалось «Не удалось загрузить данные»
+  // The detail panel used to read only detail.markers, which is absent from
+  // v2 and v3 lab files; it therefore showed "Could not load data" instead of a table.
   const detailMarkers = collectMarkers(detail);
 
   const allTypes = [...new Set(labs?.analyses?.map((a) => a.type) ?? [])].sort();
@@ -78,25 +78,25 @@ export function LabHistoryTable() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Все анализы</CardTitle>
+          <CardTitle>All labs</CardTitle>
           <CardDescription>
-            {sorted?.length ?? 0} исследований
+            {sorted?.length ?? 0} tests
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2 mb-4">
             <Input
-              placeholder="Поиск..."
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-8 w-40"
             />
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="h-8 w-40">
-                <SelectValue placeholder="Тип" />
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все типы</SelectItem>
+                <SelectItem value="all">All types</SelectItem>
                 {allTypes.map((t) => (
                   <SelectItem key={t} value={t}>{t}</SelectItem>
                 ))}
@@ -104,10 +104,10 @@ export function LabHistoryTable() {
             </Select>
             <Select value={labFilter} onValueChange={setLabFilter}>
               <SelectTrigger className="h-8 w-48">
-                <SelectValue placeholder="Лаборатория" />
+                <SelectValue placeholder="Laboratory" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все лаборатории</SelectItem>
+                <SelectItem value="all">All laboratories</SelectItem>
                 {allLabs.map((l) => (
                   <SelectItem key={l} value={l}>{l}</SelectItem>
                 ))}
@@ -125,13 +125,13 @@ export function LabHistoryTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Дата</TableHead>
-                    <TableHead>Тип</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Лаборатория
+                      Laboratory
                     </TableHead>
-                    <TableHead>Маркеров</TableHead>
-                    <TableHead>Флаги</TableHead>
+                    <TableHead>Markers</TableHead>
+                    <TableHead>Flags</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -160,7 +160,7 @@ export function LabHistoryTable() {
                           </Badge>
                         ) : (
                           <Badge variant="secondary" className="text-xs">
-                            ОК
+                            OK
                           </Badge>
                         )}
                       </TableCell>
@@ -192,10 +192,10 @@ export function LabHistoryTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Маркер</TableHead>
-                    <TableHead>Значение</TableHead>
-                    <TableHead>Норма</TableHead>
-                    <TableHead>Статус</TableHead>
+                    <TableHead>Marker</TableHead>
+                    <TableHead>Value</TableHead>
+                    <TableHead>Reference</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -228,25 +228,25 @@ export function LabHistoryTable() {
               </Table>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Не удалось загрузить данные
+                Could not load data
               </p>
             )}
             {detail?.summary && (
               <div className="mt-4 rounded-lg bg-muted p-3">
-                <p className="text-xs font-medium mb-1">Резюме</p>
-                {/* summary бывает связным текстом (v1) либо объектом со счётчиками (v2) */}
+                <p className="text-xs font-medium mb-1">Summary</p>
+                {/* summary may be prose (v1) or an object of counters (v2). */}
                 {typeof detail.summary === "string" ? (
                   <p className="text-sm">{detail.summary}</p>
                 ) : (
                   <p className="text-sm">
                     {[
-                      detail.summary.total != null && `всего ${detail.summary.total}`,
-                      detail.summary.normal != null && `в норме ${detail.summary.normal}`,
-                      detail.summary.high != null && `повышено ${detail.summary.high}`,
-                      detail.summary.low != null && `понижено ${detail.summary.low}`,
+                      detail.summary.total != null && `total ${detail.summary.total}`,
+                      detail.summary.normal != null && `normal ${detail.summary.normal}`,
+                      detail.summary.high != null && `high ${detail.summary.high}`,
+                      detail.summary.low != null && `low ${detail.summary.low}`,
                       detail.summary.critical != null &&
                         detail.summary.critical > 0 &&
-                        `критических ${detail.summary.critical}`,
+                        `critical ${detail.summary.critical}`,
                     ]
                       .filter(Boolean)
                       .join(", ")}

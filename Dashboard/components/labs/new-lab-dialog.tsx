@@ -52,7 +52,7 @@ export function NewLabDialog() {
 
   async function handleSave() {
     if (!date || !type) {
-      toast.error("Укажите дату и тип анализа");
+      toast.error("Enter a date and lab type");
       return;
     }
     setSaving(true);
@@ -86,7 +86,7 @@ export function NewLabDialog() {
         }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Анализ добавлен");
+      toast.success("Lab added");
       mutate("/api/labs");
       mutate("/api/labs/markers/list");
       setOpen(false);
@@ -94,7 +94,7 @@ export function NewLabDialog() {
       setMarkers([{ name: "", value: "", unit: "", reference_min: "", reference_max: "" }]);
       setSummary("");
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
     setSaving(false);
   }
@@ -104,36 +104,36 @@ export function NewLabDialog() {
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Добавить анализ
+          Add lab
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>Новый анализ</DialogTitle>
-          <DialogDescription>Ручной ввод результатов</DialogDescription>
+          <DialogTitle>New lab</DialogTitle>
+          <DialogDescription>Enter results manually</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <Label>Дата</Label>
+              <Label>Date</Label>
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div>
-              <Label>Тип анализа</Label>
+              <Label>Lab type</Label>
               <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="biochemistry" />
             </div>
             <div>
-              <Label>Лаборатория</Label>
-              <Input value={lab} onChange={(e) => setLab(e.target.value)} placeholder="Гемотест" />
+              <Label>Laboratory</Label>
+              <Input value={lab} onChange={(e) => setLab(e.target.value)} placeholder="Laboratory name" />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label>Маркеры</Label>
+              <Label>Markers</Label>
               <Button size="sm" variant="outline" onClick={addMarker}>
                 <Plus className="h-3 w-3 mr-1" />
-                Маркер
+                Marker
               </Button>
             </div>
             <div className="space-y-2">
@@ -141,7 +141,7 @@ export function NewLabDialog() {
                 <div key={i} className="flex gap-2 items-end">
                   <div className="flex-1">
                     <Input
-                      placeholder="Название"
+                      placeholder="Name"
                       value={m.name}
                       onChange={(e) => updateMarker(i, "name", e.target.value)}
                       className="h-8 text-xs"
@@ -149,7 +149,7 @@ export function NewLabDialog() {
                   </div>
                   <div className="w-20">
                     <Input
-                      placeholder="Значение"
+                      placeholder="Value"
                       value={m.value}
                       onChange={(e) => updateMarker(i, "value", e.target.value)}
                       className="h-8 text-xs"
@@ -157,7 +157,7 @@ export function NewLabDialog() {
                   </div>
                   <div className="w-16">
                     <Input
-                      placeholder="Ед."
+                      placeholder="Unit"
                       value={m.unit}
                       onChange={(e) => updateMarker(i, "unit", e.target.value)}
                       className="h-8 text-xs"
@@ -194,12 +194,12 @@ export function NewLabDialog() {
           </div>
 
           <div>
-            <Label>Резюме</Label>
-            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={2} placeholder="Краткий вывод по анализу..." />
+            <Label>Summary</Label>
+            <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={2} placeholder="Brief interpretation of the lab results..." />
           </div>
 
           <Button onClick={handleSave} disabled={saving} className="w-full">
-            {saving ? "Сохранение..." : "Сохранить анализ"}
+            {saving ? "Saving..." : "Save lab"}
           </Button>
         </div>
       </DialogContent>

@@ -2,39 +2,39 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Защита изменяющих запросов от вредоносной вкладки в браузере.
+ * Protect mutating requests from a malicious browser tab.
  *
- * Дашборд привязан к `127.0.0.1`, и это защищает от злоумышленника в сети.
- * Против CSRF привязка к loopback не даёт **ничего**: браузер жертвы работает
- * на той же машине, поэтому открытая в соседней вкладке страница может
- * отправить запрос на `127.0.0.1:3000` и попасть в тот же сервер.
+ * The dashboard is bound to `127.0.0.1`, which protects against attackers on the network.
+ * Loopback binding provides **no CSRF protection**: the victim's browser runs
+ * on the same machine, so a page open in another tab can send a request to
+ * `127.0.0.1:3000` and reach the same server.
  *
- * Проверено практически до появления этого файла: `PUT /api/profile`
- * с посторонним `Origin` и `Content-Type: text/plain` возвращал
- * `{"success":true}` и затирал блок `basic` в профиле — дату рождения, пол,
- * рост. Тип `text/plain` выбран не случайно: он относится к «простым»
- * запросам и не вызывает preflight, то есть браузер отправляет его без
- * предварительного разрешения сервера.
+ * This was verified before this file was created: `PUT /api/profile`
+ * with a foreign `Origin` and `Content-Type: text/plain` returned
+ * `{"success":true}` and overwrote the profile's `basic` block — date of birth,
+ * sex, and height. The `text/plain` type is deliberate: it is a "simple"
+ * request and does not trigger a preflight, so the browser sends it without
+ * prior permission from the server.
  *
- * Здесь закрываются два вектора:
+ * This closes two attack vectors:
  *
- * 1. **CSRF.** У изменяющих запросов сверяются `Origin` и `Sec-Fetch-Site`.
- *    Браузер проставляет их сам, и подделать их со страницы нельзя.
- * 2. **DNS rebinding.** Домен злоумышленника, резолвящийся в `127.0.0.1`,
- *    обходит привязку к loopback. Заголовок `Host` при этом остаётся чужим,
- *    поэтому он проверяется отдельно.
+ * 1. **CSRF.** Mutating requests are checked against `Origin` and `Sec-Fetch-Site`.
+ *    The browser sets these headers, and a page cannot forge them.
+ * 2. **DNS rebinding.** An attacker's domain resolving to `127.0.0.1`
+ *    bypasses loopback binding. Its `Host` header remains foreign,
+ *    so it is checked separately.
  *
- * Запрос без `Origin` и без `Sec-Fetch-Site` — это не браузер, а `curl` или
- * скрипт. Такой запрос пропускается: CSRF-вектором он не является, а тот,
- * кто уже исполняет команды на машине, в обходе дашборда не нуждается.
+ * A request without `Origin` and `Sec-Fetch-Site` comes from `curl` or a
+ * script, not a browser. It is allowed: it is not a CSRF vector, and anyone
+ * already executing commands on the machine does not need to bypass the dashboard.
  */
 
 const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-/** Хост признаётся своим, если это петлевой интерфейс. Порт значения не имеет. */
+/** A host is trusted when it is a loopback interface. The port is irrelevant. */
 function isLoopbackHost(host: string | null): boolean {
   if (!host) return false;
-  // Возможные формы: 127.0.0.1:3000, localhost:3000, [::1]:3000
+  // Possible forms: 127.0.0.1:3000, localhost:3000, [::1]:3000
   const hostname = host.startsWith("[")
     ? host.slice(0, host.indexOf("]") + 1)
     : host.split(":")[0];
@@ -61,9 +61,9 @@ function deny(reason: string): NextResponse {
   return NextResponse.json(
     {
       error:
-        "Запрос отклонён: он пришёл не из дашборда. " +
-        "Так выглядит попытка стороннего сайта изменить ваши данные " +
-        "через открытый на этой машине дашборд.",
+        "Request rejected: it did not come from the dashboard. " +
+        "This looks like an external site attempting to change your data " +
+        "through the dashboard open on this machine.",
       reason,
     },
     { status: 403 }
@@ -73,7 +73,7 @@ function deny(reason: string): NextResponse {
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host");
 
-  // DNS rebinding: чужое имя, резолвнутое в 127.0.0.1, приходит с чужим Host
+  // DNS rebinding: a foreign name resolving to 127.0.0.1 arrives with a foreign Host
   if (!isLoopbackHost(host)) {
     return deny("host-not-loopback");
   }
@@ -89,14 +89,14 @@ export function middleware(request: NextRequest) {
       : deny("origin-mismatch");
   }
 
-  // Origin отсутствует. Современные браузеры присылают его для изменяющих
-  // запросов всегда, поэтому проверяем метаданные выборки как второй сигнал.
+  // Origin is absent. Modern browsers always send it for mutating requests,
+  // so check Fetch metadata as a second signal.
   const site = request.headers.get("sec-fetch-site");
   if (site !== null && site !== "same-origin" && site !== "none") {
     return deny("cross-site-fetch");
   }
 
-  // Ни Origin, ни Sec-Fetch-Site — запрос не из браузера
+  // Neither Origin nor Sec-Fetch-Site: the request is not from a browser.
   return NextResponse.next();
 }
 

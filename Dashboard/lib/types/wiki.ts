@@ -1,12 +1,11 @@
 /**
- * Типы и подписи wiki-слоя.
+ * Types and labels for the wiki layer.
  *
- * Вынесены отдельно от чтения с диска: клиентские компоненты импортируют
- * подписи и типы, и если бы они лежали рядом с `fs`, сборка тянула бы
- * серверный модуль в браузерный бандл.
+ * Kept separate from disk access: client components import the labels and types,
+ * and colocating them with `fs` would pull a server module into the browser bundle.
  */
 
-/** Типы страниц, привязанных к конкретному человеку. */
+/** Page types tied to a specific person. */
 export const PERSONAL_TYPES = [
   "condition",
   "hypothesis",
@@ -15,7 +14,7 @@ export const PERSONAL_TYPES = [
   "synthesis",
 ] as const;
 
-/** Типы страниц, общих для всех профилей: литература и справка по маркерам. */
+/** Page types shared by all profiles: literature and marker references. */
 export const SHARED_TYPES = ["source", "marker"] as const;
 
 export type WikiType =
@@ -23,13 +22,13 @@ export type WikiType =
   | (typeof SHARED_TYPES)[number];
 
 export const TYPE_LABEL: Record<WikiType, string> = {
-  condition: "Состояние",
-  hypothesis: "Гипотеза",
-  symptom: "Симптом",
-  doctor: "Врач",
-  synthesis: "Разбор",
-  source: "Источник",
-  marker: "Маркер",
+  condition: "Condition",
+  hypothesis: "Hypothesis",
+  symptom: "Symptom",
+  doctor: "Doctor",
+  synthesis: "Synthesis",
+  source: "Source",
+  marker: "Marker",
 };
 
 export type WikiPage = {
@@ -42,10 +41,10 @@ export type WikiPage = {
   updated: string | null;
   sources: string[];
   url: string | null;
-  links: string[]; // исходящие, нормализованные
+  links: string[]; // outgoing, normalized
   body: string;
   shared: boolean;
-  /** Сообщение об ошибке разбора frontmatter, если он не разобрался. */
+  /** Frontmatter parse error, when parsing failed. */
   broken: string | null;
 };
 

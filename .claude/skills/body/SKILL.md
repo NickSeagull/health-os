@@ -1,148 +1,148 @@
 ---
 name: body
 description: |
-  Метрики тела: вес, давление, BMI, состав тела. Тренды и корреляции с WHOOP.
-  Триггеры: «вес», «давление», «BMI», «взвесился», «измерил давление», «body metrics»
+  Body metrics: weight, blood pressure, BMI, body composition. Trends and correlations with WHOOP.
+  Triggers: “weight”, “blood pressure”, “BMI”, “weighed myself”, “measured my blood pressure”, “body metrics”
 ---
 
-# Health Body — метрики тела
+# Health Body — body metrics
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Фиксация и анализ метрик тела: вес, давление, BMI, состав тела. Тренды и корреляции.
+Record and analyze body metrics: weight, blood pressure, BMI, body composition. Trends and correlations.
 
-## Неотложные пороги — проверяются первыми
+## Emergency thresholds — check first
 
-**До записи и любого анализа** сверься с Блоком 3 файла `.claude/shared/critical-values.md`.
+**Before recording or performing any analysis**, consult Block 3 of `.claude/shared/critical-values.md`.
 
-| Показатель | Порог | Действие |
+| Metric | Threshold | Action |
 |------------|-------|----------|
-| Артериальное давление | ≥ 180/120 | **Гипертонический криз.** Это неотложное состояние, а не «повышенное давление». Вывести первым сообщением, рекомендовать вызвать скорую при боли в груди, одышке, нарушении зрения, речи или асимметрии лица |
-| Артериальное давление | < 90/60 с обмороком, спутанностью или холодным потом | Неотложно |
-| ЧСС в покое | < 40 или > 150 | Неотложно |
-| Вес | потеря > 5% массы за месяц без намерения | К врачу |
+| Blood pressure | ≥ 180/120 | **Hypertensive crisis.** This is an emergency, not “elevated blood pressure”. Display it in the first message; recommend calling an ambulance if there is chest pain, shortness of breath, impaired vision or speech, or facial asymmetry |
+| Blood pressure | < 90/60 with fainting, confusion, or cold sweats | Emergency |
+| Resting heart rate | < 40 or > 150 | Emergency |
+| Weight | unintentional loss of > 5% of body weight in a month | See a doctor |
 
-При срабатывании — записать алерт с `severity: "critical"` и не продолжать обычный workflow, пока не выведено предупреждение.
+If triggered, record an alert with `severity: "critical"` and do not continue the normal workflow until the warning has been displayed.
 
 ## Workflow
 
-### Добавление измерения
+### Adding a measurement
 
-Спросить (все поля опциональны, кроме веса):
-- вес (кг)
-- давление (систолическое/диастолическое)
-- пульс
-- процент жира (если есть весы с анализатором)
-- мышечная масса
-- обхват талии
-- заметки
+Ask for (all fields are optional except weight):
+- weight (kg)
+- blood pressure (systolic/diastolic)
+- pulse
+- body fat percentage (if body composition scales are available)
+- muscle mass
+- waist circumference
+- notes
 
-Структура `Data/body-metrics.csv` — 11 колонок:
+Structure of `Data/body-metrics.csv` — 11 columns:
 
 ```
 date,weight_kg,height_cm,bmi,body_fat_pct,muscle_mass_kg,systolic,diastolic,heart_rate,waist_cm,notes
 ```
 
-→ Добавить строку:
+→ Add a row:
 ```
-2026-03-21,82.5,191,22.6,18.2,,120,80,65,,"утро, натощак"
+2026-03-21,82.5,191,22.6,18.2,,120,80,65,,"morning, fasting"
 ```
 
-Правила записи:
-- **Заметку с запятой обязательно брать в двойные кавычки** — иначе строка получит лишнее поле и сломает разбор всего файла
-- `height_cm` заполняется всегда, значение берётся из `Data/profile.json` → `basic.height_cm`
-- BMI рассчитывается как вес / (рост в метрах)², округление до одного знака
-- Пустое поле оставляется пустым, пробел не ставится
-- Дата в ISO 8601, не из будущего
-- При существующей записи за ту же дату — спросить, заменить или добавить второе измерение
+Writing rules:
+- **Always enclose a note containing a comma in double quotes** — otherwise the row will gain an extra field and break parsing of the entire file
+- Always populate `height_cm`, taking the value from `Data/profile.json` → `basic.height_cm`
+- Calculate BMI as weight / (height in meters)², rounded to one decimal place
+- Leave empty fields empty, without a space
+- Use ISO 8601 dates, not future dates
+- If an entry already exists for the same date, ask whether to replace it or add a second measurement
 
-Проверка правдоподобия перед записью: вес 30–250 кг, систолическое 70–250, диастолическое 40–150, пульс 30–220. При выходе за диапазон — переспросить, возможна опечатка.
+Plausibility check before recording: weight 30–250 kg, systolic 70–250, diastolic 40–150, pulse 30–220. If outside the range, ask again; it may be a typo.
 
-### Просмотр трендов
+### Viewing trends
 
-1. Прочитать `Data/body-metrics.csv`
-2. Показать последние 10 измерений:
+1. Read `Data/body-metrics.csv`
+2. Show the last 10 measurements:
 
 ```
-| Дата | Вес | BMI | Жир% | Давление | Пульс |
+| Date | Weight | BMI | Fat% | Blood pressure | Pulse |
 |------|-----|-----|------|----------|-------|
 ```
 
-3. Тренд за период:
+3. Trend over the period:
 ```
-📊 Вес за последний месяц:
-  Начало: 84.0 кг → Сейчас: 82.5 кг (−1.5 кг)
+📊 Weight over the last month:
+  Start: 84.0 kg → Now: 82.5 kg (−1.5 kg)
   Min: 82.0 | Max: 84.5 | Avg: 83.2
 ```
 
-4. Целевой вес берётся из `Data/goals/YYYY.json` → `fitness_target.target_weight_kg`. Если значение `null` — блок цели не показывать, вместо него предложить задать цель:
+4. Take the target weight from `Data/goals/YYYY.json` → `fitness_target.target_weight_kg`. If the value is `null`, do not show the goal block; instead, offer to set a goal:
 ```
-🎯 Цель: 80 кг | Осталось: 2.5 кг | Темп: −1.5 кг/мес → ~2 мес
+🎯 Goal: 80 kg | Remaining: 2.5 kg | Pace: −1.5 kg/month → ~2 months
 ```
 
-### Данные InBody
+### InBody data
 
-Измерения состава тела с InBody лежат в `Data/labs/*_inbody.json` и частично продублированы в CSV вручную.
+InBody body composition measurements are stored in `Data/labs/*_inbody.json` and partially duplicated manually in the CSV.
 
-**Владелец записи — `Data/labs/`**, CSV только отражает сводные значения. При расхождении верны данные InBody. Не создавать новую CSV-строку из InBody, если строка за эту дату уже есть.
+**The authoritative record is in `Data/labs/`**; the CSV only reflects summary values. If they disagree, the InBody data is correct. Do not create a new CSV row from InBody if a row for that date already exists.
 
-### Корреляции с WHOOP
+### Correlations with WHOOP
 
-1. Подтянуть WHOOP за период через MCP-сервер `whoop`. Если сервер недоступен — сказать об этом и продолжить без корреляций
-2. Показать связь веса с recovery, strain, sleep
+1. Retrieve WHOOP data for the period through the `whoop` MCP server. If the server is unavailable, say so and continue without correlations
+2. Show the relationship between weight and recovery, strain, and sleep
 
-Корреляция на выборке из одного человека — уровень доказательности D.
+A correlation from a sample of one person is evidence level D.
 
-### Контекст жизни
+### Life context
 
-При интерпретации динамики веса и давления учитывать (Блок 4 холистической рамки):
-- фазу питания из `Data/profile.json` → `lifestyle.nutrition` — дефицит или профицит объясняет большинство изменений веса
-- вещества: кальян, кофеин, алкоголь — прямое влияние на давление и пульс
-- нагрузку и восстановление
+When interpreting weight and blood pressure changes, consider (Block 4 of the holistic framework):
+- the nutrition phase from `Data/profile.json` → `lifestyle.nutrition` — a deficit or surplus explains most weight changes
+- substances: hookah, caffeine, alcohol — direct effects on blood pressure and pulse
+- exertion and recovery
 
-### Алерты
+### Alerts
 
-Записывать в `Cache/alerts/YYYY-MM-DD.json` по схеме из Блока 5 `critical-values.md`.
+Write to `Cache/alerts/YYYY-MM-DD.json` using the schema in Block 5 of `critical-values.md`.
 
-| Условие | Severity |
+| Condition | Severity |
 |---------|----------|
-| Давление ≥ 180/120 или ЧСС < 40 / > 150 | critical |
-| Давление 160–179 / 100–119 устойчиво | high |
-| Давление > 140/90 | medium |
-| Вес изменился > 2 кг за неделю | medium |
-| BMI вне диапазона 18,5–24,9 | low |
+| Blood pressure ≥ 180/120 or heart rate < 40 / > 150 | critical |
+| Persistent blood pressure 160–179 / 100–119 | high |
+| Blood pressure > 140/90 | medium |
+| Weight changed by > 2 kg in a week | medium |
+| BMI outside the 18.5–24.9 range | low |
 
-## Детский профиль
+## Pediatric profile
 
-При возрасте младше 18 лет рост, вес и ИМТ **не интерпретируются абсолютным
-значением** — только перцентильно по возрасту и полу (стандарты роста ВОЗ).
-См. `.claude/shared/pediatric-references.md`, Блок 4.
+For patients under 18, height, weight, and BMI **must not be interpreted as absolute
+values** — only as age- and sex-specific percentiles (WHO growth standards).
+See `.claude/shared/pediatric-references.md`, Block 4.
 
-- Записывать в CSV как обычно, интерпретировать — перцентильно
-- Значимее положения на кривой её **динамика**: пересечение двух и более
-  перцентильных линий вниз или вверх требует внимания, тогда как стабильный
-  низкий коридор чаще вариант нормы
-- Артериальное давление у ребёнка читается перцентилем по возрасту, полу и
-  росту. **Взрослый порог 140/90 неприменим**; неотложные пороги из
-  `critical-values.md` для детей тоже возрастные
-- Без даты рождения перцентиль не считается — сказать об этом, а не
-  подставлять взрослую логику
+- Record in the CSV as usual; interpret using percentiles
+- The curve's **trajectory** matters more than the position on it: crossing two or more
+  percentile lines downward or upward requires attention, whereas a consistently
+  low percentile band is more often a normal variant
+- A child's blood pressure is interpreted as a percentile for age, sex, and
+  height. **The adult threshold of 140/90 does not apply**; the emergency thresholds in
+  `critical-values.md` are also age-specific for children
+- Without a date of birth, a percentile cannot be calculated — say so rather than
+  substituting adult logic
 
 ---
 
-## Правила
+## Rules
 
-- **Неотложные пороги проверяются первыми** — до записи и до трендов
-- CSV: UTF-8, запятые, первая строка — заголовки, 11 колонок
-- Новые записи — append в конец файла, существующие строки не переписывать
-- Заметки с запятыми — только в двойных кавычках
-- Рост берётся из `Data/profile.json` → `basic.height_cm`
-- При давлении > 140/90 — предупреждение о консультации терапевта
-- Критерий завершения: строка добавлена, BMI рассчитан, алерты при срабатывании записаны
+- **Check emergency thresholds first** — before recording and before trends
+- CSV: UTF-8, commas, first row contains headers, 11 columns
+- Append new entries to the end of the file; do not rewrite existing rows
+- Notes containing commas must be enclosed in double quotes
+- Take height from `Data/profile.json` → `basic.height_cm`
+- For blood pressure > 140/90, warn that a primary care consultation is needed
+- Completion criterion: the row is added, BMI is calculated, and any triggered alerts are recorded
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу. При признаках неотложного состояния — 103 или 112.*
+⚕️ *This information is for reference only. Consult a doctor before making treatment decisions. If there are signs of an emergency, call 103 or 112.*

@@ -1,47 +1,47 @@
-# `Data/` — каталог медицинских данных
+# `Data/` — Medical Data Directory
 
-Здесь живёт вся медкарта: профиль, анализы, визиты, лекарства, цели. Всё остальное в проекте — скиллы, агенты, дашборд — только читает и пишет эти файлы.
+The entire medical record lives here: profile, lab results, visits, medications, and goals. Everything else in the project—skills, agents, and the dashboard—reads and writes these files.
 
-В репозитории лежат **шаблоны**, а не данные. Свои данные вы создаёте сами из шаблонов, и в git они не попадают (см. [«Почему содержимое не под контролем версий»](#почему-содержимое-не-под-контролем-версий)).
-
----
-
-## Два типа шаблонов
-
-| Суффикс | Что это | Зачем |
-|---------|---------|-------|
-| `*.example.*` | Пустая, но валидная структура: пустые массивы, `null`, счётчики по нулям | С этого начинают своё |
-| `*.demo.*` | Та же схема, заполненная синтетическими данными вымышленного пациента | Запустить дашборд и увидеть, как всё выглядит, до того как заводить своё |
-
-Демо-пациент — «Демо Пользователь», мужчина 34 лет, город обозначен как «Ваш город». Данные придуманы: анализы в основном в норме с одним лёгким отклонением (витамин D 24 нг/мл), один визит к терапевту, один витамин в приёме, три записи веса. Никакого отношения к реальному человеку они не имеют и медицинским примером служить не могут.
+The repository contains **templates**, not personal records. You create your own data from the templates; it stays out of Git (see [Why the contents are not version-controlled](#why-the-contents-are-not-version-controlled)).
 
 ---
 
-## Как начать
+## Two types of templates
 
-### Вариант 1. Посмотреть на демо
+| Suffix | What it contains | Purpose |
+|--------|------------------|---------|
+| `*.example.*` | An empty but valid structure: empty arrays, `null`, and zero counters | Starting your own record |
+| `*.demo.*` | The same schema populated with synthetic data for a fictional patient | Exploring the dashboard before entering your own data |
 
-Скопировать все демо-файлы в рабочие имена — снимается суффикс `.demo`:
+The demo patient is “Demo User,” a 34-year-old man whose city is listed as “Your city.” The data is invented: mostly normal lab results with one mild abnormality (vitamin D at 24 ng/mL), one primary care visit, one vitamin supplement, and three weight entries. It has no connection to a real person and must not be treated as a clinical example. The bundled structured dataset uses English labels.
+
+---
+
+## Getting started
+
+### Option 1. Explore the demo
+
+Copy all demo files to their working filenames by removing the `.demo` suffix:
 
 ```bash
 find Data -name '*.demo.*' | while read -r f; do cp "$f" "${f/.demo./.}"; done
-mv Data/goals/goals.json  Data/goals/2026.json    # см. примечание про год ниже
+mv Data/goals/goals.json  Data/goals/2026.json    # see the year note below
 mv Data/costs/costs.jsonl Data/costs/2026.jsonl
 ```
 
-Запускать из корня проекта. Команда работает в `bash` и `zsh`.
+Run this from the project root. The command works in `bash` and `zsh`.
 
-После этого запускается дашборд:
+Then start the dashboard:
 
 ```bash
 cd Dashboard && npm install && npm run dev
 ```
 
-Демо-файлы остаются на месте — рабочие копии можно удалить и повторить в любой момент.
+The demo templates remain in place, so you can delete the working copies and repeat at any time.
 
-### Вариант 2. Завести своё
+### Option 2. Start your own record
 
-То же самое, но из пустых шаблонов:
+Do the same with empty templates:
 
 ```bash
 find Data -name '*.example.*' ! -name '_analysis.*' ! -name '_visit.*' \
@@ -50,155 +50,155 @@ mv Data/goals/goals.json  Data/goals/2026.json
 mv Data/costs/costs.jsonl Data/costs/2026.jsonl
 ```
 
-`_analysis.reference.json` и `_visit.reference.md` из копирования исключены намеренно: это шаблоны **одной записи**, а не файла. Их копируют вручную, сразу под нужным именем — `Data/labs/2026-06-18_cbc.json`, `Data/doctors/visits/2026-06-25_therapist.md`.
+`_analysis.reference.json` and `_visit.reference.md` are intentionally excluded: they are **single-entry** templates, not whole-file templates. Copy them manually using the intended filename, such as `Data/labs/2026-06-18_cbc.json` or `Data/doctors/visits/2026-06-25_therapist.md`.
 
-Дальше — заполнять через скиллы, а не руками: `/onboarding` проведёт интервью и разложит ответы по файлам, `/inbox` разберёт PDF с анализами, `/labs`, `/doctor`, `/meds` пишут в свои файлы сами.
+Continue through skills rather than editing by hand: `/onboarding` interviews you and distributes answers across files; `/inbox` processes lab PDFs; `/labs`, `/doctor`, and `/meds` write their respective files.
 
-> Если вы пробовали демо, перед вариантом 2 удалите рабочие копии — иначе демо-пациент останется в вашей медкарте.
+> If you tried the demo, delete the working copies before option 2; otherwise, the fictional patient will remain in your medical record.
 
-### Примечание про файлы, названные по году
+### Note on files named by year
 
-Два файла в рабочем виде называются по году: цели и расходы. Шаблоны года не содержат — `goals.example.json` и `costs.example.jsonl`, — потому что год у каждого свой. Отсюда два `mv` в командах выше.
+Two working files are named by year: goals and expenses. Templates have no year—`goals.example.json` and `costs.example.jsonl`—because each user's starting year may differ. That explains the two `mv` commands above.
 
-Имейте в виду: обращения к этим файлам сейчас жёстко зашиты на 2026 год — дашборд читает `Data/goals/2026.json` (`Dashboard/lib/data/goals.ts:5`), скиллы ссылаются на `Data/costs/2026.jsonl`. Начиная другой год, переименуйте файл и поправьте эти ссылки.
-
----
-
-## Что где лежит
-
-### Корень
-
-| Файл | Что внутри |
-|------|-----------|
-| `profile.json` | Медкарта: базовые данные, аллергии, хронические, семейный анамнез, жалобы, образ жизни |
-| `history.json` | Операции, госпитализации, травмы, значимые события жизни — хронологический якорь |
-| `vaccinations.json` | Прививки и туберкулиновые пробы |
-| `hypotheses.json` | Гипотезы о причинах симптомов со статусом, доказательствами за и против |
-| `body-metrics.csv` | Вес, рост, ИМТ, давление, пульс, состав тела — одиннадцать колонок |
-
-### Подкаталоги
-
-| Каталог | Файлы | Что внутри |
-|---------|-------|-----------|
-| `context/` | `environment.json` | Внешний контекст: город, климат, жильё, работа, циркадный ритм, стрессоры |
-| `labs/` | `_index.json`, `YYYY-MM-DD_[type].json` | Анализы. Индекс + по файлу на исследование |
-| `labs/pdfs/` | — | Отчёты лабораторий, на которые ссылается `pdf_path` |
-| `doctors/` | `contacts.json` | Врачи: ФИО, специальность, клиника |
-| `doctors/visits/` | `_index.json`, `YYYY-MM-DD_[specialty].md` | Протоколы приёмов. Индекс + по файлу на визит |
-| `doctors/prep/` | `[specialty].md` | Подготовка к ближайшему приёму. Перезаписывается, дата в имени не ставится |
-| `dental/` | `tooth-map.json`, `procedures.json` | Карта зубов по ISO 3950 и история процедур |
-| `medications/` | `current.json`, `history.json` | Четыре независимых массива: лекарства, БАДы, наружное, протоколы. Завершённые курсы — в `history.json` |
-| `mental/` | `journal.jsonl`, `patterns.md` | Журнал состояния и выявленные паттерны |
-| `goals/` | `<год>.json` | Направления здоровья, milestones, сметы |
-| `costs/` | `<год>.jsonl` | Расходы: одна трата — одна строка |
-| `traction/` | `reviews.jsonl` | Снимки прогресса по направлениям |
-| `consilium/` | `_sessions.json`, `YYYY-MM-DD_[scope].md` | Индекс AI-консилиумов и сами отчёты |
-| `specialists/` | `marker-ownership.json`, `cross-specialty-map.json` | **База знаний системы, не ваши данные.** Какой специалист владеет каким маркером и как связаны специальности. Идут в комплекте и в git попадают |
-| `history/` | — | Каталог для оцифровки старых документов |
-
-Файл `labs/_marker-aliases.json` — тоже база знаний: канонические имена маркеров, синонимы и коэффициенты пересчёта единиц. Идёт в комплекте.
-
-### Служебные файлы
-
-Имя, начинающееся с подчёркивания, означает служебный файл, а не запись:
-
-- `_index.json` — индексы анализов и визитов
-- `_marker-aliases.json`, `_sessions.json` — справочник и журнал сессий
-- `_analysis.reference.json`, `_visit.reference.md` — шаблоны одной записи: анализа и протокола визита
-
-Подчёркивание здесь не косметика: индексы и инварианты считают файлы в каталоге, и служебные из подсчёта исключаются.
+References to these files are currently hardcoded to 2026: the dashboard reads `Data/goals/2026.json` (`Dashboard/lib/data/goals.ts:5`), and skills reference `Data/costs/2026.jsonl`. When starting another year, rename the files and update these references.
 
 ---
 
-## Форматы, которые не видно по пустому шаблону
+## Where everything lives
 
-`*.example.jsonl` — пустые файлы: append-only журнал именно так и начинается. Схему строки смотрите в соответствующем `*.demo.jsonl` или ниже.
+### Root files
 
-**`mental/journal.jsonl`** — одна запись состояния:
+| File | Contents |
+|------|----------|
+| `profile.json` | Medical record: basic information, allergies, chronic conditions, family history, complaints, and lifestyle |
+| `history.json` | Surgeries, hospitalizations, injuries, and significant life events—the chronological anchor |
+| `vaccinations.json` | Vaccinations and tuberculin tests |
+| `hypotheses.json` | Hypotheses about symptom causes, with status and evidence for and against |
+| `body-metrics.csv` | Weight, height, BMI, blood pressure, pulse, and body composition—eleven columns |
+
+### Subdirectories
+
+| Directory | Files | Contents |
+|-----------|-------|----------|
+| `context/` | `environment.json` | External context: city, climate, housing, work, circadian rhythm, and stressors |
+| `labs/` | `_index.json`, `YYYY-MM-DD_[type].json` | Lab results: an index plus one file per test panel |
+| `labs/pdfs/` | — | Lab reports referenced by `pdf_path` |
+| `doctors/` | `contacts.json` | Doctors: full name, specialty, and clinic |
+| `doctors/visits/` | `_index.json`, `YYYY-MM-DD_[specialty].md` | Visit notes: an index plus one file per visit |
+| `doctors/prep/` | `[specialty].md` | Preparation for the next appointment; overwritten, with no date in the filename |
+| `dental/` | `tooth-map.json`, `procedures.json` | ISO 3950 tooth chart and procedure history |
+| `medications/` | `current.json`, `history.json` | Four independent arrays: medications, supplements, topical treatments, and protocols. Completed courses go in `history.json` |
+| `mental/` | `journal.jsonl`, `patterns.md` | Well-being journal and identified patterns |
+| `goals/` | `<year>.json` | Health areas, milestones, and cost estimates |
+| `costs/` | `<year>.jsonl` | Expenses: one expense per line |
+| `traction/` | `reviews.jsonl` | Progress snapshots by health area |
+| `consilium/` | `_sessions.json`, `YYYY-MM-DD_[scope].md` | AI consilium index and reports |
+| `specialists/` | `marker-ownership.json`, `cross-specialty-map.json` | **System knowledge, not your data.** Marker ownership and relationships between specialties. Bundled and tracked in Git |
+| `history/` | — | Directory for digitizing old documents |
+
+`labs/_marker-aliases.json` is also system knowledge: canonical marker names, synonyms, and unit conversion factors. It is bundled with the project.
+
+### Service files
+
+A name starting with an underscore denotes a service file rather than a record:
+
+- `_index.json` — lab and visit indexes
+- `_marker-aliases.json`, `_sessions.json` — reference registry and session log
+- `_analysis.reference.json`, `_visit.reference.md` — single-entry templates for a test panel and visit note
+
+The underscore is functional: indexes and invariants count directory entries, excluding service files.
+
+---
+
+## Formats that empty templates do not illustrate
+
+`*.example.jsonl` files are empty: that is how an append-only journal begins. See the corresponding `*.demo.jsonl` or the examples below for each line's schema.
+
+**`mental/journal.jsonl`** — one well-being entry:
 
 ```json
 {"ts":"2026-07-10T22:10:00+03:00","mood":7,"energy":6,"stress":4,"sleep_quality":7,"notes":"","tags":[]}
 ```
 
-`ts` — с часовым поясом, не просто дата: за сутки записей может быть несколько. Оценки — 1–10, у `stress` 10 означает максимальный стресс.
+`ts` includes a time zone, not just a date: there may be several entries per day. Scores range from 1 to 10; for `stress`, 10 means maximum stress.
 
-**`costs/<год>.jsonl`** — одна трата:
+**`costs/<year>.jsonl`** — one expense:
 
 ```json
 {"ts":"2026-06-18","kr":"KR5.0","type":"lab","description":"","payment":"private","cost_rub":2400,"clinic":"","visit_ref":null}
 ```
 
-`payment` — `oms` (по государственной страховке, тогда `cost_rub` = 0) или `private`. `kr` берётся из `goals/<год>.json`; если трата не ложится ни в одно направление — `null`, а не выдуманный KR.
+`payment` is `oms` (public insurance, with `cost_rub` = 0) or `private`. `kr` comes from `goals/<year>.json`; if the expense fits no health area, use `null` rather than inventing a KR.
 
-**`traction/reviews.jsonl`** — снимок прогресса, по строке на ревью. Структура — в `reviews.demo.jsonl`.
+**`traction/reviews.jsonl`** — a progress snapshot, one line per review. See `reviews.demo.jsonl` for the structure.
 
-**`body-metrics.csv`** — одиннадцать колонок, пустое значение это пустое поле между запятыми, не `null` и не прочерк. Если в заметке есть запятая, значение обязательно в двойных кавычках:
+**`body-metrics.csv`** — eleven columns. A missing value is an empty field between commas, not `null` or a dash. Notes containing a comma must be enclosed in double quotes:
 
 ```csv
-2026-06-18,78.6,178,24.8,,,118,76,62,,"Утро, натощак"
+2026-06-18,78.6,178,24.8,,,118,76,62,,"Morning, fasting"
 ```
 
-Без кавычек строка разбирается как двенадцать полей и ломает разбор всего файла.
+Without quotes, the row is parsed as twelve fields and breaks parsing of the entire file.
 
 ---
 
-## Почему содержимое не под контролем версий
+## Why the contents are not version-controlled
 
-`.gitignore` в корне проекта игнорирует `Data/**` целиком и перечисляет исключения — структуру каталогов, шаблоны и базу знаний. Логика намеренно обратная привычной: не «перечислить, что скрыть», а «скрыть всё и открыть немногое». Ошибка в такой схеме приводит к тому, что файл не попадёт в git, — а не к тому, что медкарта уедет в публичный репозиторий.
+The root `.gitignore` ignores all of `Data/**` and lists exceptions for the directory structure, templates, and system knowledge. This intentionally reverses the usual approach: hide everything and expose a few known files. A mistake then keeps a file out of Git instead of sending a medical record to a public repository.
 
-Практические следствия:
+Practical consequences:
 
-- Файл с рабочим именем (`profile.json`, `2026-06-18_cbc.json`, `patterns.md`) в git не попадёт никогда.
-- Суффиксы `.example` и `.demo` носят **только шаблоны**. Не называйте так свои файлы — они окажутся в коммите.
-- `.gitkeep` в каждом подкаталоге держит структуру: пустые каталоги git не хранит.
-- PDF, DICOM и изображения игнорируются отдельным правилом — в них PHI лежит в самом сыром виде и переживает любое удаление из рабочего каталога.
+- Working filenames (`profile.json`, `2026-06-18_cbc.json`, `patterns.md`) stay out of Git.
+- The `.example` and `.demo` suffixes are **only for templates**. Do not use them for your own files: those files would be included in a commit.
+- `.gitkeep` preserves each subdirectory because Git does not store empty directories.
+- PDFs, DICOM files, and images are ignored by a separate rule: they contain raw protected health information (PHI), which survives deletion from the working directory if committed.
 
-Проверить перед коммитом, что ничего лишнего не попадает:
+Before committing, check that nothing unintended is included:
 
 ```bash
 git status --short
-git check-ignore -v Data/profile.json    # должен показать правило Data/**
+git check-ignore -v Data/profile.json    # should show the Data/** rule
 ```
 
 ---
 
-## Где описаны схемы
+## Where the schemas are defined
 
-Единственный источник истины — **`.claude/shared/data-schemas.md`**. Там по каждому файлу: поля, типы, обязательность, enum-ы, ключи дубликатов и инварианты. Шаблоны в этом каталоге выведены из него.
+The single source of truth is **`.claude/shared/data-schemas.md`**. It lists each file's fields, types, required values, enums, duplicate keys, and invariants. Templates in this directory are derived from it.
 
-При расхождении шаблона и того документа прав документ. При расхождении документа и реальных данных на диске прав диск — документ надо обновить.
+If a template conflicts with that document, the document takes precedence. If the document conflicts with actual data on disk, the disk takes precedence and the document needs updating.
 
-Смежные документы:
+Related documents:
 
-- `.claude/shared/critical-values.md` — пороги критических значений, проверяются до сохранения
-- `.claude/shared/holistic-framework.md` — какие файлы обязан прочитать AI-специалист
-- `Dashboard/SPEC.md` — как дашборд читает эти файлы
+- `.claude/shared/critical-values.md` — critical-value thresholds checked before saving
+- `.claude/shared/holistic-framework.md` — files every AI specialist must read
+- `Dashboard/SPEC.md` — how the dashboard reads these files
 
-### Инварианты
+### Invariants
 
-Проверяются при каждой записи. В `.claude/shared/data-schemas.md` те же проверки записаны короче — в расчёте на каталог, где лежат только рабочие файлы. Здесь рядом с ними живут шаблоны, поэтому `.example.*`, `.demo.*` и точечные файлы из подсчёта исключены явно:
+Check these on every write. `.claude/shared/data-schemas.md` uses shorter versions assuming a directory containing only working files. Here templates live alongside them, so `.example.*`, `.demo.*`, and dotfiles are explicitly excluded from counts:
 
 ```bash
-# число анализов в каталоге равно числу записей в индексе
+# The number of lab files equals the number of index entries
 [ "$(ls Data/labs/*.json | grep -v '/_' | grep -vc '\.\(demo\|example\)\.')" \
   = "$(jq '.analyses|length' Data/labs/_index.json)" ] && echo "labs OK"
 
-# число визитов равно total в индексе
+# The number of visits equals the index total
 [ "$(ls Data/doctors/visits/ | grep -v '^[._]' | grep -vc '\.\(demo\|example\)\.')" \
   = "$(jq '.total' Data/doctors/visits/_index.json)" ] && echo "visits OK"
 
-# сумма статусных счётчиков карты зубов равна числу известных зубов
+# The sum of tooth-chart status counters equals the number of known teeth
 jq '([.summary | to_entries[] | select(.key != "total") | .value] | add) == (.teeth | length)' Data/dental/tooth-map.json
 
-# расходы сходятся с целями
+# Expenses agree with goals
 [ "$(jq -s 'map(.cost_rub)|add' Data/costs/2026.jsonl)" \
   = "$(jq '.cost_summary.total_actual_rub' Data/goals/2026.json)" ] && echo "costs OK"
 ```
 
-Если удалить `.example.*` и `.demo.*` после настройки, работают и короткие формы из `data-schemas.md`.
+If you delete `.example.*` and `.demo.*` files after setup, the shorter forms in `data-schemas.md` also work.
 
-Проверка ширины CSV через `awk -F','` даст ложные срабатывания на строках с закавыченными запятыми — такие файлы проверяйте настоящим CSV-парсером.
+Checking CSV width with `awk -F','` produces false positives for rows with quoted commas; validate such files with a proper CSV parser.
 
 ---
 
-⚕️ Информация в этом каталоге носит справочный характер. Демо-данные синтетические и клиническим примером не являются. Для решений о лечении обратитесь к врачу.
+⚕️ Information in this directory is for reference only. Demo data is synthetic and is not a clinical example. Consult a doctor for treatment decisions.

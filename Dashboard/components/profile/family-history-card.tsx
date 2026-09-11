@@ -20,8 +20,8 @@ export function FamilyHistoryCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Семейный анамнез</CardTitle>
-        <CardDescription>{profile.family_history.length} записей</CardDescription>
+        <CardTitle>Family history</CardTitle>
+        <CardDescription>{profile.family_history.length} records</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

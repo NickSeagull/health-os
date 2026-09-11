@@ -46,9 +46,9 @@ export function UpcomingTasks() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ближайшие задачи</CardTitle>
+        <CardTitle>Upcoming tasks</CardTitle>
         <CardDescription>
-          {tasks?.length ?? 0} задач с дедлайнами
+          {tasks?.length ?? 0} tasks with deadlines
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,7 +63,7 @@ export function UpcomingTasks() {
             {overdue && overdue.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-red-500 mb-2">
-                  Просрочено ({overdue.length})
+                  Overdue ({overdue.length})
                 </p>
                 {overdue.map((t) => (
                   <TaskRow key={t.id} task={t} overdue />
@@ -73,7 +73,7 @@ export function UpcomingTasks() {
             {upcoming && upcoming.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-2">
-                  Предстоящие
+                  Upcoming
                 </p>
                 {upcoming.map((t) => (
                   <TaskRow key={t.id} task={t} />
@@ -82,7 +82,7 @@ export function UpcomingTasks() {
             )}
             {!tasks?.length && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Нет задач с дедлайнами
+                No tasks with deadlines
               </p>
             )}
           </div>

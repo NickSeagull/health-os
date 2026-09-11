@@ -1,54 +1,54 @@
-# Безопасность
+# Security
 
-> ⚠️ **Не медицинское изделие. Не медицинская рекомендация. Некоммерческий проект.**
-> Предоставляется «как есть», без гарантий. Использование — на собственный риск.
-> Все демо-данные вымышлены. Полные условия — [DISCLAIMER.md](../DISCLAIMER.md) (в корне репозитория).
-> 🚨 При неотложном состоянии — скорая помощь.
+> ⚠️ **Not a medical device. Not medical advice. Non-commercial project.**
+> Provided “as is,” without warranties. Use at your own risk.
+> All demo data is fictional. Full terms are in [DISCLAIMER.md](../DISCLAIMER.md) (in the repository root).
+> 🚨 In an emergency, call emergency services.
 
-Модель угроз, устройство защиты и правила работы. Документ описывает не только то, что защищено, но и то, что не защищено, — второе для медицинских данных важнее.
+Threat model, protection design, and operating rules. This document describes both what is protected and what is not — the second matters more for medical data.
 
-Правила ниже выросли из аудита безопасности рабочей версии системы. Четыре критические уязвимости в дашборде были подтверждены практически: через них читались произвольные файлы с диска, включая конфигурацию с живыми API-ключами, и записывались файлы за пределы проекта. Всё это устранено, и разделы документа объясняют, каким механизмом и почему именно таким.
-
----
-
-## Блок 1. Принцип: данные не покидают устройство
-
-Health-OS исходит из того, что медицинские данные человека не должны уходить с его машины. Это архитектурное решение, а не настройка, которую можно включить или выключить.
-
-Разница существенная. Настройку забывают включить, отключают «на время», теряют при переустановке. Архитектурное решение работает иначе: чтобы его нарушить, нужно совершить осознанное действие, которое видно.
-
-Как это выражено в конструкции:
-
-| Механизм | Что делает | Почему именно так |
-|----------|-----------|-------------------|
-| Репозиторий без remote | Пушить некуда | Не «нельзя пушить», а физически некуда. Барьер не полагается на дисциплину |
-| Инвертированный `.gitignore` | Игнорируется всё содержимое `Data/`, исключения перечислены поимённо | Ошибка приводит к тому, что файл не попадёт в git, а не к утечке |
-| Оригиналы вне контроля версий | PDF, сканы, DICOM не индексируются git | Они содержат PHI в сыром виде и переживают в истории любое удаление |
-| Дашборд на loopback | `127.0.0.1`, без доступа из сети | У дашборда нет аутентификации, и она не нужна, пока он недоступен извне |
-| Промпты без PII | Ни один агент не содержит данных пациента | Промпт устаревает, данные обновляются; факты живут только в `Data/` |
-| Права `600` и `go-rwx` | Данные и секреты читает только владелец | Второй пользователь системы или чужой процесс не получит доступ по умолчанию |
-
-### Что при этом всё-таки уходит наружу
-
-Честная оговорка, без которой предыдущая таблица вводила бы в заблуждение. Система построена вокруг облачной модели, и при обычной работе часть данных передаётся вовне.
-
-| Куда | Что уходит | Когда |
-|------|-----------|-------|
-| Anthropic API | Содержимое `Data/`, попадающее в контекст: анализы, профиль, история визитов | При любом обращении к скиллу или агенту. Это основной канал — консилиум по определению передаёт медданные модели |
-| Todoist | Названия и описания задач: планы обследований, специальности врачей | Только если интеграция включена |
-| Google Calendar | Названия событий: даты и типы визитов | Только если интеграция включена |
-| WHOOP | Ничего исходящего — только входящие метрики | Только если интеграция включена |
-
-Отсюда два практических вывода:
-
-1. **«Данные не покидают устройство» относится к хранению, а не к обработке.** Файлы лежат локально, а рассуждает над ними модель в облаке.
-2. **Каждая MCP-интеграция расширяет периметр.** Todoist и Calendar опциональны именно поэтому: их можно не включать, и система от этого не сломается. Решение осознанное, и принимаете его вы.
+The rules below grew out of a security audit of the working system. Four critical dashboard vulnerabilities were practically confirmed: they allowed arbitrary files to be read from disk, including configuration with live API keys, and files to be written outside the project. All have been fixed; the sections below explain which mechanisms fixed them and why.
 
 ---
 
-## Блок 2. Инвертированный `.gitignore`
+## Block 1. Principle: data does not leave the device
 
-Привычный `.gitignore` перечисляет, что скрыть. Здесь наоборот: скрывается всё, а исключения называются поимённо.
+Health-OS assumes that a person’s medical data must not leave their machine. This is an architectural decision, not a setting that can be enabled or disabled.
+
+The distinction matters. A setting may be forgotten, disabled “temporarily,” or lost during reinstallation. An architectural decision works differently: violating it requires a deliberate action that is visible.
+
+This is expressed in the design as follows:
+
+| Mechanism | What it does | Why this way |
+|-----------|--------------|--------------|
+| Repository without a remote | There is nowhere to push | Not “pushing is forbidden,” but physically nowhere to push. The barrier does not depend on discipline |
+| Inverted `.gitignore` | All `Data/` contents are ignored; exceptions are named explicitly | An error means a file is not included in git, rather than causing a leak |
+| Originals outside version control | PDFs, scans, and DICOM are not indexed by git | They contain PHI in raw form and persist in history after any deletion |
+| Dashboard on loopback | `127.0.0.1`, with no network access | The dashboard has no authentication, and needs none while it is unreachable from outside |
+| Prompts without PII | No agent contains patient data | Prompts become stale while data updates; facts live only in `Data/` |
+| `600` and `go-rwx` permissions | Only the owner can read data and secrets | A second system user or unrelated process has no access by default |
+
+### What still leaves the device
+
+An honest qualification is needed, or the previous table would mislead. The system is built around a cloud model, and ordinary operation sends some data outward.
+
+| Destination | What leaves | When |
+|-------------|-------------|------|
+| Anthropic API | `Data/` contents that enter context: lab results, profile, visit history | Whenever a skill or agent is called. This is the primary channel — a consilium necessarily sends medical data to the model |
+| Todoist | Task names and descriptions: examination plans, physician specialties | Only if the integration is enabled |
+| Google Calendar | Event names: dates and visit types | Only if the integration is enabled |
+| WHOOP | Nothing outbound — incoming metrics only | Only if the integration is enabled |
+
+Two practical conclusions follow:
+
+1. **“Data does not leave the device” refers to storage, not processing.** Files remain local, while the cloud model reasons over them.
+2. **Every MCP integration expands the perimeter.** Todoist and Calendar are optional for this reason: they can remain disabled and the system will still work. This is a deliberate choice that you make.
+
+---
+
+## Block 2. Inverted `.gitignore`
+
+A conventional `.gitignore` lists what to hide. Here it is the reverse: everything is hidden and exceptions are named explicitly.
 
 ```gitignore
 Data/**
@@ -62,41 +62,41 @@ Data/**
 !Data/specialists/*.json
 ```
 
-### Почему направление ошибки важнее её вероятности
+### Why the direction of the error matters more than its likelihood
 
-В любой схеме ошибки случаются. Вопрос в том, куда они ведут.
+Errors occur in every scheme. The question is where they lead.
 
-При обычном подходе («перечисляем, что скрыть») забытая строка означает, что файл с медданными попадает в git. Заметить это можно спустя месяцы, а история git постоянна: удаление файла новым коммитом не убирает его из прошлых.
+With the conventional approach (“list what to hide”), a forgotten line means a file containing medical data enters git. You may notice months later, and git history is permanent: deleting the file in a new commit does not remove it from earlier history.
 
-При инвертированном подходе забытая строка означает, что нужный служебный файл **не** попадёт в репозиторий. Это обнаруживается сразу — при первом клонировании чего-то не хватает — и чинится добавлением одной строки. Ущерб нулевой.
+With the inverted approach, a forgotten line means a needed support file **does not** enter the repository. This is found immediately — something is missing after the first clone — and fixed by adding one line. The damage is zero.
 
-Оба варианта ошибаются одинаково часто. Но первый ошибается в сторону утечки, а второй — в сторону неудобства.
+Both approaches fail equally often. The first fails toward a leak; the second toward inconvenience.
 
-### Зачем строка `!Data/**/`
+### Why `!Data/**/` is needed
 
-Неочевидная деталь, без которой конструкция не работает. Git не заглядывает внутрь проигнорированного каталога: если каталог исключён целиком, разыгнорить файл внутри него невозможно, сколько бы исключений вы ни написали.
+This is the non-obvious detail without which the design does not work. Git does not look inside an ignored directory: once a directory is excluded as a whole, no exception can unignore a file inside it.
 
-`!Data/**/` разыгноривает сами каталоги, оставляя игнорируемыми их файлы. Только после этого начинают действовать точечные исключения для шаблонов и справочников.
+`!Data/**/` unignores the directories themselves while leaving their files ignored. Only then do the targeted exceptions for templates and registries take effect.
 
-Проверить, что предохранитель работает:
+Check that the safeguard works:
 
 ```bash
 echo '{}' > Data/__probe.json
-git check-ignore -v Data/__probe.json    # должно вывести правило
+git check-ignore -v Data/__probe.json    # should print a rule
 rm Data/__probe.json
 ```
 
-Ту же проверку `setup.sh` выполняет автоматически при каждом запуске и сообщает об ошибке, если `Data/` вдруг оказался открыт.
+`setup.sh` performs the same check automatically on every run and reports an error if `Data/` has somehow become open.
 
-### Что находится вне `Data/`
+### What is outside `Data/`
 
-`Cache/`, `Archive/`, `Inbox/` и `Goals/` закрыты тем же способом — содержимое игнорируется, остаются только `.gitkeep`. Это не формальность: `Cache/` хранит активный контекст и сессионные логи, которые по концентрации медицинской информации не уступают самим данным.
+`Cache/`, `Archive/`, `Inbox/`, and `Goals/` are protected the same way — their contents are ignored, leaving only `.gitkeep`. This is not a formality: `Cache/` stores active context and session logs whose concentration of medical information is comparable to the data itself.
 
 ---
 
-## Блок 3. Оригиналы документов
+## Block 3. Original documents
 
-PDF, сканы, фотографии и DICOM исключены из контроля версий по расширениям:
+PDFs, scans, photographs, and DICOM are excluded from version control by extension:
 
 ```gitignore
 *.pdf
@@ -110,54 +110,54 @@ PDF, сканы, фотографии и DICOM исключены из конт�
 *.dicom
 ```
 
-Причин две, и обе весомые.
+There are two reasons, and both matter.
 
-**Первая: концентрация PHI.** Структурированный `Data/labs/2026-03-15_cbc.json` содержит числа и названия маркеров. Исходный бланк той же лаборатории содержит ФИО, дату рождения, номер полиса, адрес подразделения, печать и подпись врача. Разбирая документ, система забирает клиническое содержание и оставляет за бортом идентифицирующую обвязку — при условии, что сам бланк не попадёт в репозиторий.
+**First: PHI concentration.** Structured `Data/labs/2026-03-15_cbc.json` contains numbers and marker names. The original form from the same laboratory contains the patient’s name, date of birth, policy number, facility address, stamp, and physician signature. When processing the document, the system extracts the clinical content and leaves the identifying wrapper behind — provided the form itself does not enter the repository.
 
-**Вторая: необратимость.** Git хранит историю. Файл, удалённый сегодня, лежит во всех коммитах, где он был. Очистка истории технически возможна, но это операция с переписыванием всех хешей, и уверенности в полноте она не даёт: копии остаются в `reflog`, в упакованных объектах, в клонах, если они успели появиться. Проще не допускать, чем вычищать.
+**Second: irreversibility.** Git stores history. A file deleted today remains in every commit where it existed. History cleanup is technically possible, but it rewrites every hash and gives no certainty of completeness: copies remain in `reflog`, packed objects, and clones if any were made. Prevention is simpler than cleanup.
 
-Единственное исключение — `Dashboard/public/**`, иконки и статика интерфейса. Медицинского содержания там нет по определению.
+The only exception is `Dashboard/public/**`, including interface icons and static assets. By definition, it contains no medical content.
 
-Оригиналы при этом никуда не деваются: `/inbox` переносит их в `Archive/`, который тоже вне git. Они остаются на диске, под теми же правами доступа, что и остальные данные.
+The originals do not disappear: `/inbox` moves them to `Archive/`, which is also outside git. They remain on disk with the same permissions as the other data.
 
 ---
 
-## Блок 4. Дашборд
+## Block 4. Dashboard
 
-Дашборд — единственный компонент системы, который слушает сеть, и потому единственный, у которого есть настоящая поверхность атаки.
+The dashboard is the only system component that listens on the network and therefore the only one with a real attack surface.
 
-### Только loopback
+### Loopback only
 
 ```json
 "dev": "next dev --turbopack -H 127.0.0.1",
 "start": "next start -H 127.0.0.1"
 ```
 
-По умолчанию Next.js слушает `0.0.0.0` — все интерфейсы. В аудите это подтвердилось практически: запрос к `/api/profile` с другого устройства в той же Wi-Fi-сети возвращал полный медицинский профиль. Кофейня, коворкинг, гостевая сеть — везде, где вы открываете ноутбук, ваш медпрофиль был бы доступен соседям.
+By default, Next.js listens on `0.0.0.0` — all interfaces. The audit confirmed this in practice: a request to `/api/profile` from another device on the same Wi-Fi network returned the full medical profile. In a café, coworking space, or guest network, the profile would be available to nearby devices wherever the laptop was opened.
 
-Флаг `-H 127.0.0.1` закрывает это целиком: сокет привязан к петлевому интерфейсу, снаружи к нему подключиться нельзя независимо от того, что происходит в коде приложения.
+The `-H 127.0.0.1` flag closes this completely: the socket is bound to the loopback interface, so nothing outside can connect regardless of what happens in application code.
 
-**Аутентификации у дашборда нет, и пока он на loopback, она не нужна.** Но если вы когда-нибудь решите открыть доступ извне — через смену `-H`, через туннель, через reverse proxy, — аутентификация становится обязательной первым делом, до всего остального.
+**The dashboard has no authentication, and while it is on loopback it does not need any.** If you ever decide to open external access — by changing `-H`, using a tunnel, or using a reverse proxy — authentication becomes mandatory before anything else.
 
-Проверить текущую привязку:
+Check the current binding:
 
 ```bash
 lsof -nP -iTCP:3000 -sTCP:LISTEN
 ```
 
-Должен быть `127.0.0.1:3000`, а не `*:3000`.
+It should be `127.0.0.1:3000`, not `*:3000`.
 
-### Path traversal и `resolveWithin`
+### Path traversal and `resolveWithin`
 
-Роуты вида `/api/labs/[file]` принимают имя файла из URL. Наивная реализация склеивает его с каталогом данных:
+Routes such as `/api/labs/[file]` receive a filename from the URL. A naïve implementation joins it to the data directory:
 
 ```ts
-path.join(LABS_DIR, filename)     // так делать нельзя
+path.join(LABS_DIR, filename)     // do not do this
 ```
 
-`path.join` не защищает. Он схлопывает `..`, но результат спокойно выходит за пределы базового каталога: `path.join("/Data/labs", "../../../.claude.json")` вернёт путь к файлу в домашнем каталоге. В аудите через это читались конфигурации с живыми API-ключами и записывались файлы за пределы проекта — вплоть до возможности подменить хук и добиться выполнения произвольной команды.
+`path.join` does not protect you. It collapses `..`, but the result can leave the base directory: `path.join("/Data/labs", "../../../.claude.json")` returns a path to a file in the home directory. The audit used this to read configurations with live API keys and write files outside the project — including replacing a hook to achieve arbitrary command execution.
 
-Правильный резолв делает единственный хелпер `resolveWithin` в `Dashboard/lib/data/utils.ts`. Каждая из его проверок закрывает конкретный обход:
+The only correct resolver is `resolveWithin` in `Dashboard/lib/data/utils.ts`. Each check closes a specific bypass:
 
 ```ts
 export function resolveWithin(
@@ -165,56 +165,56 @@ export function resolveWithin(
   filename: string,
   allowedExtensions?: string[]
 ): string {
-  // 1. Декодирование — иначе %2F..%2F проходит мимо проверки на разделители
+  // 1. Decode first, or %2F..%2F bypasses separator checks
   const decoded = decodeURIComponent(filename);
 
-  // 2. Нулевой байт — обрезает путь на уровне системного вызова
+  // 2. A null byte truncates the path at the system-call level
   if (decoded.includes("\0")) throw new Error("invalid filename: null byte");
 
   const base = path.resolve(baseDir);
   const target = path.resolve(base, decoded);
 
-  // 3. Разделитель в конце обязателен: без него /Data/labs-secret
-  //    пройдёт проверку на префикс /Data/labs
+  // 3. The trailing separator is required: without it, /Data/labs-secret
+  //    would pass the /Data/labs prefix check
   if (target !== base && !target.startsWith(base + path.sep)) {
     throw new Error("path escapes base directory");
   }
 
-  // 4. Белый список расширений — .md-роут не должен отдавать .env
+  // 4. Extension allowlist — an .md route must not serve .env
   if (allowedExtensions?.length) { /* ... */ }
 
   return target;
 }
 ```
 
-Правило для любого нового кода: **путь, в построении которого участвует пользовательский ввод, резолвится только через `resolveWithin`.** Прямой `path.join` с внешними данными — дефект, а не стилистическое предпочтение.
+Rule for all new code: **a path built with user input is resolved only through `resolveWithin`.** Direct `path.join` with external data is a defect, not a stylistic preference.
 
-При чтении исключение гасится и превращается в `404`. При записи оно пробрасывается намеренно — попытка записать файл за пределы каталога данных должна падать громко, а не молча делать вид, что всё в порядке.
+On reads, the exception is caught and converted to `404`. On writes, it is deliberately rethrown — an attempt to write outside the data directory must fail loudly rather than silently pretending everything is fine.
 
-### Валидация ввода
+### Input validation
 
-Второй слой — `Dashboard/lib/data/validation.ts`. Он решает другую задачу: не пустить в данные то, что их испортит.
+The second layer is `Dashboard/lib/data/validation.ts`. It solves a different problem: preventing input that would corrupt the data.
 
-- **`isPlainFilename`** отвергает параметр `[file]`, содержащий разделители пути или переходы вверх, ещё до обращения к файловой системе. `resolveWithin` такой путь тоже отверг бы, но исключением — наружу уходила бы пятисотка с внутренним текстом ошибки. Отказ во входных данных — это `400`, а не сбой сервера.
-- **`Validator`** проверяет типы, обязательность, enum-значения, календарную корректность дат и то, что дата не из будущего. Ошибки копятся и возвращаются разом.
-- **`RANGES`** задаёт грубые физиологические границы: вес 8.25 вместо 82.5 и гемоглобин 15.8 вместо 158 не попадут в тренд. Это не диагностика, а защита от опечатки в разряде.
-- **Слияние вместо замены.** Тело PUT-запроса накладывается на существующий файл, а не заменяет его: иначе редактор, не знающий о поле `pdf_path` или `studies[]`, стирал бы их при каждом сохранении.
-- **Поле `version` никогда не сбрасывается** — на него опирается миграция схем.
+- **`isPlainFilename`** rejects a `[file]` parameter containing path separators or upward traversal before the filesystem is accessed. `resolveWithin` would reject it too, but with an exception — exposing a 500 with internal error text. Invalid input is a `400`, not a server failure.
+- **`Validator`** checks types, required fields, enum values, calendar-valid dates, and that dates are not in the future. Errors are collected and returned together.
+- **`RANGES`** defines broad physiological bounds: a weight of 8.25 instead of 82.5 and hemoglobin of 15.8 instead of 158 do not enter a trend. This is not diagnosis; it protects against a misplaced decimal.
+- **Merge instead of replacement.** A PUT body is merged into the existing file rather than replacing it: an editor that does not know fields such as `pdf_path` or `studies[]` would erase them on every save.
+- **The `version` field is never reset** — schema migration depends on it.
 
-### Чего у дашборда нет
+### What the dashboard does not have
 
-- **Ограничения размера тела запроса.** Гигантский POST исчерпает память процесса.
-- **Аудита доступа.** Кто и что читал — нигде не фиксируется.
+- **Request-body size limits.** A giant POST can exhaust the process’s memory.
+- **Access auditing.** Nothing records who read what.
 
-Оба пункта приемлемы потому, что сервер доступен только с этой машины. Меняя это условие, вы меняете и вывод.
+Both are acceptable because the server is accessible only from this machine. Change that condition and the conclusion changes too.
 
-### CSRF — было и стало
+### CSRF — before and after
 
-Раньше здесь стояло, что отсутствие защиты от CSRF приемлемо «ровно потому, что сервер доступен только с этой машины». **Это рассуждение было неверным**, и его стоит разобрать: ошибка типична.
+The old document said that the absence of CSRF protection was acceptable “precisely because the server is accessible only from this machine.” **That reasoning was wrong**, and it is worth examining because the mistake is common.
 
-Привязка к loopback защищает от злоумышленника **в сети**. Против CSRF она не даёт ничего, потому что браузер жертвы работает на той же машине: страница, открытая в соседней вкладке, обращается к `127.0.0.1:3000` и попадает в тот же сервер. Локальность здесь не смягчающее обстоятельство, а **необходимое условие атаки**.
+Loopback binding protects against an attacker **on the network**. It does nothing against CSRF because the victim’s browser runs on the same machine: a page open in another tab can call `127.0.0.1:3000` and reach the same server. Locality is not a mitigating circumstance here; it is the **necessary condition for the attack**.
 
-Уязвимость была подтверждена практически. Запрос
+The vulnerability was practically confirmed. This request:
 
 ```
 PUT /api/profile
@@ -222,81 +222,81 @@ Origin: https://evil.example
 Content-Type: text/plain
 ```
 
-возвращал `{"success":true}` и затирал блок `basic` в профиле — дату рождения, пол, рост, экстренный контакт. Без даты рождения ломается возрастная логика, педиатрический режим и все возрастные референсы. Тип `text/plain` выбран не случайно: он относится к «простым» запросам и не вызывает preflight, то есть браузер отправляет его без предварительного разрешения сервера.
+returned `{"success":true}` and overwrote the `basic` block of the profile — date of birth, sex, height, and emergency contact. Without date of birth, age logic, pediatric mode, and all age-specific references break. The `text/plain` type is deliberate: it is a “simple” request and does not trigger a preflight, so the browser sends it without first asking the server.
 
-Изменяющих роутов тринадцать, `Origin` не проверял ни один.
+There were thirteen mutating routes, and none checked `Origin`.
 
-**Закрыто в `Dashboard/middleware.ts`** — одна точка на все роуты `/api/*`:
+**Closed in `Dashboard/middleware.ts`** — one point for all `/api/*` routes:
 
-| Вектор | Проверка |
-|--------|----------|
-| CSRF из вкладки браузера | У изменяющих методов сверяются `Origin` и `Sec-Fetch-Site`. Браузер проставляет их сам, подделать со страницы нельзя |
-| DNS rebinding | Домен злоумышленника, резолвящийся в `127.0.0.1`, обходит привязку к loopback, но приходит с чужим `Host` — он проверяется отдельно |
+| Vector | Check |
+|--------|-------|
+| CSRF from a browser tab | Mutating methods compare `Origin` and `Sec-Fetch-Site`. The browser sets them itself; a page cannot forge them |
+| DNS rebinding | An attacker’s domain resolving to `127.0.0.1` bypasses loopback binding but arrives with a foreign `Host`; it is checked separately |
 
-Запрос без `Origin` и без `Sec-Fetch-Site` пропускается: это не браузер, а `curl` или скрипт. CSRF-вектором он не является, а тот, кто уже исполняет команды на машине, в обходе дашборда не нуждается.
+A request without `Origin` and `Sec-Fetch-Site` is allowed: it is `curl` or a script, not a browser. It is not a CSRF vector, and someone already executing commands on the machine does not need to bypass the dashboard.
 
-Проверено: атака выше и ещё три вектора получают `403`, легитимные запросы дашборда с `127.0.0.1` и с `localhost` работают.
+Verified: the attack above and three other vectors receive `403`; legitimate dashboard requests from `127.0.0.1` and `localhost` work.
 
 ---
 
-## Блок 5. Ключи и секреты
+## Block 5. Keys and secrets
 
-| Правило | Почему |
-|---------|--------|
-| `.mcp.json` — вне git, права `600` | Файл содержит токены. `600` закрывает его от других пользователей системы и от процессов, работающих не под вашим аккаунтом |
-| Ключи никогда не попадают в промпты, задачи и коммиты | Всё, что попало в промпт, ушло в облако. Всё, что попало в коммит, останется в истории |
-| Токены сервисов — в конфигурации самих серверов, а не размазаны по файлам | Один файл с секретами проще защитить и проще отозвать |
-| `.env`, `*.key`, `*.pem`, `credentials.json` — в `.gitignore` | Дешёвая страховка от привычки положить файл «на минуточку» в корень проекта |
+| Rule | Why |
+|------|-----|
+| `.mcp.json` — outside git, permission `600` | The file contains tokens. `600` blocks other system users and processes running outside your account |
+| Keys never enter prompts, tasks, or commits | Anything in a prompt goes to the cloud. Anything in a commit remains in history |
+| Service tokens go in the servers’ own configuration, not spread across files | One secrets file is easier to protect and revoke |
+| `.env`, `*.key`, `*.pem`, `credentials.json` go in `.gitignore` | Cheap protection against putting a file in the project root “just for a minute” |
 
-Проверить права:
+Check permissions:
 
 ```bash
-ls -l .mcp.json                  # ожидается -rw-------
+ls -l .mcp.json                  # expected -rw-------
 find Data -type f ! -perm 600 | head
 ```
 
-Отдельно стоит проверить конфигурацию Claude Code в домашнем каталоге. Она хранит переменные окружения MCP-серверов в открытом виде, и по умолчанию её права могут быть `644` — то есть файл читает любой пользователь системы и любой процесс:
+Also check the Claude Code configuration in the home directory. It stores MCP-server environment variables in plain text, and its default permissions may be `644` — meaning any system user and any process can read it:
 
 ```bash
 ls -l ~/.claude.json
 chmod 600 ~/.claude.json
 ```
 
-Это файл вне проекта, `setup.sh` его не трогает, но именно он был целью эксплуатации path traversal в аудите.
+This file is outside the project, so `setup.sh` does not touch it, but it was the target of the path-traversal exploit in the audit.
 
-**Пароли вместо токенов — отдельная плохая идея.** Токен отзывается в один клик и ограничен по правам; пароль открывает аккаунт целиком. Если интеграция позволяет OAuth или API-ключ, используйте их.
-
----
-
-## Блок 6. Модель угроз
-
-Вероятность и ущерб оценены для типового сценария: одна личная машина, один пользователь, локальный репозиторий без remote.
-
-| Сценарий | Вероятность | Ущерб | Текущая защита | Достаточна |
-|----------|-------------|-------|----------------|------------|
-| Кража устройства в выключенном состоянии | низкая | критический | Шифрование диска средствами ОС — FileVault, LUKS, BitLocker | **да**, если шифрование включено |
-| Кража устройства включённым и разблокированным | низкая | критический | Нет второго рубежа: данные лежат в открытом виде | **нет** |
-| Случайный `git push` из проекта | очень низкая | критический | Remote отсутствует физически; `Data/` под `.gitignore`; `setup.sh` проверяет оба условия | **да** |
-| Публикация репозитория с недочищенными данными | средняя | критический | Инвертированный `.gitignore`, автопроверка в `setup.sh` | **частично** — нужен ручной чек-лист, блок 8 |
-| Шаринг скриншота с открытой IDE | средняя | высокий | Технической нет. Помогает только то, что медданные лежат в `Data/`, а не в корне | **нет** |
-| Доступ другого пользователя ОС к машине | низкая | высокий | `chmod -R go-rwx Data`, `.mcp.json` — `600` | **да** для непривилегированных пользователей |
-| Физический доступ к разблокированной машине | низкая | критический | Никакой: права на файлы защищают от других учётных записей, а не от вашей | **нет** |
-| Дашборд запущен в публичной сети | средняя | критический | Привязка к `127.0.0.1` в `dev` и `start` | **да**, пока `-H` не изменён |
-| Вредоносная вкладка браузера обращается к `127.0.0.1` | средняя | высокий | Path traversal закрыт, ввод валидируется, изменяющие запросы сверяют `Origin` и `Sec-Fetch-Site` | **да** |
-| DNS rebinding: чужой домен резолвится в `127.0.0.1` | низкая | высокий | Заголовок `Host` проверяется на петлевой интерфейс | **да** |
-| Передача данных в облако через MCP и агентов | достоверность 100 % | средний | Осознанный компромисс: интеграции опциональны, канал задокументирован | **частично** — управляется вашим выбором |
-| Компрометация токена интеграции | средняя | средний | Права `600`, токены вне git | **частично** — отзыв токена остаётся ручной операцией |
-| Утечка через `Cache/` и `Archive/` при шаринге каталога | средняя | высокий | Оба вне git, но на диске лежат в открытом виде | **нет** при копировании каталога целиком |
-
-Три строки со значением «нет» объединяет общее: это не дефекты реализации, а границы модели. Система защищает данные от сети и от git. Она не защищает их от человека, у которого уже есть доступ к вашей разблокированной машине.
+**Passwords instead of tokens are a separate bad idea.** A token can be revoked with one click and has limited permissions; a password opens the entire account. If an integration supports OAuth or an API key, use that.
 
 ---
 
-## Блок 7. Что система не защищает
+## Block 6. Threat model
 
-Прямой список, чтобы не строить ложных ожиданий.
+Likelihood and impact are assessed for the typical scenario: one personal machine, one user, and a local repository without a remote.
 
-**Нет шифрования на уровне приложения.** Файлы в `Data/` — обычный JSON, CSV и Markdown в открытом виде. Любой процесс, работающий под вашей учётной записью, читает их без препятствий. Конфиденциальность в состоянии покоя целиком полагается на шифрование диска средствами операционной системы. Если оно выключено — включите, это единственная реальная защита при потере устройства.
+| Scenario | Likelihood | Impact | Current protection | Sufficient |
+|----------|------------|--------|--------------------|------------|
+| Device stolen while powered off | low | critical | OS disk encryption — FileVault, LUKS, BitLocker | **yes**, if encryption is enabled |
+| Device stolen while powered on and unlocked | low | critical | No second barrier: data is stored in plain text | **no** |
+| Accidental `git push` from the project | very low | critical | Remote physically absent; `Data/` covered by `.gitignore`; `setup.sh` checks both | **yes** |
+| Publishing a repository with uncleared data | medium | critical | Inverted `.gitignore`, automatic `setup.sh` check | **partially** — manual checklist needed, Block 8 |
+| Sharing a screenshot with the IDE open | medium | high | No technical protection. It only helps that medical data is in `Data/`, not the root | **no** |
+| Another OS user accesses the machine | low | high | `chmod -R go-rwx Data`, `.mcp.json` is `600` | **yes** for unprivileged users |
+| Physical access to an unlocked machine | low | critical | None: file permissions protect against other accounts, not against you | **no** |
+| Dashboard running on a public network | medium | critical | Binding to `127.0.0.1` in `dev` and `start` | **yes**, while `-H` is unchanged |
+| Malicious browser tab calls `127.0.0.1` | medium | high | Path traversal closed, input validated, mutating requests check `Origin` and `Sec-Fetch-Site` | **yes** |
+| DNS rebinding: foreign domain resolves to `127.0.0.1` | low | high | `Host` header checked for loopback interface | **yes** |
+| Data sent to the cloud through MCP and agents | certainty 100% | medium | Deliberate tradeoff: integrations are optional and the channel is documented | **partially** — controlled by your choice |
+| Integration token compromised | medium | medium | `600` permissions, tokens outside git | **partially** — revocation remains manual |
+| Leak through `Cache/` and `Archive/` when sharing the directory | medium | high | Both are outside git but stored in plain text on disk | **no** when copying the entire directory |
+
+The three “no” rows share a boundary: they are limits of the model rather than implementation defects. The system protects data from the network and from git. It does not protect it from someone who already has access to your unlocked machine.
+
+---
+
+## Block 7. What the system does not protect
+
+A direct list prevents false expectations.
+
+**No application-level encryption.** Files in `Data/` are ordinary JSON, CSV, and Markdown in plain text. Any process running under your account can read them without obstacles. At rest, confidentiality relies entirely on operating-system disk encryption. If it is off, turn it on; it is the only real protection when a device is lost.
 
 ```bash
 # macOS
@@ -306,135 +306,135 @@ fdesetup status
 lsblk -o NAME,FSTYPE,MOUNTPOINT | grep crypt
 ```
 
-**Нет аудита доступа.** Система не ведёт журнал того, кто, когда и что прочитал. Установить постфактум, были ли данные скопированы, невозможно.
+**No access audit.** The system does not log who read what or when. It is impossible to establish after the fact whether data was copied.
 
-**Нет многопользовательского режима.** Один каталог — один человек. Нет ролей, нет разграничения, нет разделения данных членов семьи. Права доступа устроены так, чтобы данные читал только владелец каталога, и это единственный уровень разграничения.
+**No multi-user mode.** One directory is for one person. There are no roles, access partitions, or separation of family-member data. Permissions are arranged so only the directory owner can read the data; this is the only separation layer.
 
-**Нет защиты от скомпрометированной машины.** Вредоносный процесс под вашей учётной записью получает всё: данные, токены, историю. Ни один механизм проекта этому не противостоит.
+**No protection from a compromised machine.** A malicious process under your account gets everything: data, tokens, and history. No project mechanism resists this.
 
-**Нет сертификации и соответствия регуляторным требованиям.** Health-OS — персональный инструмент, а не медицинская информационная система. HIPAA, GDPR как обработчик, ISO 27001 — ничего из этого не заявляется и не подразумевается. Для профессионального использования с чужими данными система не предназначена.
+**No certification or regulatory compliance.** Health-OS is a personal tool, not a health-information system. HIPAA, GDPR as a processor, and ISO 27001 are neither claimed nor implied. The system is not intended for professional use with other people’s data.
 
-**Нет резервного копирования.** Локальный git защищает от ошибочного редактирования, но не от потери диска. Резервные копии — ваша задача, и делать их нужно в зашифрованное хранилище.
+**No backup.** Local git protects against accidental edits but not disk loss. Backups are your responsibility and must go to encrypted storage.
 
 ---
 
-## Блок 8. Чек-лист перед тем, как поделиться
+## Block 8. Checklist before sharing
 
-### Перед публикацией или передачей репозитория
+### Before publishing or handing over the repository
 
 ```bash
-# 1. Ничего из рабочих каталогов не отслеживается
+# 1. Nothing from working directories is tracked
 git ls-files | grep -E '^(Data|Cache|Archive|Inbox|Goals)/'
-# Ожидается: только *.example.*, *.demo.*, README.md, .gitkeep
-#            и справочники Data/labs/_marker-aliases.json, Data/specialists/*.json
+# Expected: only *.example.*, *.demo.*, README.md, .gitkeep
+#           and registries Data/labs/_marker-aliases.json, Data/specialists/*.json
 
-# 2. Оригиналов документов нет ни в рабочем дереве, ни в истории
+# 2. No original documents in the working tree or history
 git ls-files | grep -iE '\.(pdf|jpe?g|png|heic|tiff?|dcm|dicom)$'
 git log --all --pretty=format: --name-only --diff-filter=A \
   | sort -u | grep -iE '\.(pdf|jpe?g|png|heic|dcm)$'
-# Ожидается: пусто, кроме Dashboard/public/
+# Expected: empty, except Dashboard/public/
 
-# 3. Секретов нет
+# 3. No secrets
 git ls-files | grep -E '(\.mcp\.json|\.env|\.key|\.pem|credentials\.json)$'
 git log --all -p | grep -inE 'sk-[a-z0-9]{10}|ghp_|Bearer [A-Za-z0-9]{20}' | head
 
-# 4. Абсолютных путей с вашим именем пользователя нет
+# 4. No absolute paths containing your username
 grep -rIn "$HOME" --exclude-dir=node_modules --exclude-dir=.git . | head
 
-# 5. Персональных данных в отслеживаемых файлах нет
-git ls-files -z | xargs -0 grep -lniE 'фамилия|полис|снилс|дата рождения' | head
+# 5. No personal data in tracked files
+git ls-files -z | xargs -0 grep -lniE 'surname|insurance policy|social security number|date of birth' | head
 ```
 
-Если хотя бы одна проверка что-то нашла — **не публикуйте очищенный репозиторий, создайте новый.** История git постоянна, и вычистить её надёжнее, чем начать заново, обычно не получается. Правильный порядок: новый каталог, `git init`, копирование только кода, первый коммит.
+If any check finds something, **do not publish the cleaned repository; create a new one.** Git history is permanent, and cleaning it reliably is usually harder than starting over. The right order is a new directory, `git init`, copying only code, and a first commit.
 
-### Перед скриншотом
+### Before a screenshot
 
-- Закройте вкладки дашборда с профилем, анализами и визитами.
-- Сверните дерево файлов IDE или уберите из кадра — имена файлов в `Data/labs/` сами по себе рассказывают, чем вы болеете.
-- Проверьте, что в кадре нет `Cache/active-context.md` и `MEMORY.md`: там текущие диагнозы и планы обследований в концентрированном виде.
-- Проверьте историю терминала в кадре — команды часто содержат имена файлов с датами и специальностями.
-- Панель уведомлений и заголовок окна тоже попадают в кадр.
+- Close dashboard tabs showing the profile, lab results, and visits.
+- Collapse the IDE file tree or remove it from the frame — filenames in `Data/labs/` alone reveal what you may be ill with.
+- Check that `Cache/active-context.md` and `MEMORY.md` are not visible: they contain current diagnoses and examination plans in concentrated form.
+- Check the terminal history in the frame — commands often contain filenames with dates and specialties.
+- Notification panels and the window title also appear in the frame.
 
-### Перед демонстрацией экрана
+### Before screen sharing
 
-Разверните демо-набор в отдельном каталоге и показывайте его:
+Deploy the demo set in a separate directory and show that:
 
 ```bash
-git clone <репозиторий> /tmp/health-os-demo
+git clone <repository> /tmp/health-os-demo
 cd /tmp/health-os-demo && ./setup.sh --demo
 ```
 
-Данные вымышленного пациента выглядят так же, как настоящие, и позволяют показать всё, включая консилиум.
+Fictional-patient data looks like real data and lets you show everything, including a consilium.
 
 ---
 
-## Блок 9. Если есть подозрение на утечку
+## Block 9. Suspected leak
 
-Порядок действий, от быстрого к долгому.
+Actions, from fastest to slowest.
 
-**1. Оцените канал.** Что именно могло уйти: репозиторий, отдельный файл, скриншот, доступ к дашборду из сети, токен интеграции. От этого зависит всё остальное.
+**1. Assess the channel.** What may have left: the repository, one file, a screenshot, dashboard access from the network, or an integration token. Everything else depends on this.
 
-**2. Отзовите токены — первым делом.** Это единственное действие, которое действительно обратимо, и единственное, где скорость имеет значение.
+**2. Revoke tokens first.** This is the only truly reversible action and the only one where speed matters.
 
-- Todoist: Settings → Integrations → Developer → отозвать и выпустить новый.
-- Google: страница управления доступом аккаунта → отозвать доступ приложения.
-- Anthropic и прочие сервисы — через их консоли.
-- После отзыва обновите `.mcp.json` и проверьте права: `chmod 600 .mcp.json`.
+- Todoist: Settings → Integrations → Developer → revoke and issue a new token.
+- Google: account access-management page → revoke the application’s access.
+- Anthropic and other services — through their consoles.
+- After revocation, update `.mcp.json` and check permissions: `chmod 600 .mcp.json`.
 
-**3. Если утёк git-репозиторий.** Удалите его из публичного доступа, но не считайте это решением: форки, клоны и кеши поисковых систем остаются. Исходите из того, что попавшее в публичный репозиторий разошлось. Практический вывод — не пытайтесь «почистить историю и вернуть», создайте новый репозиторий с нуля и опубликуйте только код.
+**3. If a git repository leaked.** Remove it from public access, but do not consider that a solution: forks, clones, and search-engine caches remain. Assume that anything in a public repository has spread. In practice, do not try to “clean history and restore”; create a new repository from scratch and publish only code.
 
-**4. Если дашборд был доступен из сети.** Проверьте привязку (`lsof`, блок 4), верните `-H 127.0.0.1`. Установить, обращался ли кто-то, невозможно — аудита доступа нет. Исходите из худшего: считайте, что содержимое `Data/` могло быть прочитано, а токены из конфигураций — скомпрометированы, и отзовите их.
+**4. If the dashboard was accessible from the network.** Check the binding (`lsof`, Block 4) and restore `-H 127.0.0.1`. It is impossible to determine whether anyone connected because there is no access audit. Assume the worst: that `Data/` contents may have been read and configuration tokens compromised, and revoke them.
 
-**5. Если утёк отдельный файл данных.** Медицинские данные нельзя «отозвать» — в этом их принципиальное отличие от пароля. Реалистичное действие: понять объём — что именно было в файле, кто мог получить, чем это грозит практически. Для большинства бытовых сценариев ущерб репутационный, а не операционный, но решение о том, кого уведомлять, принимаете вы.
+**5. If a separate data file leaked.** Medical data cannot be “revoked,” which is its fundamental difference from a password. The realistic action is to understand the scope: what was in the file, who may have received it, and what practical harm could result. In most everyday scenarios the harm is reputational rather than operational, but you decide whom to notify.
 
-**6. Проверьте, не повторится ли.** Прогоните чек-лист из блока 8 целиком и `./setup.sh` — он проверит изоляцию репозитория и работу `.gitignore`.
-
----
-
-## Блок 10. Правила для тех, кто дописывает код
-
-Перед тем как принять новый роут, скрипт или скилл, работающий с файлами:
-
-1. **Строится ли путь из пользовательского ввода.** Если да — используется ли `resolveWithin`, а не `path.join`.
-2. **Валидируется ли ввод до записи.** Тип, обязательность, enum, календарная корректность даты, физиологический диапазон.
-3. **Не расширяет ли изменение поверхность доступа наружу.** Новый слушающий сокет, новый исходящий запрос, новая интеграция — всё это меняет модель угроз, и её нужно перечитать.
-4. **Не появляются ли данные пациента в местах, где их быть не должно:** в промптах агентов, в коммитах, в логах, в названиях задач внешних сервисов.
-5. **Не ослабляет ли изменение `.gitignore`.** Любое новое исключение в разделе `Data/` требует объяснения, почему этот файл заведомо не содержит личных данных.
+**6. Check that it will not happen again.** Run the complete Block 8 checklist and `./setup.sh` — it checks repository isolation and `.gitignore` behavior.
 
 ---
 
-⚕️ Документ описывает защиту данных, а не медицинские решения. Для решений о лечении обратитесь к врачу.
+## Block 10. Rules for people adding code
+
+Before accepting a new route, script, or skill that works with files:
+
+1. **Is the path built from user input?** If so, does it use `resolveWithin` rather than `path.join`?
+2. **Is input validated before writing?** Check type, required fields, enum, calendar-valid date, and physiological range.
+3. **Does the change expand external access?** A new listening socket, outbound request, or integration changes the threat model, which must be reread.
+4. **Does patient data appear where it should not:** agent prompts, commits, logs, or task names in external services?
+5. **Does the change weaken `.gitignore`?** Every new exception in the `Data/` section requires an explanation of why that file definitively contains no personal data.
 
 ---
 
-## Права агента
+⚕️ This document describes data protection, not medical decisions. Consult a physician for treatment decisions.
 
-До версии с профилями `.claude/settings.json` разрешал `Bash`, `Write`, `Edit`, `WebFetch` и `WebSearch` без подтверждения, а список `deny` был пуст. Для репозитория с медицинскими файлами это чрезмерно: агент, читающий присланный PDF, мог выполнить любую команду оболочки.
+---
 
-Сейчас права минимальные, и устроены они так:
+## Agent permissions
 
-| Список | Что в нём | Зачем |
-|--------|-----------|-------|
-| `allow` | Чтение, поиск, запись **только** в `Data/`, `Cache/`, `Archive/`, `Inbox/`, `Goals/`, чтение страниц с девяти медицинских доменов | Обычная работа не требует подтверждений |
-| `ask` | `Bash`, `WebSearch` | Каждая команда оболочки и каждый поиск — с вашего разрешения |
-| `deny` | Запись в `.claude/**`, `.git/**`, чтение `~/.ssh`, `~/.claude`, `~/.aws`, `~/.gnupg`, любых `.env*`, `.mcp.json`; `curl`, `wget`, `nc`, `ssh`, `scp`, `rsync`, `git push`, `git remote add` | Барьер, работающий при любых настройках |
+Before profiles, `.claude/settings.json` allowed `Bash`, `Write`, `Edit`, `WebFetch`, and `WebSearch` without confirmation, and the `deny` list was empty. For a repository containing medical files, this was excessive: an agent reading a submitted PDF could execute any shell command.
 
-Ключевое свойство: **`deny` и явные `ask` действуют во всех режимах**, включая режим полного обхода разрешений. `allow` в этом режиме не значит ничего — поэтому реальную защиту дают именно два других списка. Запрет на запись в `.claude/**` означает, что агент не может расширить собственные права: это тот случай, где правило защищает само себя.
+Permissions are now minimal:
 
-### Чего эти правила не делают
+| List | Contents | Purpose |
+|------|----------|---------|
+| `allow` | Read, search, and write **only** in `Data/`, `Cache/`, `Archive/`, `Inbox/`, and `Goals/`; read pages from nine medical domains | Ordinary work requires no confirmation |
+| `ask` | `Bash`, `WebSearch` | Every shell command and search requires your permission |
+| `deny` | Write to `.claude/**`, `.git/**`; read `~/.ssh`, `~/.claude`, `~/.aws`, `~/.gnupg`, any `.env*`, `.mcp.json`; `curl`, `wget`, `nc`, `ssh`, `scp`, `rsync`, `git push`, `git remote add` | Barrier that works under any settings |
 
-Перечислено честно, потому что защита, границы которой не названы, опаснее её отсутствия.
+The key property is: **`deny` and explicit `ask` apply in every mode**, including permission-bypass mode. `allow` means nothing in that mode, so the real protection comes from the other two lists. The ban on writing to `.claude/**` means the agent cannot expand its own permissions: this is a rule that protects itself.
 
-- **Обёртки обходят запреты Bash.** Правило `Bash(curl:*)` блокирует `curl …`, но не `sudo curl …`, не `bash -c "curl …"`, не `python3 -c "import urllib…"`. Claude Code снимает перед сверкой лишь фиксированный набор обёрток — `timeout`, `nice`, `nohup` и подобные, — и `sudo` в него не входит. Настоящий барьер здесь — `ask` на `Bash`: любая нераспознанная команда всё равно спросит разрешения
-- **Запреты на файлы не видят сторонних процессов.** `Read(**/.env*)` останавливает чтение через встроенные инструменты и распознаваемые команды вроде `cat`, но не Python-скрипт, открывающий файл сам
-- **`Edit`-запреты не покрывают Bash.** `git commit` и `rm` через оболочку `.git` и `.claude` затронуть могут — иначе сломались бы обычные операции с репозиторием
-- **`Bash(git push:*)` хрупок**: лишний пробел или вызов по абсолютному пути к бинарнику могут не совпасть с шаблоном. Реальный предохранитель — отсутствие remote у репозитория по построению
-- **Хуки сессий не проходят через эти правила** — они запускаются оболочкой вне тул-вызовов, поэтому `deny` на `.claude/**` их не ломает
+### What these rules do not do
+
+This is listed honestly because protection with unnamed boundaries is more dangerous than no protection.
+
+- **Wrappers bypass Bash bans.** `Bash(curl:*)` blocks `curl …`, but not `sudo curl …`, `bash -c "curl …"`, or `python3 -c "import urllib…"`. Claude Code strips only a fixed set of wrappers before matching — `timeout`, `nice`, `nohup`, and similar — and `sudo` is not among them. The real barrier here is `ask` on `Bash`: every unrecognized command still asks for permission
+- **File bans do not see third-party processes.** `Read(**/.env*)` stops reading through built-in tools and recognized commands such as `cat`, but not a Python script that opens the file itself
+- **`Edit` bans do not cover Bash.** `git commit` and `rm` through the shell can affect `.git` and `.claude` — otherwise ordinary repository operations would break
+- **`Bash(git push:*)` is fragile**: an extra space or an absolute path to the binary may not match the pattern. The real safeguard is that the repository has no remote by design
+- **Session hooks do not pass through these rules** — they run in a shell outside tool calls, so a `deny` on `.claude/**` does not break them
 
 ### Sandbox
 
-Для работы с реальными медицинскими данными стоит включить встроенный sandbox Claude Code — он изолирует файловую систему и сеть для команд оболочки на уровне операционной системы, а не инструкций.
+When working with real medical data, enable the built-in Claude Code sandbox — it isolates the filesystem and network for shell commands at the operating-system level rather than through instructions.
 
-По умолчанию он **выключен**. Включается командой `/sandbox` или ключом `"sandbox": {"enabled": true}`. Именно он закрывает обходы через `sudo` и сторонние интерпретаторы, перечисленные выше.
+It is **off by default**. Enable it with `/sandbox` or with `"sandbox": {"enabled": true}`. This is what closes the `sudo` and third-party-interpreter bypasses listed above.
 
-В настройки проекта он не добавлен намеренно: sandbox меняет поведение оболочки для всей сессии, и это решение пользователя, а не значение по умолчанию, навязанное репозиторием.
+It is intentionally not included in the project settings: the sandbox changes shell behavior for the entire session, so this is the user’s choice rather than a repository-imposed default.

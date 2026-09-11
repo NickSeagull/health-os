@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated": null,
-  "purpose": "Внешний контекст жизни: география, климат, жильё, работа, стресс. Читается всеми AI-специалистами до того, как искать редкую патологию — среда и режим объясняют находку чаще и дешевле.",
+  "purpose": "External life context: geography, climate, housing, work, and stress. All AI specialists read this before searching for rare pathology; environment and routine explain findings more often and at lower cost.",
   "location": {
     "city": "",
     "district": "",
@@ -84,14 +84,14 @@
     "chronology_anchors": []
   },
   "_needs_input": [
-    "location.city / country — укажите свой город и страну",
-    "location.latitude и location.longitude — заполните под свой город. Широта не подставлена намеренно: от неё зависят выводы по длине светового дня, сезонному синтезу витамина D и сезонному аффективному паттерну. Значения берутся из любой карты по названию города",
-    "healthcare_access.insurance — какая страховка действует и есть ли ДМС",
-    "climate.type и climate.derived_facts — тип климата и следствия из него",
-    "air_and_water — качество воздуха и воды по месту жительства",
-    "housing — тип жилья, отопление, влажность зимой, животные, сырость",
-    "work — сфера, поза, экранные часы, нагрузка, дорога",
-    "circadian_context — хронотип, часовой пояс, утренний свет, сменный график",
-    "stress_context.chronology_anchors — год, возраст и событие: переезды, смены работы, потери, операции. Нужны, чтобы привязать начало симптомов к событиям жизни"
+    "location.city / country — enter your city and country",
+    "location.latitude and location.longitude — enter the coordinates for your city. Latitude is intentionally blank: daylight length, seasonal vitamin D synthesis, and seasonal affective patterns depend on it. Get the values from any map by city name",
+    "healthcare_access.insurance — active insurance and whether private health insurance is available",
+    "climate.type and climate.derived_facts — climate type and its consequences",
+    "air_and_water — local air and water quality",
+    "housing — housing type, heating, winter humidity, pets, and dampness",
+    "work — field, posture, screen hours, workload, and commute",
+    "circadian_context — chronotype, time zone, morning light, and shift work",
+    "stress_context.chronology_anchors — year, age, and event: moves, job changes, losses, and operations. These link symptom onset to life events"
   ]
 }

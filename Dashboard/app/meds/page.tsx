@@ -8,8 +8,8 @@ export default function MedsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Лекарства"
-        description="Текущие препараты, БАДы, наружные"
+        title="Medications"
+        description="Current medications, supplements, and topical treatments"
       />
       <ScheduleGrid />
       <MedCards />

@@ -1,245 +1,247 @@
 ---
 name: lab-order
 description: |
-  Где сдать анализы: путь по ОМС, сравнение цен лабораторий (Гемотест, Инвитро), ссылки для заказа. Расшифровка результатов — в /labs.
-  Триггеры: «найди анализы», «где сдать», «сравни цены», «lab order», «сколько стоит анализ», «есть ли по ОМС»
+  Where to get tested: route through compulsory medical insurance, comparison of prices of laboratories (Hemotest, Invitro), links for ordering. Deciphering the results is in /labs.
+  Triggers: “find tests”, “where to take tests”, “compare prices”, “lab order”, “how much does the test cost”, “is it available under compulsory medical insurance”
 ---
 
-# Lab Order — поиск и сравнение лабораторий
+# Lab Order - search and comparison of laboratories
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading and writing, determine the active profile by
+> `.claude/shared/profile-resolution.md`. Short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before recording, tell whose profile it goes to.
 
-## Назначение
+## Purpose
 
-Найти конкретные анализы: где сдать и почём. Проверить путь по ОМС, сравнить цены частных лабораторий (Гемотест, Инвитро и др.), дать прямые ссылки для заказа. Автоматически обновить задачу в Todoist со сводкой и ссылками.
+Find specific tests: where to take them and how much. Check the compulsory medical insurance route, compare prices of private laboratories (Hemotest, Invitro, etc.), provide direct links for ordering. Automatically update a task in Todoist with a summary and links.
 
-**Границы скилла:** `/lab-order` — до сдачи (где сдать, сколько стоит, как подготовиться). `/labs` — после сдачи (расшифровка результатов, тренды маркеров, динамика, влияние на гипотезы). Файлы с результатами загружаются через `Inbox/` + `/inbox`.
+**Skill limits:** `/lab-order` - before testing (where to go, how much it costs, how to prepare). `/labs` - after testing (interpreting results, marker trends, dynamics, impact on hypotheses). Result files are loaded through `Inbox/` + `/inbox`.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### 1. Определить список анализов
+### 1. Determine the list of tests
 
-Из запроса пользователя или из контекста:
-- Если указана цель (например, «перед гематологом») → сформировать список на основе `Data/goals/YYYY.json` milestones и медицинского контекста
-- Если указаны конкретные анализы → использовать их
-- Если указан milestone → взять описание milestone
+From the user request or from the context:
+- If a goal is specified (for example, “before hematologist”) → generate a list based on `Data/goals/YYYY.json` milestones and medical context
+- If specific tests are indicated → use them
+- If a milestone is specified → take the milestone description
 
-Если список формируется не по назначению врача, а по цели — прямо сказать об этом: «Список собран по цели, а не по направлению врача. Врач может назначить иначе». Не расширять список «на всякий случай»: каждый лишний маркер — деньги и лишний повод для тревоги из-за пограничного результата.
+If the list is compiled not according to the doctor’s prescription, but according to the purpose, say this directly: “The list is compiled according to the purpose, and not according to the doctor’s direction. The doctor may prescribe otherwise.” Don’t expand the list “just in case”: every extra marker is money and an extra reason to worry about a borderline result.
 
-### 2. ОМС-путь (проверять первым)
+### 2. Compulsory medical insurance route (check first)
 
-Приоритет ОМС — зафиксированное правило пользователя. Прежде чем сравнивать цены частных лабораторий, проверить, положен ли анализ бесплатно.
+Compulsory medical insurance priority is a fixed user rule. Before comparing prices of private laboratories, check whether the analysis is free.
 
-Прочитать `Data/context/environment.json` → `healthcare_access` (страховка, ДМС).
+Read `Data/context/environment.json` → `healthcare_access` (insurance, VHI).
 
-Проверить в `Data/goals/YYYY.json`: у связанного milestone может стоять `oms_available: true` — тогда платный путь заведомо не единственный.
+Check in `Data/goals/YYYY.json`: the associated milestone may have `oms_available: true` — then the paid path is obviously not the only one.
 
-WebSearch: `[название анализа] по ОМС [город] направление поликлиника`
+WebSearch: `[test name] under OMS [city] referral outpatient clinic`
 
-Выяснить по каждому анализу из списка:
-- Входит ли в программу госгарантий ОМС
-- Нужно ли направление (форма 057/у) и от какого врача — терапевта или профильного специалиста
-- Где сдают: своя поликлиника по прикреплению или централизованная лаборатория
-- Сроки: сколько ждать направления и сколько — результат
-- Ограничения: кратность в год, только по показаниям, только определённые группы
+Replace placeholders with the requested specialty, service, and location.
 
-**Показывать ОМС-путь первым, до таблицы цен.** Даже если пользователь спросил «сколько стоит» — сначала строка «часть из этого бесплатна по ОМС», потом цены.
+Find out for each analysis from the list:
+- Is compulsory health insurance included in the state guarantee program?
+- Do you need a referral (form 057/u), and from which doctor — a primary care physician or a specialist?
+- Where testing is done: the assigned clinic or a centralized laboratory
+- Timing: how long to wait for the direction and how long for the result
+- Limitations: frequency per year, indications only, or certain groups only
 
-Формат блока:
+**Show the compulsory medical insurance path first, before the price table.** Even if the user asked “how much does it cost” - first the line “some of this is free under compulsory medical insurance”, then the prices.
+
+Block format:
 
 ```markdown
-### ОМС-путь
+### Compulsory Medical Insurance Path
 
-| Анализ | По ОМС | Что нужно |
+| Analysis | According to compulsory medical insurance | What you need |
 |--------|--------|-----------|
-| [Анализ 1] | ✅ да | Направление от терапевта, поликлиника по прикреплению, ~[срок] |
-| [Анализ 2] | ⚠️ по показаниям | [какие показания] |
-| [Анализ 3] | ❌ нет | Только платно |
+| [Analysis 1] | ✅ yes | Referral from a primary care physician, assigned clinic, ~[term] |
+| [Analysis 2] | ⚠️ according to indications | [what indications] |
+| [Analysis 3] | ❌ no | Paid only |
 
-Бесплатно можно закрыть: [N из M] анализов.
-Что останется платным: [список]
+You can close for free: [N of M] analyses.
+What will remain paid: [list]
 ```
 
-Если по ОМС доступно всё — так и написать, и не разворачивать сравнение платных цен без отдельной просьбы.
+If everything is available under compulsory medical insurance, write so and do not expand the comparison of paid prices without a separate request.
 
-Если ДМС есть (`healthcare_access.dms: true`) — добавить третий путь: что покрывается по `dms_details`.
+If there is VHI (`healthcare_access.dms: true`) - add a third way: what is covered under `dms_details`.
 
-Не отговаривать от платного пути: он быстрее и часто удобнее. Задача — показать оба варианта и дать выбрать, а не решить за пользователя.
+Do not discourage the paid route: it is faster and often more convenient. The goal is to show both options and let the user choose, rather than decide for them.
 
-### 3. Поиск по лабораториям
+### 3. Search by laboratories
 
-**ВАЖНО: двухэтапная верификация цен!**
+**IMPORTANT: two-step price verification!**
 
-Для КАЖДОГО анализа:
+For EACH analysis:
 
-**Этап 1 — WebSearch** (найти URL страницы анализа):
-- `site:gemotest.ru [название анализа] цена москва`
-- `site:invitro.ru [название анализа] цена москва`
-- Из результатов — извлечь URL страницы анализа
+**Step 1 - WebSearch** (find analysis page URL):
+- `site:gemotest.ru [test name] price [city]`
+- `site:invitro.ru [test name] price [city]`
+- From the results - extract the URL of the analysis page
 
-**Этап 2 — WebFetch** (проверить реальную цену на странице):
-- Для КАЖДОГО найденного URL → `WebFetch(url, "Найди точную цену анализа в рублях")`
-- Использовать ТОЛЬКО цену со страницы, НЕ из поискового snippet
-- Search snippets часто показывают неверные цены (старые, из другого региона, рекламные)
+**Stage 2 - WebFetch** (check actual price on page):
+- For EVERY URL found → `WebFetch(url, "Find the exact test price in rubles")`
+- Use ONLY the price from the page, NOT from the search snippet
+- Search snippets often show incorrect prices (old, from another region, advertising)
 
-**Комплексы** — искать отдельно:
-- `site:gemotest.ru [ключевые слова] комплекс акция`
-- `site:invitro.ru [ключевые слова] комплекс профиль`
-- Также проверять через WebFetch!
+**Complexes** - search separately:
+- `site:gemotest.ru [keywords] panel promotion`
+- `site:invitro.ru [keywords] panel profile`
+- Also check via WebFetch!
 
-**Другие лабы** (по запросу): Хеликс, KDL, Ситилаб — аналогично
+**Other labs** (on request): Helix, KDL, Citylab - similar
 
-**Взятие крови** — отдельная услуга, платится один раз за визит и входит в итог. Её цену проверять так же, как цену анализа: WebSearch → WebFetch страницы лаборатории. Она меняется и различается по регионам и филиалам.
+**Blood drawing** is a separate service, paid once per visit and included in the total. Check its price in the same way as the price of analysis: WebSearch → WebFetch laboratory pages. It changes and differs by region and branch.
 
-Ни одной цены в этом файле нет и быть не должно. Любое число в итоговой таблице — с проверенной страницы лаборатории на сегодняшнюю дату. Если страница не отдаёт цену — писать «уточнять», а не подставлять запомненное значение.
+There is not a single price in this file and there should not be. Any number in the final table is from the verified laboratory page for today's date. If the page does not give the price, write “clarify” rather than insert the remembered value.
 
-### 4. Поиск комплексов
+### 4. Search for complexes
 
-Ключевая оптимизация — найти готовые пакеты, где несколько анализов вместе дешевле:
-- Искать по ключевым словам цели: «анемия», «гормоны», «обследование» и т.д.
-- Сравнить цену комплекса vs сумму поштучно
-- Рассчитать экономию
+The key optimization is to find ready-made packages where several tests together are cheaper:
+- Search by target keywords: “anemia”, “hormones”, “examination”, etc.
+- Compare the price of the complex vs the amount per piece
+- Calculate savings
 
-### 5. Показать пользователю
+### 5. Show to user
 
-Показать сравнительную таблицу в чате:
+Show comparison table in chat:
 
 ```
-## Сравнение цен — [цель]
-Дата поиска: YYYY-MM-DD
+## Price comparison - [target]
+Search Date: YYYY-MM-DD
 
-Сначала блок «ОМС-путь» из шага 2, затем эта таблица — по тому, что осталось платным.
+First, the “Compulsory Medical Insurance Path” block from step 2, then this table for what remains to be paid.
 
-| Анализ | Гемотест | Инвитро |
+| Analysis | Hemotest | Invitro |
 |--------|----------|---------|
-| ОАК развёрнутый | [цена] ₽ | [цена] ₽ |
+| UAC expanded | [price] ₽ | [price] ₽ |
 | ... | | |
-| **Итого поштучно** | **[сумма] ₽** | **[сумма] ₽** |
-| **Взятие крови** | **[цена со страницы] ₽** | **[цена со страницы] ₽** |
-| **ИТОГО** | **[сумма] ₽** | **[сумма] ₽** |
+| **Total per piece** | **[amount] ₽** | **[amount] ₽** |
+| **Blood drawing** | **[price from page] ₽** | **[price from page] ₽** |
+| **TOTAL** | **[amount] ₽** | **[amount] ₽** |
 
-### Комплексы
-- [Название] — [цена] ₽ (vs [сумма поштучно] ₽, экономия [X] ₽)
-  [ссылка]
+### Complexes
+- [Name] - [price] ₽ (vs [piece amount] ₽, savings [X] ₽)
+  [link]
 
-### Рекомендация
-Дешевле в [лаб]: [сумма] ₽ (экономия [X] ₽ vs [другая лаб])
+### Recommendation
+Cheaper in [lab]: [amount] ₽ (saving [X] ₽ vs [other lab])
 ```
 
-Все ячейки — плейсхолдеры. Подставлять только проверенные через WebFetch значения; непроверенное — «уточнять».
+All cells are placeholders. Substitute only values checked via WebFetch; mark unverified values as “clarify”.
 
-### 6. Обновить задачу в Todoist
+### 6. Update a task in Todoist
 
-**Если есть связанная задача** (найти по тексту или по todoist_task_id из milestone):
+**If there is a related task** (find by text or by todoist_task_id from milestone):
 
-#### 6a. Обновить description задачи — краткая сводка
+#### 6a. Update task description - summary
 
-Через MCP `update-tasks` обновить description задачи:
+Via MCP `update-tasks` update the task description:
 
 ```markdown
-## Список анализов
+## List of tests
 
-**Обязательно:**
-- [ ] [Анализ 1]
-- [ ] [Анализ 2]
+**Required:**
+- [ ] [Analysis 1]
+- [ ] [Analysis 2]
 ...
 
-**Желательно:**
-- [ ] [Анализ N]
+**Preferred:**
+- [ ] [Analysis N]
 
-## Где сдать
+## Where to get tested
 
-**Рекомендация: [Лаборатория]** (~[сумма] ₽)
+**Recommendation: [Laboratory]** (~[amount] ₽)
 
-| Анализ | Цена |
+| Analysis | Price |
 |--------|------|
-| [Анализ 1] | [цена] ₽ |
+| [Analysis 1] | [price] ₽ |
 | ... | |
-| Взятие крови | [цена] ₽ |
-| **Итого** | **[сумма] ₽** |
+| Blood draw | [price] ₽ |
+| **Total** | **[amount] ₽** |
 
-💡 Комплекс «[название]» — [цена] ₽ (экономия [X] ₽)
+💡 Complex “[name]” – [price] ₽ (saving [X] ₽)
 
-## Подготовка
-- Натощак (8–12 ч)
-- Утром до 10:00
-- Не тренироваться накануне
-- Паспорт (для ОМС — ещё полис и направление)
+## Preparation
+- On an empty stomach (8–12 hours)
+- In the morning until 10:00
+- Do not train the day before
+- Passport (for compulsory medical insurance - also a policy and direction)
 ```
 
-#### 6b. Добавить комментарий — подробные ссылки
+#### 6b. Add a comment - detailed links
 
-Через MCP `add-comments` добавить комментарий к задаче:
+Via MCP `add-comments` add a comment to the task:
 
 ```markdown
-## Ссылки на анализы (поиск [дата])
+## Links to tests (search [date])
 
-### Гемотест (итого ~[сумма] ₽)
-- [Анализ 1]([ссылка]) — [цена] ₽
-- [Анализ 2]([ссылка]) — [цена] ₽
+### Hemotest (total ~[amount] ₽)
+- [Analysis 1]([link]) — [price] ₽
+- [Analysis 2]([link]) - [price] ₽
 ...
-💡 Комплекс: [Название]([ссылка]) — [цена] ₽
+💡 Complex: [Name]([link]) - [price] ₽
 
-### Инвитро (итого ~[сумма] ₽)
-- [Анализ 1]([ссылка]) — [цена] ₽
-- [Анализ 2]([ссылка]) — [цена] ₽
+### Invitro (total ~[amount] ₽)
+- [Analysis 1]([link]) — [price] ₽
+- [Analysis 2]([link]) - [price] ₽
 ...
-💡 Комплекс: [Название]([ссылка]) — [цена] ₽
+💡 Complex: [Name]([link]) - [price] ₽
 
-### Сравнение
-Дешевле: [лаборатория] на [X] ₽
+### Comparison
+Cheaper: [laboratory] at [X] ₽
 
-> Цены из поиска на [дата]. Могут отличаться — проверь на сайте.
+> Prices from search on [date]. May vary - check on the website.
 ```
 
-### 7. Обновить milestone (если есть)
+### 7. Update milestone (if any)
 
-Если анализы связаны с milestone в `Data/goals/YYYY.json`:
-- Добавить todoist_task_id если ещё не привязан
-- Обновить `cost_estimate_rub` на основе найденных цен
+If tests are associated with a milestone in `Data/goals/YYYY.json`:
+- Add todoist_task_id if not already linked
+- Update `cost_estimate_rub` based on the prices found
 
-### 8. Записать расход (после сдачи)
+### 8. Record expense (after testing)
 
-После того как пользователь сообщит, что сдал:
-- Спросить: сколько заплатил, какая лаборатория, ОМС или платно
-- Append одной строкой в `Data/costs/YYYY.jsonl`
-- Обновить `cost_actual_rub` у связанного milestone
+After the user reports that they completed the tests:
+- Ask: how much they paid, which laboratory, and whether it was OMS or private
+- Append in one line to `Data/costs/YYYY.jsonl`
+- Update `cost_actual_rub` for the associated milestone
 
-**Схема записи — в `.claude/shared/data-schemas.md`, раздел о `Data/costs/YYYY.jsonl`.** Не изобретать свой набор полей: файл агрегируют `/traction` и `/status`, и запись с другими ключами ломает разбивку расходов.
+**Record schema is in `.claude/shared/data-schemas.md`, section about `Data/costs/YYYY.jsonl`.** Do not invent your own set of fields: the file is aggregated by `/traction` and `/status`, and a record with other keys breaks the cost breakdown.
 
-Обязательные поля: `ts`, `kr`, `type`, `description`, `payment`, `cost_rub`, `clinic`, `visit_ref`.
+Required fields: `ts`, `kr`, `type`, `description`, `payment`, `cost_rub`, `clinic`, `visit_ref`.
 
-Для анализов: `type` — `lab`, `clinic` — название лаборатории, `payment` — `oms` при бесплатной сдаче (тогда `cost_rub` — `0`) или `private`. Сдача по ОМС тоже записывается: нулевая строка показывает, что направление сработало, и отличает «бесплатно» от «не сдавал».
+For tests: `type` - `lab`, `clinic` - laboratory name, `payment` - `oms` for free testing (then `cost_rub` - `0`) or `private`. OMS testing is recorded too: the zero-cost line shows that the referral worked and distinguishes “free” from “not completed.”
 
-## Связанные скиллы
+## Related skills
 
-| Скилл | Когда |
+| Skill | When |
 |-------|-------|
-| `/lab-order` | До сдачи: где сдать, положено ли по ОМС, почём, как подготовиться |
-| `/labs` | После сдачи: расшифровка, отклонения, тренды маркеров, влияние на гипотезы |
-| `/inbox` | Загрузка файлов с результатами — PDF, сканы, фото из `Inbox/` |
+| `/lab-order` | Before testing: where to go, whether OMS covers it, cost, preparation |
+| `/labs` | After testing: interpretation, deviations, marker trends, impact on hypotheses |
+| `/inbox` | Uploading files with results - PDF, scans, photos from `Inbox/` |
 
-Если пользователь просит расшифровать результат — это `/labs`, не этот скилл. Если спрашивает, где сдать уже расшифрованное повторно, — снова сюда.
+If the user asks to interpret a result, it is `/labs`, not this skill. If they ask where to repeat a test that has already been interpreted, come here again.
 
-## Правила
+## Rules
 
-- **ОМС первым** — бесплатный путь показывать до сравнения платных цен, даже если спросили только про цену
-- Ни одной зашитой цены в скилле. Каждое число — с проверенной страницы лаборатории, с датой проверки
-- Цены могут отличаться от актуальных. Всегда указывать дату поиска
-- Если комплекс дешевле отдельных анализов — рекомендовать комплекс и считать итого с комплексом
-- Не рекомендовать лабораторию по качеству — только по цене и удобству
-- Ссылки — только прямые с сайтов лабораторий (из WebSearch)
-- Всегда добавлять стоимость взятия крови к итогу — по проверенной цене
-- Расход писать по схеме из `.claude/shared/data-schemas.md`, включая нулевые записи по ОМС
-- В Todoist: description — краткая сводка + чеклист, comment — подробные ссылки
+- **OMS first** - show the free route before comparing paid prices, even if the user asks only about price
+- Not a single price built into the skill. Each number is from a verified laboratory page, with the date of verification
+- Prices may differ from current ones. Always indicate search date
+- If the complex is cheaper than individual tests, recommend the complex and calculate the total with the complex
+- Do not recommend the laboratory based on quality - only on price and convenience
+- Links - only direct ones from laboratory sites (from WebSearch)
+- Always add the cost of blood drawing to the total - at the verified price
+- Write expenses according to the scheme from `.claude/shared/data-schemas.md`, including zero entries for compulsory medical insurance
+- In Todoist: description - brief summary + checklist, comment - detailed links
 
-**Критерий завершения:** ОМС-путь проверен и показан первым, по каждому анализу сказано, положен ли он бесплатно и что для этого нужно; каждая цена в выдаче получена через WebFetch страницы лаборатории либо помечена «уточнять»; взятие крови учтено в итоге; указана дата поиска; при записи расхода строка содержит все восемь полей схемы и файл остаётся валидным JSONL.
+**Completion criterion:** The OMS path is checked and shown first; for each test, state whether it is covered for free and what is required; every price in the results comes from WebFetch of the laboratory page or is marked “clarify”; blood collection is included in the total; the search date is stated; when recording an expense, the line contains all eight schema fields and the file remains valid JSONL.
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *Information is for reference only. Consult your physician for treatment decisions.*

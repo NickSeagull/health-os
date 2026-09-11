@@ -5,7 +5,7 @@
       "date": "2026-07-08",
       "scope": "question",
       "specialists": ["endocrinologist", "hematologist"],
-      "question": "Что может объяснять снижение энергии во второй половине дня при анализах в норме?",
+      "question": "What could explain reduced energy in the afternoon when test results are within range?",
       "file": "2026-07-08_question-energy.md",
       "rounds": 3,
       "disputes_total": 2,

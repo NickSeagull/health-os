@@ -1,19 +1,17 @@
 # ═══════════════════════════════════════════════════════════════════
-#  МЕДИЦИНСКИЕ ДАННЫЕ
+#  MEDICAL DATA
 # ═══════════════════════════════════════════════════════════════════
 #
-# Главный предохранитель проекта. По умолчанию игнорируется ВСЁ
-# содержимое Data/ — так, чтобы случайно закоммитить собственную
-# медкарту было невозможно.
+# The main project safeguard. ALL contents of Data/ are ignored by default
+# to prevent accidentally committing your own medical record.
 #
-# Логика обратная привычной: не «перечисляем, что скрыть», а
-# «скрываем всё и перечисляем редкие исключения». Ошибка в такой
-# схеме приводит к тому, что файл не попадёт в git, — а не к утечке.
+# The usual logic is reversed: hide everything and list a few exceptions.
+# A mistake keeps a file out of Git rather than leaking it.
 
 Data/**
 
-# Исключения: структура каталогов, шаблоны и база знаний системы.
-# Личных данных ни в одном из них нет и быть не должно.
+# Exceptions: directory structure, templates, and system knowledge.
+# None of these contain, or should contain, personal data.
 !Data/**/
 !Data/**/.gitkeep
 !Data/**/README.md
@@ -24,30 +22,30 @@ Data/**
 !Data/**/*.demo.jsonl
 !Data/**/*.demo.csv
 
-# Markdown-шаблоны: протокол визита и файл паттернов. Суффиксы .example
-# и .demo носят только шаблоны — реальная запись никогда их не имеет,
-# поэтому исключение не ослабляет предохранитель выше.
+# Markdown templates: visit notes and patterns. Only templates use the
+# .example and .demo suffixes; real records never do, so this exception
+# does not weaken the safeguard above.
 !Data/**/*.example.md
 !Data/**/*.demo.md
 
-# Образцы формата отдельной записи — анализа, протокола визита.
-# В отличие от .example они НЕ разворачиваются установщиком: это справка
-# «как выглядит запись», а не файл-контейнер, который нужно завести.
-# Развёрнутый образец создавал бы анализ, отсутствующий в индексе.
+# Single-entry format references: a lab result or visit note.
+# Unlike .example files, these are NOT deployed by the installer: they
+# illustrate an entry rather than a container file to initialize.
+# Deploying one would create a lab result missing from the index.
 !Data/**/*.reference.json
 !Data/**/*.reference.md
 
-# Справочники системы, а не данные пациента
+# System reference data, not patient data
 !Data/labs/_marker-aliases.json
 !Data/specialists/*.json
 
 # ═══════════════════════════════════════════════════════════════════
-#  ОРИГИНАЛЫ ДОКУМЕНТОВ
+#  ORIGINAL DOCUMENTS
 # ═══════════════════════════════════════════════════════════════════
 #
-# PDF, сканы и снимки содержат PHI в самом сыром виде: ФИО, даты
-# рождения, номера полисов, печати клиник. В git они переживают
-# любое удаление из рабочего каталога и всплывают при шаринге истории.
+# PDFs, scans, and images contain raw PHI: full names, dates of birth,
+# insurance numbers, and clinic stamps. In Git they survive deletion
+# from the working directory and reappear when history is shared.
 
 *.pdf
 *.dcm
@@ -59,21 +57,21 @@ Data/**
 *.tiff
 *.dicom
 
-# Кроме иконок и статики дашборда
+# Except dashboard icons and static assets
 !Dashboard/public/**
 
-# И кроме иллюстраций документации. Скриншоты сняты на синтетических
-# демо-данных вымышленного пациента — реальных сведений на них нет
+# And documentation illustrations. Screenshots use synthetic demo data
+# for a fictional patient and contain no real personal information
 !docs/img/**
 
 # ═══════════════════════════════════════════════════════════════════
-#  РАБОЧИЕ КАТАЛОГИ
+#  WORKING DIRECTORIES
 # ═══════════════════════════════════════════════════════════════════
 
-# Строка `!<каталог>/**/` обязательна перед разыгноренными файлами:
-# git не умеет разыгнорить файл внутри проигнорированного каталога,
-# и без неё вложенные .gitkeep молча выпадают — после клонирования
-# подкаталогов Cache/alerts, Cache/sessions и Archive/processed просто нет.
+# The `!<directory>/**/` line is required before unignored files:
+# Git cannot unignore a file inside an ignored directory. Without this
+# line, nested .gitkeep files silently disappear and clones lack
+# the Cache/alerts, Cache/sessions, and Archive/processed subdirectories.
 
 Inbox/**
 !Inbox/**/
@@ -92,7 +90,7 @@ Goals/**
 !Goals/**/.gitkeep
 
 # ═══════════════════════════════════════════════════════════════════
-#  СЕКРЕТЫ
+#  SECRETS
 # ═══════════════════════════════════════════════════════════════════
 
 .mcp.json
@@ -104,17 +102,17 @@ Goals/**
 credentials.json
 
 # ═══════════════════════════════════════════════════════════════════
-#  РАНТАЙМ CLAUDE CODE
+#  CLAUDE CODE RUNTIME
 # ═══════════════════════════════════════════════════════════════════
 
-# Breadcrumbs сессий содержат абсолютные пути с именем пользователя
+# Session breadcrumbs contain absolute paths with the username
 .claude/hooks/pending-sessions/*.json
 .claude/hooks/session-start-*.tmp
 .claude/projects/
 .claude/settings.local.json
 
 # ═══════════════════════════════════════════════════════════════════
-#  ДАШБОРД
+#  DASHBOARD
 # ═══════════════════════════════════════════════════════════════════
 
 Dashboard/node_modules/
@@ -124,14 +122,13 @@ Dashboard/.env.local
 Dashboard/tsconfig.tsbuildinfo
 
 # ═══════════════════════════════════════════════════════════════════
-#  КОНФЛИКТНЫЕ КОПИИ
+#  CONFLICTING COPIES
 # ═══════════════════════════════════════════════════════════════════
 #
-# iCloud Drive, Dropbox и Finder создают дубликаты вида «settings 2.json».
-# Claude Code их не читает, но в репозитории они выглядят вторым
-# источником правды: рядом с настоящим файлом лежит похожий, а отличаются
-# они содержимым, а не именем. Однажды такая копия устаревших прав
-# доступа уже попала в публикацию.
+# iCloud Drive, Dropbox, and Finder create duplicates such as "settings 2.json".
+# Claude Code does not read them, but they resemble a second source of truth
+# beside the real file, with differences hidden in their contents.
+# A copy containing outdated access permissions was once published this way.
 
 * [0-9].*
 *[Cc]opy.*
@@ -139,7 +136,7 @@ Dashboard/tsconfig.tsbuildinfo
 *conflicted copy*
 
 # ═══════════════════════════════════════════════════════════════════
-#  СИСТЕМНОЕ
+#  SYSTEM FILES
 # ═══════════════════════════════════════════════════════════════════
 
 .DS_Store

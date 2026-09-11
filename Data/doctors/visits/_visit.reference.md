@@ -1,38 +1,39 @@
-# Заголовок визита — специальность и месяц
+# Visit title — specialty and month
 
-## Первичный приём — YYYY-MM-DD
+## Initial appointment — YYYY-MM-DD
 
-- **Дата:** YYYY-MM-DD
-- **Врач:** ФИО или «—», если в документе не указан
-- **Специальность:** специальность по-русски
-- **Клиника:** название и адрес
-- **Номер карты:** необязательно
-- **Тип приёма:** первичный / повторный
+- **Date:** YYYY-MM-DD
+- **Doctor:** Full name, or “—” if not specified in the document
+- **Specialty:** Specialty (required by the current data format)
+- **Clinic:** Name and address
+- **Record number:** Optional
+- **Appointment type:** Initial / follow-up
 
-### Жалобы
+### Complaints
 
-### Клинический диагноз
+### Clinical diagnosis
 
-### План обследования
+### Examination plan
 
-### Назначения
+### Prescriptions
 
-### Рекомендации
+### Recommendations
 
 ### Follow-up
 
-- Контрольный визит:
-- Контрольные анализы:
+- Follow-up appointment:
+- Follow-up tests:
 
 <!--
-Шаблон протокола визита. Имя файла: YYYY-MM-DD_[specialty][_type].md
-  [specialty] — латиницей, kebab-case: therapist, cardio, neuro, ent, urology, gastro…
-  [_type] — необязательно: consultation, ecg, mri-brain, ultrasound_thyroid…
+Visit report template. Filename: YYYY-MM-DD_[specialty][_type].md
+  [specialty] — Latin characters, kebab-case: therapist, cardio, neuro, ent, urology, gastro…
+  [_type] — optional: consultation, ecg, mri-brain, ultrasound_thyroid…
 
-Поля «Дата», «Врач», «Специальность» и «Клиника» дашборд разбирает регулярным
-выражением ровно в этом написании — с двоеточием внутри `**…**`. Меняя формулировку,
-проверьте Dashboard/lib/data/visits.ts.
+The dashboard parses the fields “Date”, “Doctor”, “Specialty”, and “Clinic”
+using regular expressions with these exact labels and the colon inside `**…**`.
+Keep these literal field labels for compatibility; before changing them, check
+Dashboard/lib/data/visits.ts.
 
-Файл начинается с подчёркивания и потому считается служебным: он не входит
-в visits/_index.json и не учитывается в инварианте «число файлов = total».
+The filename begins with an underscore, so it is treated as a service file:
+it is excluded from visits/_index.json and from the “file count = total” invariant.
 -->

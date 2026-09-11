@@ -3,32 +3,32 @@
   "vaccinations": [
     {
       "date": "2025-10-14",
-      "vaccine": "Грипп (Совигрипп)",
-      "dose": "сезонная",
-      "clinic": "Поликлиника по месту жительства",
-      "notes": "0.5 мл"
+      "vaccine": "Influenza (Sovigripp)",
+      "dose": "seasonal",
+      "clinic": "Local outpatient clinic",
+      "notes": "0.5 mL"
     },
     {
       "date": "2021-11-02",
       "vaccine": "COVID-19",
-      "dose": "II этап",
-      "clinic": "Поликлиника по месту жительства",
+      "dose": "stage II",
+      "clinic": "Local outpatient clinic",
       "notes": ""
     },
     {
       "date": "2018-06-05",
-      "vaccine": "АДС-М (дифтерия, столбняк)",
-      "dose": "ревакцинация",
-      "notes": "Следующая ревакцинация через 10 лет"
+      "vaccine": "Td (diphtheria, tetanus)",
+      "dose": "booster",
+      "notes": "Next booster in 10 years"
     }
   ],
   "tuberculin_tests": [
     {
       "date": "2016-04-19",
-      "type": "р. Манту",
-      "result": "отрицательная"
+      "type": "Mantoux test",
+      "result": "negative"
     }
   ],
   "schedule": [],
-  "source": "Демо-данные. В реальном файле — прививочный сертификат (форма 156/у-93), выписки, детская медкарта"
+  "source": "Demo data. A real file would contain the vaccination certificate (form 156/u-93), discharge summaries, and the child health record"
 }

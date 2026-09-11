@@ -1,6 +1,6 @@
 ---
 type: symptom
-title: Снижение энергии во второй половине дня
+title: Reduced energy in the afternoon
 slug: low-energy
 status: active
 created: 2026-02-10
@@ -9,8 +9,8 @@ sources:
   - doctors/visits/2026-06-25_therapist.md
 ---
 
-Началось в тёмный сезон, к лету ослабло. Обсуждалось на приёме —
-[[doctor/therapist]].
+Started during the darker season and eased by summer. Discussed at the
+appointment: [[doctor/therapist]].
 
-Объясняется двумя конкурирующими гипотезами:
-[[hypothesis/vitamin-d-deficiency]] и [[hypothesis/irregular-sleep]].
+Explained by two competing hypotheses:
+[[hypothesis/vitamin-d-deficiency]] and [[hypothesis/irregular-sleep]].

@@ -1,214 +1,219 @@
 ---
 name: find-doctor
 description: |
-  Поиск врача или медицинской услуги — анализ отзывов, рейтингов, цен, расстояния. Сравнение и рекомендация.
-  Триггеры: «найди врача», «найди [специальность]», «где принимает», «хороший терапевт», «поиск врача», «find doctor», «куда пойти к [специальность]»
+  Search for a doctor or medical service - analysis of reviews, ratings, prices, distance. Comparison and recommendation.
+  Triggers: “find a doctor”, “find [specialty]”, “where they see patients”, “find a good primary care physician”, “search for a doctor”, “find doctor”, “where to go for [specialty]”
 ---
 
-# Find Doctor — поиск врача и медицинских услуг
+# Find Doctor - search for a doctor and medical services
 
-## Назначение
+## Purpose
 
-Найти лучшего врача нужной специальности или медицинскую услугу: агрегировать данные с платформ отзывов, сравнить по рейтингу, цене, расстоянию и доступности. Предложить оптимальный вариант.
+Find the best doctor for the desired specialty or medical service: aggregate data from review platforms, compare by rating, price, distance and accessibility. Offer the best option.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
-## Локация и доступ к медицине
+## Location and access to medicine
 
-**Читать из `Data/context/environment.json`, не из этого файла.** Адрес и страховка в тексте скилла устаревают при первом же переезде и расходятся с данными.
+**Read from `Data/context/environment.json`, not from this file.** The address and insurance in the skill text become outdated the first time you move and are inconsistent with the data.
 
-| Что нужно | Откуда брать |
+| What you need | Where to get it |
 |-----------|--------------|
-| Город, район, улица, ближайшее метро | `location.city`, `location.district`, `location.street`, `location.nearest_metro` |
-| Страховка | `healthcare_access.insurance` |
-| Есть ли ДМС и какой | `healthcare_access.dms`, `healthcare_access.dms_details` |
-| Готовность ездить | `healthcare_access.travel_readiness`, `healthcare_access.max_travel_time_min` |
-| Транспорт | `healthcare_access.preferred_transport` |
+| City, district, street, nearest metro | `location.city`, `location.district`, `location.street`, `location.nearest_metro` |
+| Insurance | `healthcare_access.insurance` |
+| Is there voluntary health insurance and what kind | `healthcare_access.dms`, `healthcare_access.dms_details` |
+| Ready to ride | `healthcare_access.travel_readiness`, `healthcare_access.max_travel_time_min` |
+| Transport | `healthcare_access.preferred_transport` |
 
-Ниже по тексту `[метро]`, `[район]`, `[город]` — подстановки из этих полей.
+Below in the text `[metro]`, `[district]`, and `[city]` are substitutions from these fields.
 
-Если файл отсутствует или нужные поля пусты — спросить пользователя один раз, использовать ответ в текущем поиске и предложить записать его в `Data/context/environment.json`, чтобы не спрашивать снова.
+If the file is missing or the required fields are empty, ask the user once, use the answer in the current search and offer to write it in `Data/context/environment.json` so as not to ask again.
 
 ## Workflow
 
-### 1. Уточнить запрос
+### 1. Clarify the request
 
-Из сообщения пользователя определить:
-- **Специальность** (обязательно) — терапевт, ортопед, гастроэнтеролог и т.д.
-- **Цель визита** (если указана) — конкретная жалоба, обследование, second opinion
-- **Срочность** — плановый / нужно быстро
-- **Бюджет** — если есть ограничения
-- **Предпочтения** — пол врача, возраст, конкретная клиника
+From the user message determine:
+- **Specialty** (required) - primary care physician, orthopedist, gastroenterologist, etc.
+- **Purpose of visit** (if specified) - specific complaint, examination, second opinion
+- **Urgency** - planned / needed quickly
+- **Budget** - if there are restrictions
+- **Preferences**—doctor’s gender, age, specific clinic
 
-Если специальность неясна → спросить. Остальное — опционально, не допрашивать.
+If the specialty is unclear → ask. The rest is optional, do not interrogate.
 
-### 2. Проверить существующие контакты
+### 2. Check existing contacts
 
-Прочитать `Data/doctors/contacts.json` → `doctors[]`.
+Read `Data/doctors/contacts.json` → `doctors[]`.
 
-**Статусы врача:**
+**Doctor statuses:**
 
-| Статус | Значение |
+| Status | Meaning |
 |--------|----------|
-| `active` | Наблюдается сейчас или готов пойти повторно |
-| `historical` | Был в прошлом: другой город, детство, разовый визит. Не отбрасывать — это опыт пациента |
-| `rejected` | Отказался идти повторно. Не предлагать снова |
+| `active` | Currently seeing the doctor or ready to return |
+| `historical` | Was in the past: another city, childhood, one-time visit. Not discarding is the patient's experience |
+| `rejected` | Refused to go again. Do not offer again |
 
-Записи без поля `status` считать `historical`.
+Records without the `status` field are considered `historical`.
 
-Искать врачей нужной специальности **любого статуса, кроме `rejected`**, и разбирать по случаям:
+Search for doctors of the required specialty **any status except `rejected`**, and sort by case:
 
-- **Есть `active`** → «У тебя уже есть [ФИО] в [клиника]. Ищем нового или к нему?»
-- **Есть только `historical`** → упомянуть и пояснить, почему это не готовый вариант: «Был [ФИО], [клиника], [period] — [город, если не текущий]. Продолжаем искать нового?»
-- **Есть `rejected`** → в выдаче не предлагать; если тот же врач всплывёт в результатах поиска, пометить «🚩 отказ в прошлом»
-- **Ничего нет** → идти дальше молча
+- **There is `active`** → “You already have [full name] at [clinic]. Are we looking for something new or joining him?”
+- **There is only `historical`** → mention it and explain why it is not a ready-made option: “There was [full name] at [clinic] during [period] — [city, if not current]. Should we continue looking for someone new?”
+- **There is `rejected`** → do not offer in search results; if the same doctor comes up in search results, tag “🚩 past refusal”
+- **Nothing** → move on in silence
 
-Фильтр только по `active` не годится: сейчас у всех записей статус `historical`, и такой шаг не сработал бы ни разу.
+Filtering only by `active` is not suitable: now all records have the status `historical`, and such a step would never work.
 
-Специальность сопоставлять по вхождению подстроки, а не по точному совпадению: в данных встречается «травматолог-ортопед, к.м.н.», «нейрофизиолог (ЭЭГ, РЭГ)», «педиатр (участковый)».
+Match specialties by substring rather than exact equality: the data contains “traumatologist-orthopedist, Ph.D.,” “neurophysiologist (EEG, REG),” and “pediatrician (local).”
 
-Прочитать `Data/doctors/visits/_index.json`:
-- Были ли визиты к врачам этой специальности?
-- Если были → кратко: «Последний визит: [дата] к [ФИО], [клиника]»
+Read `Data/doctors/visits/_index.json`:
+- Have there been any visits to doctors of this specialty?
+- If there were any → briefly: “Last visit: [date] with [full name] at [clinic].”
 
-### 3. Два пути — ОМС и частный
+### 3. Two ways - compulsory medical insurance and private
 
-**Всегда показывать оба варианта:**
+**Always show both options:**
 
-#### 3a. ОМС-путь (приоритетный)
+#### 3a. OMS path (priority)
 
-WebSearch: `[специальность] по ОМС [город] ЕМИАС запись`
+WebSearch: `[specialty] under OMS [city] EMIAS appointment`
 
-Выяснить:
-- Доступна ли эта специальность по ОМС напрямую или нужно направление от терапевта
-- Как записаться через ЕМИАС / Госуслуги
-- Ближайшие поликлиники к `[метро]` с этим специалистом
-- Примерные сроки ожидания
+Replace placeholders with the requested specialty, service, and location.
 
-Если в `healthcare_access.dms` стоит `true` — добавить третий путь: что покрывает ДМС по `dms_details`.
+Find out:
+- Is this specialty available directly under compulsory medical insurance, or do you need a referral from a primary care physician?
+- How to sign up through EMIAS / State Services
+- The nearest clinics to `[metro]` with this specialist
+- Approximate waiting times
 
-#### 3b. Частный путь
+If `healthcare_access.dms` contains `true`, add a third way: what is covered by VHI under `dms_details`.
 
-Переходить к шагам 4–7 ниже.
+#### 3b. Private path
 
-### 4. Поиск врачей на платформах
+Proceed to steps 4-7 below.
 
-**ВАЖНО: трёхэтапная верификация!**
+### 4. Search for doctors on platforms
 
-**Радиус поиска:**
-- По умолчанию: `[район]` + соседние районы. Соседние определять по карте, а не по списку в этом файле
-- Если пользователь готов ездить дальше (`healthcare_access.travel_readiness`) → расширять до всего города. Добавить запросы без привязки к метро: `[специальность] [город] рейтинг отзывы`, `лучший [специальность] [город]`
-- Если пользователь ищет по цене → обязательно искать по всему городу: дешёвые варианты могут быть не рядом
+**IMPORTANT: three-step verification!**
 
-**Этап 1 — WebSearch** (найти кандидатов):
+**Search radius:**
+- Default: `[district]` + neighboring areas. Neighbors are determined by the map, not by the list in this file
+- If the user is ready to travel further (`healthcare_access.travel_readiness`) → expand to the entire city. Add queries without reference to the metro: `[specialty] [city] ratings reviews`, `best [specialty] [city]`
+- If the user is searching by price → be sure to search throughout the city: cheap options may not be nearby
 
-Параллельные запросы:
-- `site:prodoctorov.ru [специальность] [метро] [город] рейтинг`
-- `site:prodoctorov.ru [специальность] [район] рейтинг`
-- `site:docdoc.ru [специальность] метро [метро]`
-- `site:napopravku.ru [специальность] [метро]`
-- Если цель конкретная: `лучший [специальность] [город] [цель] отзывы`
+**Stage 1 - WebSearch** (find candidates):
 
-Из результатов — собрать 5–8 кандидатов с URL их профилей.
+Parallel queries:
 
-**Этап 2 — WebFetch агрегаторов** (рейтинг и отзывы, НЕ цены):
+Replace placeholders with the requested specialty, service, and location.
 
-Для каждого кандидата → `WebFetch(profile_url)`:
-- Рейтинг (число + количество отзывов)
-- Стаж работы
-- Клиника и адрес
-- Ближайшая запись (если есть на странице)
-- Ключевые отзывы — паттерны: что хвалят, на что жалуются
-- **Название клиники и её домен** — понадобится для этапа 3
+- `site:prodoctorov.ru [specialty] [metro] [city] ratings`
+- `site:prodoctorov.ru [specialty] [district] ratings`
+- `site:docdoc.ru [specialty] metro [metro]`
+- `site:napopravku.ru [specialty] [metro]`
+- If the goal is specific: `best [specialty] [city] [goal] reviews`
 
-⚠️ **Цены с агрегаторов НЕ брать** — они часто устаревшие и вводят в заблуждение.
+From the results - collect 5-8 candidates with the URL of their profiles.
 
-**Этап 3 — WebFetch официальных сайтов** (цены — ground truth):
+**Stage 2 - WebFetch aggregators** (ratings and reviews, NOT prices):
 
-Для каждого топ-кандидата (топ-5):
-1. WebSearch: `site:[домен-клиники] прайс` или `site:[домен-клиники] цены [специальность]`
-2. WebFetch прайс-страницы клиники
-3. Найти цену первичного и повторного приёма
+For each candidate → `WebFetch(profile_url)`:
+- Rating (number + number of reviews)
+- Work experience
+- Clinic and address
+- Nearest entry (if available on the page)
+- Key reviews - patterns: what they praise, what they complain about
+- **Name of the clinic and its domain** - will be needed for stage 3
 
-Это **ЕДИНСТВЕННЫЙ** авторитетный источник цен. Если официальный сайт не отдаёт цены (таймаут, нет прайса, цена за услугу не найдена) → в таблице писать «⚠️ уточнять по тел.». **Не подставлять** цену с агрегатора.
+⚠️ **DO NOT take prices from aggregators** - they are often outdated and misleading.
 
-**Если кандидат упоминается как «топ» на нескольких платформах** — повышать приоритет.
+**Stage 3 - WebFetch official sites** (prices - ground truth):
 
-#### Правила работы с ценами
+For each top candidate (top 5):
+1. WebSearch: `site:[clinic-domain] price-list` or `site:[clinic-domain] prices [specialty]`
+2. WebFetch clinic price pages
+3. Find the price of initial and repeat appointments
 
-- **Агрегаторы** — ТОЛЬКО для рейтингов и отзывов. Цены на них часто устаревшие. Перечень — в разделе «Платформы для поиска» ниже, он единственный. Любой не перечисленный там сайт-агрегатор подпадает под то же правило
-- **Официальный сайт клиники** — ЕДИНСТВЕННЫЙ источник цен. Искать страницу «прайс» / «цены» / «стоимость»
-- **Всегда различать тип цены:** за 1 зуб, за 1 челюсть, комплексная (обе челюсти), за приём и т.д. В таблице указывать ТИП цены
-- Если на сайте клиники цена не найдена → писать «уточнять», НЕ подставлять цену с агрегатора
-- При поиске услуги (чистка, МРТ и т.д.) — искать прайс-страницу конкретной услуги: `site:[домен-клиники] прайс [услуга]`
+This is the **ONLY** authoritative price source. If the official website does not provide prices (timeout, no price list, price for the service not found) → write “⚠️ check by phone” in the table. **Do not substitute** the price from the aggregator.
 
-### 5. Анализ и скоринг
+**If a candidate is mentioned as “top” on several platforms** – increase priority.
 
-Для каждого кандидата рассчитать условный скор:
+#### Rules for working with prices
 
-**Базовые веса (по умолчанию):**
+- **Aggregators** - ONLY for ratings and reviews. Their prices are often outdated. The list is in the “Search Platforms” section below, it is the only one. Any aggregator site not listed there is subject to the same rule
+- **The official website of the clinic** is the ONLY source of prices. Search page "price" / "prices" / "cost"
+- **Always distinguish the type of price:** for 1 tooth, for 1 jaw, complex (both jaws), per appointment, etc. Please indicate price TYPE in the table
+- If the price is not found on the clinic’s website → write “check by phone”, DO NOT substitute the price from the aggregator
+- When searching for a service (cleaning, MRI, etc.) - look for the price page of a specific service: `site:[clinic-domain] price-list [service]`
 
-| Фактор | Вес | Как оценивать |
+### 5. Analysis and scoring
+
+For each candidate, calculate the conditional score:
+
+**Base weights (default):**
+
+| Factor | Weight | How to evaluate |
 |--------|-----|---------------|
-| Рейтинг | 25% | Нормализовать к 5.0, учесть количество отзывов (>50 надёжнее) |
-| Отзывы (качество) | 25% | Паттерны: внимательность, точность диагнозов, результат лечения |
-| Цена | 20% | Нормализовать: дешевле = лучше (но не демпинг) |
-| Расстояние | 20% | Минуты от `[метро]` (метро/авто) |
-| Доступность | 10% | Ближайшая запись: быстрее = лучше |
+| Rating | 25% | Normalize to 5.0, take into account the number of reviews (>50 is more reliable) |
+| Reviews (quality) | 25% | Patterns: attentiveness, accurate diagnoses, treatment result |
+| Price | 20% | Normalize: cheaper = better (but not dumping) |
+| Distance | 20% | Minutes from `[metro]` (metro/car) |
+| Availability | 10% | Nearest appointment: faster is better |
 
-**Адаптация весов:** если пользователь явно указал приоритет (например «цена — основное», «главное — близко», «нужен лучший специалист»), перераспределить веса:
-- Приоритетный фактор → 40%
-- Остальные факторы делят оставшиеся 60% пропорционально базовым весам
-- Пример: пользователь сказал «цена — основное» → Цена 40%, Рейтинг 15%, Отзывы 15%, Расстояние 15%, Доступность 15%
+**Adaptation of weights:** if the user has explicitly indicated a priority (for example, “price is the main thing,” “the main thing is close,” “the best specialist is needed”), redistribute the weights:
+- Priority factor → 40%
+- The remaining factors divide the remaining 60% in proportion to the base weights
+- Example: user said “price is the main thing” → Price 40%, Rating 15%, Reviews 15%, Distance 15%, Access 15%
 
-**Корректировки:**
-- Мало отзывов (<10) → понизить уверенность, пометить «⚠️ мало отзывов»
-- Негативные паттерны в отзывах (грубость, ошибки) → красный флаг 🚩
-- Врач из клиники, где уже есть другие врачи пользователя → бонус «удобство одного места»
+**Adjustments:**
+- Few reviews (<10) → downgrade certainty, mark “⚠️ few reviews”
+- Negative patterns in reviews (rudeness, mistakes) → red flag 🚩
+- A doctor from a clinic where there are already other user doctors → bonus “convenience of one place”
 
-### 6. Показать пользователю
+### 6. Show to user
 
 ```markdown
-## Поиск — [специальность] (дата поиска: YYYY-MM-DD)
+## Search — [specialty] (search date: YYYY-MM-DD)
 
-### ОМС-путь
-- [Как попасть бесплатно — направление, ЕМИАС, сроки]
-- Ближайшая поликлиника: [название, адрес]
+### Compulsory Medical Insurance Path
+- [How to get in for free - directions, EMIAS, deadlines]
+- Nearest clinic: [name, address]
 
-### Частный путь — топ кандидаты
+### Private path - top candidates
 
-| # | Врач | Клиника | Рейтинг | Отзывы | Цена (источник) | Дорога | Скор |
+| # | Doctor | Clinic | Rating | Reviews | Price (source) | Road | Score |
 |---|------|---------|---------|--------|-----------------|--------|------|
-| 1 | [ФИО] | [клиника] | ⭐ 4.8 (120) | ✅ хороший | 3 500 ₽ первичный (сайт) | 15 мин | 87 |
-| 2 | [ФИО] | [клиника] | ⭐ 4.6 (230) | ✅ отличный | 5 000 ₽ комплекс (сайт) | 25 мин | 82 |
-| 3 | [ФИО] | [клиника] | ⭐ 4.9 (45) | ⚠️ мало | уточнять | 10 мин | 78 |
+| 1 | [full name] | [clinic] | ⭐ 4.8 (120) | ✅ good | 3,500 ₽ primary (website) | 15 min | 87 |
+| 2 | [full name] | [clinic] | ⭐ 4.6 (230) | ✅ excellent | 5,000 ₽ complex (website) | 25 min | 82 |
+| 3 | [full name] | [clinic] | ⭐ 4.9 (45) | ⚠️ little | clarify | 10 min | 78 |
 
-### Детали по кандидатам
+### Details by candidate
 
-#### 1. [ФИО] — [клиника]
-- **Стаж:** X лет
-- **Адрес:** [адрес], [как добраться от `[метро]`]
-- **Цена:** первичный — X ₽, повторный — Y ₽
-- **Запись:** ближайшая [дата] / [ссылка на запись]
-- **Что хвалят:** [паттерны из отзывов]
-- **На что жалуются:** [если есть]
-- **Ссылки:** [ПроДокторов] [DocDoc]
+#### 1. [full name] - [clinic]
+- **Experience:** X years
+- **Address:** [address], [how to get there from `[metro]`]
+- **Price:** primary - X ₽, repeated - Y ₽
+- **Record:** nearest [date] / [link to record]
+- **What they praise:** [patterns from reviews]
+- **What they are complaining about:** [if any]
+- **Links:** [ProDoctors] [DocDoc]
 
 #### 2. ...
 
-### Рекомендация
-[Кого выбрать и почему — с учётом баланса цена/качество/расстояние]
+### Recommendation
+[Who to choose and why - taking into account the balance of price/quality/distance]
 ```
 
-### 7. Действия после выбора
+### 7. Actions after selection
 
-Когда пользователь выберет врача:
+When the user selects a doctor:
 
-#### 7a. Сохранить в контакты
+#### 7a. Save to contacts
 
-Файл `Data/doctors/contacts.json` — объект-обёртка, а не массив:
+The `Data/doctors/contacts.json` file is a wrapper object, not an array:
 
 ```json
 {
@@ -217,123 +222,123 @@ WebSearch: `[специальность] по ОМС [город] ЕМИАС з�
 }
 ```
 
-**Новую запись добавлять (append) в массив `doctors[]`. Поле `version` не трогать. Существующие записи не переписывать.** Запись объекта врача в корень файла уничтожит и обёртку, и все 7 имеющихся контактов.
+**Add a new entry (append) to the `doctors[]` array. Do not touch the `version` field. Do not overwrite existing records.** Writing a doctor object to the root of the file will destroy both the wrapper and all 7 existing contacts.
 
-Обязательные поля — те же, что у существующих записей:
+Required fields are the same as for existing records:
 
 ```json
 {
-  "name": "[ФИО]",
-  "specialty": "[специальность]",
-  "clinic": "[клиника]",
-  "period": "[YYYY — н.в.]",
+  "name": "[full name]",
+  "specialty": "[specialty]",
+  "clinic": "[clinic]",
+  "period": "[YYYY - present]",
   "status": "active",
-  "phone": "[если найден]"
+  "phone": "[if found]"
 }
 ```
 
-Дополнительные поля, которые добавляет этот скилл (опциональны, у старых записей их нет — это нормально):
+Additional fields that this skill adds (optional, old records do not have them - this is normal):
 
 ```json
 {
-  "address": "[адрес]",
+  "address": "[address]",
   "source": "find-doctor",
   "found_date": "YYYY-MM-DD",
   "checked_date": "YYYY-MM-DD",
   "rating": { "prodoctorov": 0.0, "reviews_count": 0 },
   "price_initial": 0,
-  "notes": "[краткие заметки]"
+  "notes": "[brief notes]"
 }
 ```
 
-Поля `id` в файле нет ни у одной записи — не выдумывать его. Врач идентифицируется парой `name` + `specialty`.
+There is no `id` field in the file - don’t invent it. The doctor is identified by the pair `name` + `specialty`.
 
-Перед записью проверить, нет ли этого врача в `doctors[]` уже. Если есть — обновить его запись (`status`, `checked_date`, `price_initial`, `rating`), а не создавать дубликат.
+Before making an appointment, check if this doctor is already in `doctors[]`. If there is one, update its entry (`status`, `checked_date`, `price_initial`, `rating`), and not create a duplicate.
 
-#### 7b. Создать задачу в Todoist
+#### 7b. Create a task in Todoist
 ```
-Задача: «Записаться к [специальность] — [ФИО]»
+Task: “Make an appointment with [specialty] - [full name]”
 Description:
-  - Клиника: [название], [адрес]
-  - Цена: ~X ₽ (первичный)
-  - Запись: [ссылка или телефон]
-  - Цель визита: [если указана]
-Priority: p3 (или p2 если срочно)
-Due: [если пользователь указал срок]
+  - Clinic: [name], [address]
+  - Price: ~X ₽ (primary)
+  - Record: [link or phone]
+  - Purpose of visit: [if specified]
+Priority: p3 (or p2 if urgent)
+Due: [if the user specified a due date]
 ```
 
-#### 7c. Привязать к milestone (если есть)
-Если поиск связан с направлением в `Data/goals/YYYY.json`:
-- Обновить `cost_estimate_rub` на основе цены врача
-- Привязать `todoist_task_id`
+#### 7c. Link to milestone (if any)
+If the search is related to the direction in `Data/goals/YYYY.json`:
+- Update `cost_estimate_rub` based on doctor price
+- Bind `todoist_task_id`
 
-### 8. Поиск услуги (не врача)
+### 8. Search for a service (not a doctor)
 
-Если пользователь ищет не врача, а услугу (МРТ, УЗИ, процедура):
+If the user is looking not for a doctor, but for a service (MRI, ultrasound, procedure):
 
-Адаптировать workflow:
-- Вместо профилей врачей → искать клиники/центры с услугой
-- WebSearch: `[услуга] цена [город] [метро]`, `site:prodoctorov.ru [услуга] рейтинг`
-- Дополнительные запросы для цен:
-  - `[услуга] [город] цена прайс недорого [текущий год]`
-  - `[услуга] [город] рейтинг клиник сравнение цен`
-- Для каждой найденной клиники — WebSearch прайс-страницы: `site:[домен-клиники] прайс [услуга]` или `site:[домен] цены [услуга]`
-- Сравнивать по: цена (с официального сайта!), оборудование (для МРТ — теслы), рейтинг клиники, расстояние
-- ОМС-путь: доступна ли услуга по ОМС, нужно ли направление
-- Цены — только с официальных сайтов клиник (см. «Правила работы с ценами» в разделе 4)
+Adapt workflow:
+- Instead of doctor profiles → look for clinics/centers with the service
+- WebSearch: `[service] price [city] [metro]`, `site:prodoctorov.ru [service] ratings`
+- Additional requests for prices:
+  - `[service] [city] price price-list affordable [current year]`
+  - `[service] [city] clinic ratings price comparison`
+- For each found clinic - WebSearch price pages: `site:[clinic-domain] price-list [service]` or `site:[domain] prices [service]`
+- Compare by: price (from the official website!), equipment (for MRI - Tesla), clinic rating, distance
+- Compulsory medical insurance route: is the compulsory medical insurance service available, is a referral needed?
+- Prices - only from the official websites of clinics (see “Rules for working with prices” in section 4)
 
-## Платформы для поиска
+## Search platforms
 
-Единый перечень агрегаторов — этот. На него ссылаются «Правила работы с ценами» в разделе 4.
+A unified list of aggregators is this one. It is referred to in the “Rules for working with prices” in section 4.
 
-| Платформа | URL | Что берём |
+| Platform | URL | What do we take |
 |-----------|-----|-----------|
-| ПроДокторов | prodoctorov.ru | Рейтинг, отзывы, стаж, запись |
-| DocDoc | docdoc.ru | Запись, отзывы, рейтинг |
-| НаПоправку | napopravku.ru | Отзывы, рейтинг |
-| Яндекс Карты | yandex.ru/maps | Рейтинг клиники, отзывы, расстояние |
-| Стоматология.рф / stom-firms.ru | stom-firms.ru | Профильный агрегатор по стоматологии — рейтинг и отзывы клиник |
+| ProDoctors | prodoctorov.ru | Rating, reviews, experience, entry |
+| DocDoc | docdoc.ru | Recording, reviews, rating |
+| On the Correction | napopravku.ru | Reviews, rating |
+| Yandex Maps | yandex.ru/maps | Clinic rating, reviews, distance |
+| Dentistry.rf / stom-firms.ru | stom-firms.ru | Specialty aggregator for dentistry — clinic ratings and reviews |
 
-Со всех — только рейтинги и отзывы. Цены ни с одной из платформ не брать.
+From everyone - only ratings and reviews. Do not take prices from any of the platforms.
 
-## Если сеть недоступна
+## If the network is unavailable
 
-WebSearch или WebFetch могут не отработать — нет соединения, инструмент недоступен, сайт закрыт для агента.
+WebSearch or WebFetch may not work - there is no connection, the tool is unavailable, the site is closed to the agent.
 
-- **WebSearch не работает** → поиск невозможен. Сказать об этом прямо, не выдумывать кандидатов и не подставлять клиники по памяти. Показать то, что доступно офлайн: врачи из `Data/doctors/contacts.json` по нужной специальности и общий ОМС-путь (направление от терапевта, запись через ЕМИАС). Предложить повторить поиск позже
-- **WebFetch не работает при живом WebSearch** → работать по выдаче поиска: кандидаты и их клиники — да, рейтинги — с пометкой «из поисковой выдачи, не проверено», цены — **нет**. В колонке цены писать «⚠️ уточнять по тел.»
-- **Часть кандидатов не открылась** → не отбрасывать их молча, показать с пометкой «страница недоступна»
-- В шапку результата добавить строку «⚠️ Поиск неполный: [что именно не отработало]»
+- **WebSearch does not work** → search is not possible. Say this directly, do not invent candidates and do not substitute clinics from memory. Show what is available offline: doctors from `Data/doctors/contacts.json` in the required specialty and the general compulsory medical insurance route (referral from a primary care physician, registration via EMIAS). Suggest searching again later
+- **WebFetch does not work with live WebSearch** → work on search results: candidates and their clinics - yes, ratings - marked “from search results, not verified”, prices - **no**. In the price column write “⚠️ check by phone.”
+- **Some of the candidates did not open** → do not discard them silently, show them with the mark “page unavailable”
+- Add the line “⚠️ Search incomplete: [what exactly didn’t work]” to the result header
 
-Никогда не заполнять пробел правдоподобным вымыслом: несуществующая клиника с выдуманной ценой хуже честного «не нашёл».
+Never fill a gap with a plausible fiction: a non-existent clinic with a fictitious price is worse than an honest “I couldn’t find it.”
 
-## Актуальность сохранённых данных
+## Freshness of saved data
 
-`rating`, `price_initial` и `checked_date` в `contacts.json` — снимок на дату проверки, а не постоянное свойство врача.
+`rating`, `price_initial` and `checked_date` in `contacts.json` are a snapshot on the date of inspection, and not a permanent property of the doctor.
 
-| Возраст записи | Что делать |
+| Post age | What to do |
 |----------------|------------|
-| До 3 месяцев | Использовать как есть, указав дату проверки |
-| 3–12 месяцев | Показать с пометкой «данные от [дата], могли измениться». Цену перепроверить на сайте клиники, если она влияет на решение |
-| Больше 12 месяцев | Считать устаревшими. Не показывать как факт — перепроверить или писать «уточнять» |
+| Up to 3 months | Use as is, indicating the date of review |
+| 3–12 months | Show with the note “data as of [date], may have changed.” Double-check the price on the clinic’s website if it influences the decision |
+| More than 12 months | Consider obsolete. Do not show it as a fact - double-check or write “clarify” |
 
-После перепроверки обновлять `checked_date`, `price_initial` и `rating` в существующей записи, а не заводить нового врача.
+After rechecking, update `checked_date`, `price_initial` and `rating` in the existing record, rather than adding a new doctor.
 
-Цены в `Data/goals/YYYY.json` → `cost_estimate_rub`, проставленные из старого поиска, при планировании визита старше 6 месяцев тоже перепроверять.
+Prices in `Data/goals/YYYY.json` → `cost_estimate_rub`, entered from the old search, also double-check when planning a visit older than 6 months.
 
-## Правила
+## Rules
 
-- **ОМС первым** — всегда показывать бесплатный путь, даже если пользователь спрашивает про частного
-- **Трёхэтапная верификация** — рейтинги с агрегаторов (WebFetch), цены ТОЛЬКО с официальных сайтов клиник. Агрегаторные цены часто устаревшие и вводят в заблуждение
-- **Цена — ground truth с сайта клиники** — если цена не найдена на официальном сайте, писать «уточнять по тел.», не подставлять данные агрегаторов
-- **Не рекомендовать безоговорочно** — показывать факты, предлагать выбор
-- **Мало отзывов = низкая уверенность** — всегда помечать
-- **Актуальность** — указывать дату поиска, предупреждать что цены могут меняться. TTL сохранённых цен и рейтингов — см. «Актуальность сохранённых данных»
-- **Локация — из данных** — `Data/context/environment.json`, а не из текста этого файла
-- **Запись в контакты — append в `doctors[]`** — обёртку и `version` не трогать, существующие записи не переписывать
-- **Нет данных — так и писать** — при недоступной сети не восполнять пробелы догадками
-- **Не звонить и не записывать** — только найти и предложить, запись — действие пользователя
+- **OMS first** — always show the free path, even if the user asks about a private one
+- **Three-step verification** - ratings from aggregators (WebFetch), prices ONLY from the official websites of clinics. Aggregator prices are often out of date and misleading
+- **Price - ground truth from the clinic’s website** - if the price is not found on the official website, write “check by phone”, do not enter aggregator data
+- **Do not recommend unconditionally** - show facts, offer choice
+- **Few reviews = low confidence** - always mark
+- **Relevance** — indicate the search date, warn that prices may change. TTL of saved prices and ratings — see “Freshness of saved data”
+- **Location - from data** - `Data/context/environment.json`, and not from the text of this file
+- **Record in contacts - append to `doctors[]`** - do not touch the wrapper and `version`, do not overwrite existing entries
+- **No data - just write it** - if the network is inaccessible, do not fill in the gaps with guesses
+- **Do not call or record** - only find and suggest, record - user action
 
-**Критерий завершения:** ОМС-путь показан первым и содержит конкретику (нужно ли направление, как записаться, сроки); у каждого кандидата в таблице указан источник цены либо честное «уточнять по тел.»; ни одна цена не взята с агрегатора; локация подставлена из `environment.json`; если врач сохранён — он добавлен в массив `doctors[]` с `checked_date`, а файл после записи остаётся валидным JSON с прежним `version`; все сбои сети отражены в шапке результата.
+**Completion criterion:** The compulsory health insurance route is shown first and contains specifics (whether a referral is needed, how to sign up, deadlines); Each candidate has a price source indicated in the table or an honest “check by phone”; not a single price is taken from an aggregator; location is substituted from `environment.json`; if the doctor is saved, he is added to the `doctors[]` array with `checked_date`, and the file after recording remains valid JSON with the same `version`; all network failures are reflected in the result header.
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *Information is for reference only. Consult your physician for treatment decisions.*

@@ -12,8 +12,8 @@ export default function BodyPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Тело"
-        description="Метрики тела, состав, давление"
+        title="Body"
+        description="Body metrics, composition, and blood pressure"
         actions={<AddMeasurementDialog />}
       />
       <div className="grid gap-6 lg:grid-cols-2">

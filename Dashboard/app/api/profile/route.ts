@@ -23,7 +23,7 @@ export async function PUT(request: Request) {
     const v = new Validator();
     if (body?.basic !== undefined) {
       if (typeof body.basic !== "object" || body.basic === null) {
-        v.add("basic: объект");
+        v.add("basic: object");
       } else {
         v.optionalDate(body.basic.date_of_birth, "basic.date_of_birth");
         v.optionalNumber(body.basic.height_cm, "basic.height_cm", "height_cm");
@@ -34,15 +34,15 @@ export async function PUT(request: Request) {
     v.optionalArray(body?.family_history, "family_history");
     v.optionalArray(body?.current_complaints, "current_complaints");
     if (body?.lifestyle !== undefined && typeof body.lifestyle !== "object") {
-      v.add("lifestyle: объект");
+      v.add("lifestyle: object");
     }
 
     const invalid = v.response();
     if (invalid) return invalid;
 
-    // Слияние верхнего уровня: PUT приходил с той частью профиля, что показывает
-    // страница, и сносил всё остальное. Блоки lifestyle сливаем отдельно —
-    // иначе правка сна затирает незаполненные caffeine, hydration и остальные
+    // Merge the top level: PUT contains the portion shown by the page and would
+    // otherwise delete everything else. Merge lifestyle blocks separately so a
+    // sleep edit does not erase unset caffeine, hydration, and other fields.
     await writeProfile({
       ...existing,
       ...(body as ProfileData),

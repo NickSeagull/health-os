@@ -37,7 +37,7 @@ export function MilestoneTimeline() {
       <CardHeader>
         <CardTitle>Timeline milestones</CardTitle>
         <CardDescription>
-          {withDeadline.length} milestones с дедлайнами
+          {withDeadline.length} milestones with deadlines
         </CardDescription>
       </CardHeader>
       <CardContent>

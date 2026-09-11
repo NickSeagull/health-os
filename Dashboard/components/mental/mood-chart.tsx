@@ -37,9 +37,9 @@ export function MoodChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Настроение / Энергия / Стресс / Сон</CardTitle>
+        <CardTitle>Mood / Energy / Stress / Sleep</CardTitle>
         <CardDescription>
-          {entries?.length ?? 0} записей
+          {entries?.length ?? 0} entries
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -48,11 +48,11 @@ export function MoodChart() {
         ) : !chartData || chartData.length < 2 ? (
           <EmptyState
             icon={<Brain className="h-8 w-8" />}
-            title="Недостаточно данных для графика"
+            title="Not enough data for a chart"
             description={
               chartData?.length === 1
-                ? "Есть 1 запись. Добавьте ещё для построения графика."
-                : "Начните отмечать настроение — данные появятся здесь"
+                ? "There is 1 entry. Add another to build the chart."
+                : "Start tracking your mood — data will appear here"
             }
           />
         ) : (
@@ -73,10 +73,10 @@ export function MoodChart() {
                     return (
                       <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                         <p className="font-medium">{formatDateShort(d.date)}</p>
-                        <p>Настроение: {d.mood}/10</p>
-                        <p>Энергия: {d.energy}/10</p>
-                        <p>Стресс: {d.stress}/10</p>
-                        <p>Сон: {d.sleep_quality}/10</p>
+                        <p>Mood: {d.mood}/10</p>
+                        <p>Energy: {d.energy}/10</p>
+                        <p>Stress: {d.stress}/10</p>
+                        <p>Sleep: {d.sleep_quality}/10</p>
                         {d.notes && (
                           <p className="text-xs text-muted-foreground mt-1">
                             {d.notes}
@@ -92,7 +92,7 @@ export function MoodChart() {
                   dataKey="mood"
                   stroke="#22c55e"
                   strokeWidth={2}
-                  name="Настроение"
+                  name="Mood"
                   dot={{ r: 4 }}
                 />
                 <Line
@@ -100,7 +100,7 @@ export function MoodChart() {
                   dataKey="energy"
                   stroke="#3b82f6"
                   strokeWidth={2}
-                  name="Энергия"
+                  name="Energy"
                   dot={{ r: 4 }}
                 />
                 <Line
@@ -108,7 +108,7 @@ export function MoodChart() {
                   dataKey="stress"
                   stroke="#ef4444"
                   strokeWidth={2}
-                  name="Стресс"
+                  name="Stress"
                   dot={{ r: 4 }}
                 />
                 <Line
@@ -116,7 +116,7 @@ export function MoodChart() {
                   dataKey="sleep_quality"
                   stroke="#8b5cf6"
                   strokeWidth={2}
-                  name="Сон"
+                  name="Sleep"
                   dot={{ r: 4 }}
                 />
               </LineChart>

@@ -1,51 +1,51 @@
-# Долгосрочная память
+# Long-Term Memory
 
-Файл загружается в контекст каждой сессии. Здесь живёт устойчивое: что в работе, что решено, что ждёт ответа. Горячий контекст последней сессии — в `Cache/active-context.md`, не здесь.
+This file is loaded into the context of every session. It holds lasting information: what is in progress, what has been resolved, and what is awaiting an answer. The latest session’s working context belongs in `Cache/active-context.md`, not here.
 
-Обновляется скиллом `/wrap-up` и вручную при значимых событиях: новый визит, новый курс лечения, закрытый вопрос.
+Updated by the `/wrap-up` skill and manually after significant events: a new visit, a new treatment course, or a resolved question.
 
-> Пока файл пуст — это нормально для свежей установки. Запустите `/onboarding`, и разделы начнут наполняться.
-
----
-
-## Пациент
-
-<!-- Кратко: возраст, ключевые хронические состояния, что определяет картину.
-     Без ФИО и контактов — они в Data/profile.json. -->
-
-—
-
-## Активные направления
-
-<!-- Что сейчас в работе: направление, статус, ближайший шаг.
-     Источник истины — Data/goals/<год>.json, здесь только выжимка. -->
-
-—
-
-## Ключевые находки
-
-<!-- Отклонения и наблюдения, которые влияют на решения. С датой и источником. -->
-
-—
-
-## Активные курсы
-
-<!-- Препараты и добавки в приёме сейчас. Подробности — Data/medications/current.json. -->
-
-—
-
-## Открытые вопросы
-
-<!-- На что нет ответа: ждём результат, не спросили у врача, нужно решить. -->
-
-—
-
-## Ближайшие действия
-
-<!-- Что сделать в следующие недели. Конкретно, с датами где возможно. -->
-
-—
+> An empty file is normal for a fresh installation. Run `/onboarding`, and the sections will start to fill in.
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+## Patient
+
+<!-- Briefly: age, key chronic conditions, and factors that shape the overall picture.
+     No full names or contact details — those belong in Data/profile.json. -->
+
+—
+
+## Active Health Areas
+
+<!-- Current work: health area, status, and next step.
+     Source of truth — Data/goals/<year>.json; only a summary belongs here. -->
+
+—
+
+## Key Findings
+
+<!-- Abnormalities and observations that affect decisions. Include the date and source. -->
+
+—
+
+## Active Treatment Courses
+
+<!-- Medications and supplements currently being taken. Details — Data/medications/current.json. -->
+
+—
+
+## Open Questions
+
+<!-- Unanswered questions: awaiting a result, not yet asked the doctor, or a decision needed. -->
+
+—
+
+## Upcoming Actions
+
+<!-- What to do in the coming weeks. Be specific, with dates where possible. -->
+
+—
+
+---
+
+⚕️ This information is for reference only. Consult a doctor before making treatment decisions.

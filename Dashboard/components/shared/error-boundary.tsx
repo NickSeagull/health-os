@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <CardContent className="flex flex-col items-center gap-3 py-8">
               <AlertTriangle className="h-8 w-8 text-destructive" />
               <p className="text-sm text-muted-foreground">
-                Ошибка загрузки компонента
+                Component failed to load
               </p>
               <p className="text-xs text-muted-foreground max-w-md text-center">
                 {this.state.error?.message}
@@ -43,7 +43,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 variant="outline"
                 onClick={() => this.setState({ hasError: false })}
               >
-                Попробовать снова
+                Try again
               </Button>
             </CardContent>
           </Card>

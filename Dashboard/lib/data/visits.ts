@@ -30,11 +30,15 @@ export async function readVisitDetailMd(filename: string): Promise<VisitDetailMd
   const raw = await safeReadFile(target);
   if (!raw) return null;
 
+  return parseVisitDetailMd(raw);
+}
+
+export function parseVisitDetailMd(raw: string): VisitDetailMd {
   const titleMatch = raw.match(/^# (.+)/m);
-  const dateMatch = raw.match(/- \*\*Дата:\*\* (.+)/);
-  const doctorMatch = raw.match(/- \*\*Врач:\*\* (.+)/);
-  const clinicMatch = raw.match(/- \*\*Клиника:\*\* (.+)/);
-  const specialtyMatch = raw.match(/- \*\*Специальность:\*\* (.+)/);
+  const dateMatch = raw.match(/- \*\*Date:\*\* (.+)/);
+  const doctorMatch = raw.match(/- \*\*Doctor:\*\* (.+)/);
+  const clinicMatch = raw.match(/- \*\*Clinic:\*\* (.+)/);
+  const specialtyMatch = raw.match(/- \*\*Specialty:\*\* (.+)/);
 
   return {
     raw,
@@ -50,7 +54,7 @@ export async function writeVisitDetailJson(
   filename: string,
   data: VisitDetailJson
 ): Promise<void> {
-  // Ошибка намеренно пробрасывается: запись за пределы каталога должна падать громко
+  // Deliberately propagate this error: writes outside the directory must fail loudly.
   const target = resolveWithin(VISITS_DIR(), filename, [".json"]);
   await safeWriteJson(target, data);
 }

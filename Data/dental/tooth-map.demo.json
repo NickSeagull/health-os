@@ -5,15 +5,15 @@
   "teeth": {
     "18": {
       "status": "extracted",
-      "notes": "Удалён зуб мудрости, 2024"
+      "notes": "Wisdom tooth removed, 2024"
     },
     "28": {
       "status": "extracted",
-      "notes": "Удалён зуб мудрости, 2024"
+      "notes": "Wisdom tooth removed, 2024"
     },
     "36": {
       "status": "filled",
-      "notes": "Композитная пломба, 2023"
+      "notes": "Composite filling, 2023"
     }
   },
   "summary": {
@@ -27,5 +27,5 @@
     "root_canal": 0
   },
   "imaging": [],
-  "notes": "Карта разрежена: ключи есть только у зубов с известным статусом. Статус неизвестен: 29 — их нужно внести после ближайшего осмотра."
+  "notes": "Sparse chart: keys exist only for teeth with a known status. Status unknown: 29 teeth; add them after the next examination."
 }

@@ -1,38 +1,38 @@
-# Паттерны состояния
+# Well-being patterns
 
-> Файл заполняется скиллом `/mental` при накоплении **не менее 14 записей** в `journal.jsonl`.
-> На меньшей выборке паттерны не выводятся — статистика на нескольких точках вводит в заблуждение.
+> The `/mental` skill fills in this file once `journal.jsonl` contains **at least 14 entries**.
+> Patterns are not inferred from a smaller sample: statistics based on a few data points are misleading.
 
-**Обновлено:** —
-**Записей в журнале:** 0
-
----
-
-## Тренды
-
-_Пока недостаточно данных._
-
-## Дни недели
-
-_Пока недостаточно данных._
-
-## Теги, связанные со стрессом
-
-_Пока недостаточно данных._
-
-## Влияние сна на энергию
-
-_Пока недостаточно данных._
-
-## Конкурирующие объяснения
-
-Проверяются до психологических интерпретаций:
-
-- фаза питания — `Data/profile.json` → `lifestyle.nutrition`
-- сезон и световой день — `Data/context/environment.json`
-- вещества, режим сна, нагрузка на работе
-- недавние отклонения в анализах — щитовидная железа, железо, B12, витамин D
+**Updated:** —
+**Journal entries:** 0
 
 ---
 
-⚕️ Корреляция на выборке из одного человека — уровень доказательности D. Это наблюдение, а не причинно-следственная связь. Для решений о лечении обратитесь к врачу.
+## Trends
+
+_Not enough data yet._
+
+## Days of the week
+
+_Not enough data yet._
+
+## Tags associated with stress
+
+_Not enough data yet._
+
+## Effect of sleep on energy
+
+_Not enough data yet._
+
+## Competing explanations
+
+Check these before considering psychological interpretations:
+
+- nutrition phase — `Data/profile.json` → `lifestyle.nutrition`
+- season and daylight duration — `Data/context/environment.json`
+- substances, sleep schedule, workload
+- recent lab abnormalities — thyroid function, iron, B12, vitamin D
+
+---
+
+⚕️ Correlation in a sample of one person is evidence level D. It is an observation, not a causal relationship. Consult a physician for treatment decisions.

@@ -28,8 +28,8 @@ export function CompletedFeed() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Завершённые</CardTitle>
-        <CardDescription>Последние выполненные задачи</CardDescription>
+        <CardTitle>Completed</CardTitle>
+        <CardDescription>Recently completed tasks</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -40,7 +40,7 @@ export function CompletedFeed() {
           </div>
         ) : !data?.items?.length ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет завершённых задач
+            No completed tasks
           </p>
         ) : (
           <div className="space-y-2 max-h-[300px] overflow-auto">

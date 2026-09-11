@@ -11,8 +11,8 @@ export default function LabsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Анализы"
-        description="История анализов, тренды маркеров, отклонения"
+        title="Labs"
+        description="Lab history, marker trends, and abnormalities"
         actions={<NewLabDialog />}
       />
       <div className="grid gap-6 lg:grid-cols-2">

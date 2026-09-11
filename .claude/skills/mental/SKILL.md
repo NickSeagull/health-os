@@ -1,129 +1,129 @@
 ---
 name: mental
 description: |
-  Mood tracking, корреляции с WHOOP recovery/sleep, выявление паттернов и триггеров.
-  Триггеры: «настроение», «mood», «стресс», «тревога», «запиши состояние»
+  Mood tracking, correlations with WHOOP recovery/sleep, and identification of patterns and triggers.
+  Triggers: “mood”, “stress”, “anxiety”, “record how I feel”
 ---
 
-# Health Mental — ментальное здоровье
+# Health Mental — mental health
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading and writing, determine the active profile by
+> `.claude/shared/profile-resolution.md`. Short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before recording, tell whose profile it goes to.
 
-## Назначение
+## Purpose
 
-Mood tracking с корреляциями WHOOP. Выявление паттернов стресса, тревожности и их триггеров.
+Track mood and correlate it with WHOOP data. Identify patterns of stress, anxiety, and their triggers.
 
-## Красные флаги — проверяются первыми
+## Red flags - checked first
 
-**До любой другой работы** прочитай Блок 4 файла `.claude/shared/critical-values.md` и проверь запись пользователя на красные флаги.
+**Before any other work** read Block 4 of the `.claude/shared/critical-values.md` file and check the user's entry for red flags.
 
-Срабатывает при любом из признаков:
+A red flag is triggered when any of the following occurs:
 
-- упоминание суицидальных мыслей, намерений или плана — в любой формулировке, включая косвенные («не хочу просыпаться», «всем будет лучше без меня», «нет смысла»)
-- упоминание самоповреждения
-- настроение ≤ 2
-- падение настроения на 4 и более пункта за сутки
-- настроение ≤ 4 устойчиво семь дней и более
-- безнадёжность в сочетании с бессонницей и утратой интереса
+- mention of suicidal thoughts, intentions or plans - in any formulation, including indirect ones (“I don’t want to wake up”, “everyone will be better off without me”, “there is no point”)
+- mention of self-harm
+- mood ≤ 2
+- mood drop by 4 or more points within 24 hours
+- mood persistently ≤ 4 for seven days or more
+- hopelessness combined with insomnia and loss of interest
 
-Проверяется не только числовая оценка, но и свободный текст в поле `notes` — читается всегда.
+Not only the numerical score is checked, but also the free text in the `notes` field - it is always read.
 
-**При срабатывании:** остановить обычный workflow, вывести блок контактов помощи из Блока 4 `critical-values.md`, записать алерт с `severity: "critical"` и `type: "mental_crisis"`. Не продолжать разбор корреляций и паттернов, не давать советов по режиму и питанию, не диагностировать.
+**When triggered:** stop the normal workflow, display the help contact block from Block 4 `critical-values.md`, record an alert with `severity: "critical"` and `type: "mental_crisis"`. Do not continue analyzing correlations and patterns, do not give advice on regimen and nutrition, do not diagnose.
 
 ## Workflow
 
-### Запись состояния
+### Record a mood entry
 
-Спросить (шкала 1–10):
-1. Настроение (mood)
-2. Энергия (energy)
-3. Стресс (stress) — инвертировано: 1 = нет стресса, 10 = максимальный
-4. Качество сна субъективно (sleep_quality)
-5. Заметки (что повлияло, триггеры)
-6. Теги (work, health, relationship, money и т. д.)
+Ask (scale 1–10):
+1. Mood (mood)
+2. Energy (energy)
+3. Stress (stress; inverted: 1 = no stress, 10 = maximum)
+4. Subjective sleep quality (sleep_quality)
+5. Notes (what influenced your mood; triggers)
+6. Tags (work, health, relationship, money, etc.)
 
-→ Append в `Data/mental/journal.jsonl`:
+→ Append to `Data/mental/journal.jsonl`:
 ```json
-{"ts":"2026-03-21T20:00:00+03:00","mood":7,"energy":6,"stress":3,"sleep_quality":8,"notes":"Продуктивный день","tags":["work"]}
+{"ts":"2026-03-21T20:00:00+03:00","mood":7,"energy":6,"stress":3,"sleep_quality":8,"notes":"Productive day","tags":["work"]}
 ```
 
-Валидация перед записью: оценки в диапазоне 1–10, `ts` в ISO 8601 с таймзоной, дата не из будущего. При выходе значения за диапазон — переспросить, не записывать молча.
+Validation before recording: scores must be in the range 1–10, `ts` must use ISO 8601 with a time zone, and the date must not be in the future. If a value is outside this range, ask again; never write it silently.
 
-### Просмотр за период
+### View by period
 
-1. Прочитать `Data/mental/journal.jsonl`
-2. Показать за последние 7 дней:
+1. Read `Data/mental/journal.jsonl`
+2. Show entries for the last 7 days:
 
 ```
-| Дата | Mood | Energy | Stress | Sleep | Заметки |
+| Date | Mood | Energy | Stress | Sleep | Notes |
 |------|------|--------|--------|-------|---------|
 ```
 
-3. Средние за период:
+3. Averages for the period:
 ```
-📊 За неделю:
+📊 Weekly summary:
   Mood: 6.8 avg | Energy: 6.2 avg | Stress: 4.1 avg | Sleep: 7.0 avg
 ```
 
-Если записей за период нет — сказать прямо «нет данных за период», не показывать пустую таблицу.
+If there are no records for the period, say directly “no data for the period” and do not show an empty table.
 
-### Корреляции с WHOOP
+### Correlations with WHOOP
 
-Если данные доступны:
-1. Подтянуть WHOOP за тот же период через MCP-сервер `whoop`. Если сервер недоступен — сказать об этом и продолжить без корреляций
-2. Показать:
+If data is available:
+1. Retrieve WHOOP data for the same period through the MCP server `whoop`. If the server is unavailable, say so and continue without correlations
+2. Show:
 ```
-📊 Корреляции:
-  Recovery ↔ Mood: r=0.72 (сильная)
-  Sleep hours ↔ Energy: r=0.65 (средняя)
-  HRV ↔ Stress: r=-0.58 (обратная)
+📊 Correlations:
+  Recovery ↔ Mood: r=0.72 (strong)
+  Sleep hours ↔ Energy: r=0.65 (moderate)
+  HRV ↔ Stress: r=-0.58 (inverse)
 ```
 
-Корреляция на выборке из одного человека — уровень доказательности D. Указывать это и не выдавать за причинно-следственную связь.
+Correlations from a single-person sample are evidence level D. State this clearly and do not present them as cause-and-effect relationships.
 
-### Паттерны
+### Patterns
 
-При накоплении ≥ 14 записей:
-1. Анализировать тренды
-2. Выявлять паттерны:
-   - дни недели с низким настроением
-   - теги, коррелирующие со стрессом
-   - влияние сна на энергию
-3. Обновить `Data/mental/patterns.md`
+When ≥ 14 entries are accumulated:
+1. Analyze trends
+2. Identify patterns:
+   - days of the week with low mood
+   - tags correlating with stress
+   - influence of sleep on energy
+3. Update `Data/mental/patterns.md`
 
-Если записей меньше 14 — сказать сколько есть и сколько нужно, паттерны не выводить. Статистика на малой выборке вводит в заблуждение.
+If there are fewer than 14 records, state how many are present and how many more are needed; do not display patterns. Statistics from a small sample are misleading.
 
-### Контекст жизни
+### Context of life
 
-При интерпретации сниженного настроения проверить до психологических объяснений (Блок 4 холистической рамки):
+When interpreting low mood, check life context before attributing it to psychological causes (Block 4 of the holistic framework):
 
-- фаза питания из `Data/profile.json` → `lifestyle.nutrition` — дефицит калорий сам по себе снижает настроение, энергию и концентрацию
-- сезон и световой день из `Data/context/environment.json` — сезонное аффективное расстройство как конкурирующее объяснение
-- вещества, режим сна, нагрузка на работе
-- недавние отклонения в анализах — щитовидная железа, железо, B12, витамин D
+- nutrition phase from `Data/profile.json` → `lifestyle.nutrition` - a calorie deficit itself reduces mood, energy, and concentration
+- season and daylight from `Data/context/environment.json` - seasonal affective disorder as a competing explanation
+- substances, sleep patterns, workload
+- recent test abnormalities - thyroid, iron, B12, vitamin D
 
-### Алерты
+### Alerts
 
-Записывать в `Cache/alerts/YYYY-MM-DD.json` по схеме из Блока 5 `critical-values.md`.
+Write to `Cache/alerts/YYYY-MM-DD.json` according to the scheme from Block 5 `critical-values.md`.
 
-| Условие | Severity |
+| Condition | Severity |
 |---------|----------|
-| Красный флаг из Блока 4 `critical-values.md` | critical |
-| Настроение ≤ 4 устойчиво 7 дней | high |
-| Среднее настроение < 5 за 3 дня | medium |
-| Стресс > 7 три дня подряд | medium |
-| Энергия < 4 три дня подряд | medium |
+| Red flag from Block 4 `critical-values.md` | critical |
+| Mood ≤ 4 for 7 consecutive days | high |
+| Average mood < 5 for 3 days | medium |
+| Stress > 7 three days in a row | medium |
+| Energy < 4 three days in a row | medium |
 
-## Правила
+## Rules
 
-- **Красные флаги проверяются первыми** — до записи, до статистики, до корреляций
-- JSONL — append-only, никогда не перезаписывать
-- Timestamps с таймзоной (+03:00)
-- Не пытаться быть психотерапевтом и не диагностировать
-- Теги — строчными буквами, без пробелов
-- Критерий завершения: запись добавлена в журнал, алерты при срабатывании записаны в `Cache/alerts/`
+- **Red flags are checked first** - before recording, before statistics, before correlations
+- JSONL - append-only, never overwrite
+- All timestamps must include the time zone (+03:00)
+- Do not try to be a psychotherapist and do not diagnose
+- Tags - lowercase letters, no spaces
+- Completion criterion: entry added to the log, alerts when triggered are written to `Cache/alerts/`
 
-⚕️ *Информация носит справочный характер. При устойчивых проблемах обратитесь к специалисту. При мыслях о причинении себе вреда — 112, 103 или 8-800-2000-122.*
+⚕️ *Information is for reference only. For persistent problems, contact a specialist. If you are thinking about harming yourself, call 112, 103, or 8-800-2000-122.*

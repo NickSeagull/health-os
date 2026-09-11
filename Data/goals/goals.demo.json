@@ -4,33 +4,33 @@
   "phases": [
     {
       "id": "phase_1",
-      "name": "Срочное",
-      "period": "2026-Q3 (июль — сентябрь)",
+      "name": "Urgent",
+      "period": "2026-Q3 (July–September)",
       "priority": "high",
       "directions": ["KR5.0"]
     },
     {
       "id": "phase_2",
-      "name": "Плановое",
-      "period": "2026-Q4 (октябрь — декабрь)",
+      "name": "Planned",
+      "period": "2026-Q4 (October–December)",
       "priority": "medium",
       "directions": ["KR5.4"]
     }
   ],
   "directions": [
     {
-      "area": "Общее самочувствие",
+      "area": "General well-being",
       "kr": "KR5.0",
       "phase": "phase_1",
       "status": "investigating",
-      "goal": "Понять причину сниженной энергии во второй половине дня",
+      "goal": "Understand the cause of reduced energy in the afternoon",
       "last_activity": "2026-06-25",
       "cost_estimate_rub": 3700,
       "cost_actual_rub": 2400,
       "milestones": [
         {
           "id": "kr5.0_m1",
-          "title": "Приём терапевта по месту жительства",
+          "title": "Primary care visit at a local clinic",
           "type": "visit",
           "status": "completed",
           "deadline": "2026-06-30",
@@ -39,11 +39,11 @@
           "cost_actual_rub": 0,
           "todoist_task_id": null,
           "depends_on": [],
-          "notes": "Приём состоялся 2026-06-25"
+          "notes": "Visit completed on 2026-06-25"
         },
         {
           "id": "kr5.0_m2",
-          "title": "Базовая панель: ОАК, витамины, биохимия",
+          "title": "Basic panel: CBC, vitamins, chemistry",
           "type": "lab",
           "status": "completed",
           "deadline": "2026-06-20",
@@ -52,11 +52,11 @@
           "cost_actual_rub": 2400,
           "todoist_task_id": null,
           "depends_on": [],
-          "notes": "Единственное отклонение — витамин D"
+          "notes": "The only abnormality is vitamin D"
         },
         {
           "id": "kr5.0_m3",
-          "title": "Контроль 25(OH)D через 3 месяца",
+          "title": "Repeat 25(OH)D in three months",
           "type": "lab",
           "status": "not_started",
           "deadline": "2026-09-30",
@@ -65,25 +65,25 @@
           "cost_actual_rub": null,
           "todoist_task_id": null,
           "depends_on": ["kr5.0_m2"],
-          "notes": "На фоне приёма витамина D3 2000 МЕ"
+          "notes": "While taking vitamin D3 2,000 IU"
         }
       ],
       "related_visits": ["2026-06-25_therapist.md"],
       "related_labs": ["2026-06-18_cbc-vitamins.json"]
     },
     {
-      "area": "Стоматология",
+      "area": "Dentistry",
       "kr": "KR5.4",
       "phase": "phase_2",
       "status": "in_progress",
-      "goal": "Плановое наблюдение, гигиена раз в полгода",
+      "goal": "Routine monitoring, hygiene every six months",
       "last_activity": "2026-05-20",
       "cost_estimate_rub": 7000,
       "cost_actual_rub": 5000,
       "milestones": [
         {
           "id": "kr5.4_m1",
-          "title": "Профессиональная гигиена полости рта",
+          "title": "Professional oral hygiene",
           "type": "procedure",
           "status": "completed",
           "deadline": "2026-05-31",
@@ -96,7 +96,7 @@
         },
         {
           "id": "kr5.4_m2",
-          "title": "Плановый осмотр и обновление карты зубов",
+          "title": "Routine examination and dental chart update",
           "type": "visit",
           "status": "not_started",
           "deadline": "2026-11-30",
@@ -105,7 +105,7 @@
           "cost_actual_rub": null,
           "todoist_task_id": null,
           "depends_on": ["kr5.4_m1"],
-          "notes": "Внести в карту статус зубов, сейчас известны только три"
+          "notes": "Add tooth statuses to the chart; only three are currently known"
         }
       ],
       "related_visits": [],

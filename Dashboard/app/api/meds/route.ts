@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { readMeds, writeMeds } from "@/lib/data/meds";
 import { Validator } from "@/lib/data/validation";
-import type { MedsFile } from "@/lib/types/medication";
+import { MED_TIMINGS, type MedsFile } from "@/lib/types/medication";
 
-/** Четыре независимых массива Блока 11. Потеря любого делает записи невидимыми */
+/** Four independent arrays from Block 11. Losing any one makes records invisible. */
 const MED_ARRAYS = ["medications", "supplements", "topical", "protocols"] as const;
 
 const MED_STATUSES = ["active", "as_needed", "paused", "finished"] as const;
@@ -27,21 +27,28 @@ export async function PUT(request: Request) {
 
     const v = new Validator();
     for (const key of MED_ARRAYS) {
-      // Клиент присылает файл целиком: пропущенный массив означал бы, что
-      // все курсы из него исчезли молча
+      // The client sends the complete file: a missing array would silently
+      // make all of its courses disappear.
       v.requireArray(body?.[key], key);
 
-      // Обходим только то, что действительно массив, иначе `.entries()` роняет роут
+      // Iterate only over actual arrays; otherwise `.entries()` would crash the route.
       const items = Array.isArray(body?.[key]) ? body[key] : [];
       for (const [i, item] of items.entries()) {
-        const entry = item as { id?: unknown; name?: unknown; status?: unknown };
+        const entry = item as { id?: unknown; name?: unknown; status?: unknown; timing?: unknown };
         if (typeof entry?.id !== "string" || entry.id.trim() === "") {
-          v.add(`${key}[${i}].id: обязательное поле (${key.slice(0, 3)}_NN)`);
+          v.add(`${key}[${i}].id: required field (${key.slice(0, 3)}_NN)`);
         }
         if (typeof entry?.name !== "string" || entry.name.trim() === "") {
-          v.add(`${key}[${i}].name: обязательное поле`);
+          v.add(`${key}[${i}].name: required field`);
         }
-        // protocols[] в данных пуст, набор его статусов не зафиксирован
+        if (key === "medications" || key === "supplements") {
+          v.requireArray(entry?.timing, `${key}[${i}].timing`);
+          const timing = Array.isArray(entry?.timing) ? entry.timing : [];
+          timing.forEach((value, timingIndex) => {
+            v.requireEnum(value, `${key}[${i}].timing[${timingIndex}]`, MED_TIMINGS);
+          });
+        }
+        // protocols[] is empty in the data, and its status set is not defined.
         if (key !== "protocols") {
           v.requireEnum(entry?.status, `${key}[${i}].status`, MED_STATUSES);
         }
@@ -54,7 +61,7 @@ export async function PUT(request: Request) {
     await writeMeds({
       ...existing,
       ...(body as MedsFile),
-      // version сохраняется при перезаписи и никогда не сбрасывается (Блок 0)
+      // Preserve version on overwrite; never reset it (Block 0).
       version: existing.version ?? 1,
     });
     return NextResponse.json({ success: true });

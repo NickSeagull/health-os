@@ -1,63 +1,63 @@
-# Алиасы специальностей
+# Specialty aliases
 
-> Единый реестр соответствия разговорных названий именам агентов. Используется скиллами `/consilium` и `/doctor-consult`. Ранее таблица дублировалась в обоих файлах и успела разойтись.
+> The single registry mapping conversational names to agent names. Used by `/consilium` and `/doctor-consult`. This table was previously duplicated in both files and had diverged.
 
 ---
 
-## Соответствие
+## Mapping
 
-| Алиасы | Агент |
+| Aliases | Agent |
 |--------|-------|
-| `гастро`, `gastro`, `гастроэнтеролог`, `жкт` | `gastroenterologist` |
-| `гемато`, `hemato`, `гематолог`, `кровь` | `hematologist` |
-| `эндо`, `endo`, `эндокринолог`, `гормоны` | `endocrinologist` |
-| `уро`, `uro`, `уролог`, `почки`, `простата` | `urologist` |
-| `гинеколог`, `gyn`, `женское здоровье`, `цикл`, `месячные` | `gynecologist` |
-| `нейро`, `neuro`, `невролог`, `головные боли` | `neurologist` |
-| `кардио`, `cardio`, `кардиолог`, `сердце` | `cardiologist` |
-| `дерма`, `derma`, `дерматолог`, `кожа` | `dermatologist` |
-| `лор`, `ent`, `отоларинголог`, `нос`, `горло` | `ent` |
-| `орто`, `ortho`, `ортопед`, `позвоночник`, `спина` | `orthopedist` |
-| `психиатр`, `psych`, `психика`, `настроение` | `psychiatrist` |
-| `стоматолог`, `dental`, `зубы` | `dentist` |
-| `офтальмолог`, `ophthalmo`, `глаза`, `зрение` | `ophthalmologist` |
+| `gastro`, `gastroenterologist`, `GI`, `gastrointestinal` | `gastroenterologist` |
+| `hemato`, `hematologist`, `blood` | `hematologist` |
+| `endo`, `endocrinologist`, `hormones` | `endocrinologist` |
+| `uro`, `urologist`, `kidneys`, `prostate` | `urologist` |
+| `gynecologist`, `gyn`, `women's health`, `cycle`, `periods` | `gynecologist` |
+| `neuro`, `neurologist`, `headaches` | `neurologist` |
+| `cardio`, `cardiologist`, `heart` | `cardiologist` |
+| `derma`, `dermatologist`, `skin` | `dermatologist` |
+| `ENT`, `ent`, `otolaryngologist`, `nose`, `throat` | `ent` |
+| `ortho`, `orthopedist`, `spine`, `back` | `orthopedist` |
+| `psychiatrist`, `psych`, `mental health`, `mood` | `psychiatrist` |
+| `dentist`, `dental`, `teeth` | `dentist` |
+| `ophthalmologist`, `ophthalmo`, `eyes`, `vision` | `ophthalmologist` |
 
-`health-coach` в этот реестр не входит: он не диагностический специалист. Вызывается через `/coach`.
+`health-coach` is not included in this registry: it is not a diagnostic specialist. Invoke it through `/coach`.
 
 ---
 
-## Автоподбор по вопросу
+## Automatic selection by question
 
-Когда специальность не названа явно, а задан вопрос — подбирать по теме.
+When a question is asked without explicitly naming a specialty, select specialists by topic.
 
-| Тема вопроса | Специалисты |
+| Question topic | Specialists |
 |--------------|-------------|
-| Усталость, нет сил, не высыпаюсь | `hematologist`, `endocrinologist`, `psychiatrist`, `ent`, `neurologist` |
-| Головная боль, мигрень, головокружение | `neurologist`, `orthopedist`, `ophthalmologist`, `cardiologist` |
-| Сердцебиение, давление, пульс | `cardiologist`, `endocrinologist`, `neurologist` |
-| Кожа, сыпь, зуд, родинки | `dermatologist`, `endocrinologist`, `hematologist` |
-| Живот, изжога, стул, вздутие | `gastroenterologist`, `endocrinologist` |
-| Мочеиспускание, боль в пояснице, паху | `urologist`, `orthopedist` |
-| Цикл, месячные, женское здоровье | `gynecologist`, `endocrinologist` |
-| Планирование беременности | `gynecologist`, `endocrinologist` |
-| Менопауза, приливы | `gynecologist`, `endocrinologist`, `cardiologist` |
-| Настроение, тревога, концентрация | `psychiatrist`, `endocrinologist`, `neurologist` |
-| Сон, храп, апноэ | `ent`, `psychiatrist`, `cardiologist`, `neurologist` |
-| Вес, гормоны, либидо | `endocrinologist`, `urologist`, `gynecologist`, `psychiatrist` |
-| Разбор анализов крови | `hematologist`, `endocrinologist`, `cardiologist` |
-| Спина, осанка, суставы, стопы | `orthopedist`, `neurologist` |
-| Зубы, дёсны, полость рта | `dentist` |
-| Зрение, глаза | `ophthalmologist`, `neurologist` |
+| Fatigue, lack of energy, unrefreshing sleep | `hematologist`, `endocrinologist`, `psychiatrist`, `ent`, `neurologist` |
+| Headache, migraine, dizziness | `neurologist`, `orthopedist`, `ophthalmologist`, `cardiologist` |
+| Palpitations, blood pressure, pulse | `cardiologist`, `endocrinologist`, `neurologist` |
+| Skin, rash, itching, moles | `dermatologist`, `endocrinologist`, `hematologist` |
+| Abdominal symptoms, heartburn, stools, bloating | `gastroenterologist`, `endocrinologist` |
+| Urination, lower back or groin pain | `urologist`, `orthopedist` |
+| Menstrual cycle, periods, women's health | `gynecologist`, `endocrinologist` |
+| Pregnancy planning | `gynecologist`, `endocrinologist` |
+| Menopause, hot flashes | `gynecologist`, `endocrinologist`, `cardiologist` |
+| Mood, anxiety, concentration | `psychiatrist`, `endocrinologist`, `neurologist` |
+| Sleep, snoring, apnea | `ent`, `psychiatrist`, `cardiologist`, `neurologist` |
+| Weight, hormones, libido | `endocrinologist`, `urologist`, `gynecologist`, `psychiatrist` |
+| Blood test review | `hematologist`, `endocrinologist`, `cardiologist` |
+| Back, posture, joints, feet | `orthopedist`, `neurologist` |
+| Teeth, gums, oral cavity | `dentist` |
+| Vision, eyes | `ophthalmologist`, `neurologist` |
 
-**Подбор с учётом пола.** Прочитай `Data/profile.json` → `basic.sex` до формирования состава:
+**Sex-aware selection.** Read `Data/profile.json` → `basic.sex` before assembling the panel:
 
-- `gynecologist` вызывается только при `female` либо при `intersex` с соответствующими органами
-- `urologist` вызывается при любом поле: почки и мочевые пути универсальны. У женщин он не рассматривает простату
-- При жалобе на усталость у женщины детородного возраста в состав добавляется `gynecologist`: менструальная кровопотеря — самая частая причина дефицита железа, и без этого специалиста гипотеза не будет рассмотрена
-- Если `sex` не указан — не угадывать. Спросить у пользователя либо собрать состав без половозависимых специальностей, отметив это в отчёте
+- Invoke `gynecologist` only for `female`, or for `intersex` when the relevant organs are present
+- Invoke `urologist` for any sex: kidneys and the urinary tract are universal. For women, the specialist does not assess the prostate
+- For fatigue in a woman of reproductive age, add `gynecologist`: menstrual blood loss is the most common cause of iron deficiency, and without this specialist the hypothesis will not be considered
+- If `sex` is unspecified, do not guess. Ask the user or assemble a panel without sex-dependent specialties, noting this in the report
 
-**Правила подбора:**
+**Selection rules:**
 
-- При неоднозначности лучше включить больше специалистов, чем меньше — перекрёстные находки и есть ценность консилиума
-- Верхний предел — **8 специалистов** за один запуск. Если подбор дал больше, показать состав, объяснить логику и спросить подтверждение
-- Если тема не распознана — показать список доступных специальностей и спросить, а не угадывать молча
+- When uncertain, it is better to include more specialists rather than fewer — cross-specialty findings are the value of the consilium
+- The upper limit is **8 specialists** per run. If selection yields more, show the panel, explain the reasoning, and ask for confirmation
+- If the topic is not recognized, show the available specialties and ask rather than guessing silently

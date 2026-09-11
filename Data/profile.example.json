@@ -79,11 +79,11 @@
       "variability_notes": ""
     },
     "_needs_input": [
-      "basic — заполните имя, дату рождения, рост и группу крови",
-      "lifestyle.caffeine — кофе, чай, энергетики и время последнего приёма",
-      "lifestyle.hydration — сколько воды в день",
-      "lifestyle.screen_and_light — экранное время и утренний дневной свет",
-      "lifestyle.sleep_regularity — фактическое время отбоя в будни и выходные"
+      "basic — enter name, date of birth, height, and blood type",
+      "lifestyle.caffeine — coffee, tea, energy drinks, and time of last intake",
+      "lifestyle.hydration — daily water intake",
+      "lifestyle.screen_and_light — screen time and morning daylight",
+      "lifestyle.sleep_regularity — actual bedtimes on weekdays and weekends"
     ]
   }
 }

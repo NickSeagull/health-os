@@ -34,7 +34,7 @@ export function TractionOverview() {
       <Card>
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет данных traction. Первый обзор будет создан после weekly review.
+            No traction data. The first review will be created after the weekly review.
           </p>
         </CardContent>
       </Card>
@@ -51,7 +51,7 @@ export function TractionOverview() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs text-muted-foreground">Общий прогресс</CardTitle>
+            <CardTitle className="text-xs text-muted-foreground">Overall progress</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{overallPct}%</p>
@@ -61,16 +61,16 @@ export function TractionOverview() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs text-muted-foreground">Расходы</CardTitle>
+            <CardTitle className="text-xs text-muted-foreground">Costs</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{formatRub(latest.cost_total_rub)}</p>
-            <p className="text-xs text-muted-foreground">из {formatRub(latest.cost_estimate_total_rub)}</p>
+            <p className="text-xs text-muted-foreground">of {formatRub(latest.cost_estimate_total_rub)}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs text-muted-foreground">Тренировки</CardTitle>
+            <CardTitle className="text-xs text-muted-foreground">Workouts</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{latest.fitness.workouts_this_month}/{latest.fitness.target}</p>
@@ -79,7 +79,7 @@ export function TractionOverview() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs text-muted-foreground">Период</CardTitle>
+            <CardTitle className="text-xs text-muted-foreground">Period</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">{latest.period}</p>
@@ -91,8 +91,8 @@ export function TractionOverview() {
       {/* Directions */}
       <Card>
         <CardHeader>
-          <CardTitle>Направления</CardTitle>
-          <CardDescription>{latest.directions_summary.length} направлений</CardDescription>
+          <CardTitle>Areas</CardTitle>
+          <CardDescription>{latest.directions_summary.length} areas</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -145,7 +145,7 @@ export function TractionOverview() {
           </CardHeader>
           <CardContent>
             {latest.blockers.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Нет блокеров</p>
+              <p className="text-sm text-muted-foreground">No blockers</p>
             ) : (
               <ul className="space-y-1">
                 {latest.blockers.map((b, i) => (

@@ -21,9 +21,9 @@ import { mutate } from "swr";
 import { toast } from "sonner";
 
 /**
- * Пустое поле ввода приходит как "", а `z.coerce.number()` превращает "" в 0 —
- * так в CSV попадали нули вместо пустых значений (вес 0 кг, давление 0/0).
- * Пустую строку нужно гасить до undefined ещё до приведения к числу.
+ * An empty input arrives as "", and `z.coerce.number()` turns it into 0.
+ * This used to write zeros instead of empty values to CSV (0 kg weight, 0/0 blood pressure).
+ * Convert empty strings to undefined before coercing them to numbers.
  */
 const optionalNumber = z.preprocess(
   (v) => (v === "" || v === null || v === undefined ? undefined : v),
@@ -31,7 +31,7 @@ const optionalNumber = z.preprocess(
 );
 
 const schema = z.object({
-  date: z.string().min(1, "Укажите дату"),
+  date: z.string().min(1, "Enter a date"),
   weight_kg: optionalNumber,
   systolic: optionalNumber,
   diastolic: optionalNumber,
@@ -57,8 +57,8 @@ export function AddMeasurementDialog() {
   });
 
   async function onSubmit(data: FormData) {
-    // Ответ роута раньше игнорировался: отказ по валидации выглядел как успешное
-    // сохранение, диалог закрывался, а строки в CSV не появлялось
+    // The route response used to be ignored: a validation failure looked like
+    // a successful save, the dialog closed, and no CSV row was created.
     const res = await fetch("/api/body-metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -67,11 +67,11 @@ export function AddMeasurementDialog() {
 
     if (!res.ok) {
       const { error } = await res.json().catch(() => ({ error: "" }));
-      toast.error(error || "Не удалось сохранить измерение");
+      toast.error(error || "Could not save measurement");
       return;
     }
 
-    toast.success("Измерение сохранено");
+    toast.success("Measurement saved");
     mutate("/api/body-metrics");
     reset();
     setOpen(false);
@@ -82,18 +82,18 @@ export function AddMeasurementDialog() {
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Добавить
+          Add
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Новое измерение</DialogTitle>
-          <DialogDescription>Добавить метрики тела</DialogDescription>
+          <DialogTitle>New measurement</DialogTitle>
+          <DialogDescription>Add body metrics</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="date">Дата</Label>
+              <Label htmlFor="date">Date</Label>
               <Input id="date" type="date" {...register("date")} />
               {errors.date && (
                 <p className="text-xs text-destructive mt-1">
@@ -102,7 +102,7 @@ export function AddMeasurementDialog() {
               )}
             </div>
             <div>
-              <Label htmlFor="weight_kg">Вес (кг)</Label>
+              <Label htmlFor="weight_kg">Weight (kg)</Label>
               <Input
                 id="weight_kg"
                 type="number"
@@ -111,7 +111,7 @@ export function AddMeasurementDialog() {
               />
             </div>
             <div>
-              <Label htmlFor="systolic">Систолическое</Label>
+              <Label htmlFor="systolic">Systolic</Label>
               <Input
                 id="systolic"
                 type="number"
@@ -119,7 +119,7 @@ export function AddMeasurementDialog() {
               />
             </div>
             <div>
-              <Label htmlFor="diastolic">Диастолическое</Label>
+              <Label htmlFor="diastolic">Diastolic</Label>
               <Input
                 id="diastolic"
                 type="number"
@@ -127,7 +127,7 @@ export function AddMeasurementDialog() {
               />
             </div>
             <div>
-              <Label htmlFor="heart_rate">ЧСС</Label>
+              <Label htmlFor="heart_rate">Heart rate</Label>
               <Input
                 id="heart_rate"
                 type="number"
@@ -135,7 +135,7 @@ export function AddMeasurementDialog() {
               />
             </div>
             <div>
-              <Label htmlFor="waist_cm">Талия (см)</Label>
+              <Label htmlFor="waist_cm">Waist (cm)</Label>
               <Input
                 id="waist_cm"
                 type="number"
@@ -145,11 +145,11 @@ export function AddMeasurementDialog() {
             </div>
           </div>
           <div>
-            <Label htmlFor="notes">Заметки</Label>
+            <Label htmlFor="notes">Notes</Label>
             <Textarea id="notes" {...register("notes")} />
           </div>
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Сохранение..." : "Сохранить"}
+            {isSubmitting ? "Saving..." : "Save"}
           </Button>
         </form>
       </DialogContent>

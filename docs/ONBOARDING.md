@@ -1,36 +1,36 @@
-# Онбординг
+# Onboarding
 
-> ⚠️ **Не медицинское изделие. Не медицинская рекомендация. Некоммерческий проект.**
-> Предоставляется «как есть», без гарантий. Использование — на собственный риск.
-> Все демо-данные вымышлены. Полные условия — [DISCLAIMER.md](../DISCLAIMER.md) (в корне репозитория).
-> 🚨 При неотложном состоянии — скорая помощь.
+> ⚠️ **Not a medical device. Not medical advice. Noncommercial project.**
+> Provided “as is,” without warranties. Use at your own risk.
+> All demo data is fictional. Full terms: [DISCLAIMER.md](../DISCLAIMER.md) (in the repository root).
+> 🚨 In a medical emergency, contact emergency services.
 
-Как войти в систему, не утонув. Разложено по этапам: каждый даёт работающий результат сам по себе, следующий можно отложить на неделю.
+Get started without becoming overwhelmed. Each stage delivers a working result on its own; the next can wait a week.
 
-Полное наполнение занимает недели, и это нормально. Система полезна уже после первого этапа.
+Filling everything in takes weeks, and that is normal. The system is useful after the first stage.
 
 ---
 
-## Этап 0. Осмотреться (15 минут, без своих данных)
+## Stage 0. Explore (15 minutes, without your own data)
 
-Прежде чем вносить что-то личное, посмотрите на систему с демо-данными вымышленного пациента.
+Before entering personal information, explore the system with a fictional patient's demo data.
 
 ```bash
 ./setup.sh --demo
 cd Dashboard && npm install && npm run dev
 ```
 
-Откройте `http://127.0.0.1:3000`. Полистайте разделы, посмотрите, как выглядят анализы и тренды.
+Open `http://127.0.0.1:3000`. Browse the sections to see how lab results and trends look.
 
-Затем в Claude Code попробуйте:
+Then try this in Claude Code:
 
 ```
-/consilium почему демо-пациент устаёт?
+/consilium why is the demo patient tired?
 ```
 
-Запустится трёхраундовый разбор. Обратите внимание на секцию «Неразрешённые разногласия» — это то, ради чего всё построено.
+A three-round review will begin. Pay attention to “Unresolved disagreements”—that is what the system was built for.
 
-**Когда наигрались**, очистите демо-данные полностью — иначе вымышленный пациент останется в вашей медкарте:
+**When you have finished exploring**, remove all deployed demo data; otherwise, the fictional patient will remain in your medical record:
 
 ```bash
 find Data -type f ! -name '.gitkeep' ! -name 'README.md' \
@@ -39,202 +39,190 @@ find Data -type f ! -name '.gitkeep' ! -name 'README.md' \
 ./setup.sh
 ```
 
-Команда удаляет развёрнутые файлы всех форматов, включая `.md`-протоколы визитов, и сохраняет шаблоны со справочниками.
+This removes deployed files in every format, including `.md` visit notes, while preserving templates and reference files.
 
 ---
 
-## Этап 1. Базовая медкарта (30–40 минут)
+## Stage 1. Basic medical record (30–40 minutes)
 
-Минимум, после которого система начинает быть полезной.
+The minimum needed to make the system useful.
 
 ```
 /onboarding
 ```
 
-Discovery-интервью соберёт:
+The discovery interview collects:
 
-- рост, дату рождения, группу крови
-- аллергии и хронические состояния
-- текущие жалобы, которые беспокоят
-- врачей, у которых наблюдаетесь
-- что принимаете сейчас — лекарства и добавки
-- **контекст жизни**: питание, сон, движение, вещества, работа, климат
+- Height, date of birth, and blood type
+- Allergies and chronic conditions
+- Current symptoms that concern you
+- Doctors you see
+- Medications and supplements you currently take
+- **Life context**: diet, sleep, movement, substances, work, and climate
 
-Последний пункт часто хочется пропустить. Не пропускайте: холистическая рамка построена на нём, и без него специалисты будут искать патологию там, где причина в режиме. Дефицит калорий, кальян, нерегулярный сон и широта проживания объясняют больше отклонений, чем редкие болезни.
+The last item is tempting to skip. Do not skip it: the holistic framework depends on it. Without it, specialists may look for disease when the cause is your routine. A calorie deficit, hookah use, irregular sleep, and latitude can explain more abnormalities than rare diseases.
 
-**Что не знаете — оставляйте пустым.** Незаполненное попадает в `_needs_input` и всплывёт позже. Выдуманные значения хуже пустых.
+**Leave anything you do not know blank.** Missing information goes into `_needs_input` and will be revisited later. Invented values are worse than empty fields.
 
-**Результат этапа:** `Data/profile.json` и `Data/context/environment.json` заполнены. Можно спрашивать специалистов.
+**Stage outcome:** `Data/profile.json` and `Data/context/environment.json` are populated. You can ask the specialists questions.
 
 ---
 
-## Этап 2. Первые анализы (20 минут на партию)
+## Stage 2. First lab results (20 minutes per batch)
 
-Положите PDF из лаборатории в `Inbox/` и запустите:
+Place lab PDFs in `Inbox/` and run:
 
 ```
 /inbox
 ```
 
-Документы распознаются, раскладываются по `Data/labs/`, попадают в индекс, оригиналы уходят в `Archive/`.
+Documents are recognized, organized into `Data/labs/`, and indexed. Originals move to `Archive/`.
 
-Дальше:
+Next:
 
 ```
-/labs расшифруй последние
+/labs interpret the latest results
 ```
 
-Начинайте со свежего. Исторические анализы можно оцифровывать месяцами, а свежие дают пользу сразу.
+Start with recent results. Digitizing historical records can take months; recent results are useful immediately.
 
-> **Про разные лаборатории.** Референсные интервалы зависят от метода, а некоторые маркеры приходят в разных единицах. Система знает об этом и помечает несопоставимые точки — но сравнивать значения между лабораториями «на глаз» не стоит.
+> **Different laboratories.** Reference intervals depend on the method, and some markers arrive in different units. The system flags incomparable points, but do not compare values across laboratories by eye.
 
-**Результат этапа:** есть с чем работать специалистам.
+**Stage outcome:** the specialists have data to work with.
 
 ---
 
-## Этап 3. Первый консилиум (10 минут ожидания)
+## Stage 3. First consilium (10-minute wait)
 
 ```
-/consilium почему я постоянно устаю?
+/consilium why am I always tired?
 ```
 
-Или назовите специальности явно: `/consilium гемато эндо`.
+Or name specialties explicitly: `/consilium hematologist endocrinologist`.
 
-Что произойдёт:
+What happens:
 
-1. Специалисты дадут независимые заключения, не видя друг друга
-2. Те, чьи зоны пересеклись, оспорят выводы коллег
-3. Оркестратор разрешит споры и соберёт гипотезу общей первопричины
+1. Specialists produce independent opinions without seeing one another's work.
+2. Those whose areas overlap challenge their colleagues' conclusions.
+3. The orchestrator resolves disputes and builds a shared root-cause hypothesis.
 
-Отчёт сохранится в `Data/consilium/`.
+The report is saved in `Data/consilium/`.
 
-**Как читать отчёт.** Самое ценное не в разделе с находками, а в двух других:
+**Reading the report.** The most valuable material is in two sections beyond the findings:
 
-- **«Неразрешённые разногласия»** — здесь система честно говорит, чего не знает, и называет исследование, которое рассудит спор
-- **«Пробелы в данных»** — чего не хватает для полноты картины
+- **“Unresolved disagreements”**: the system states what it does not know and identifies a test that could settle the disagreement.
+- **“Data gaps”**: what is missing from the overall picture.
 
-Это готовый список вопросов к живому врачу.
+These provide a ready-made list of questions for a real doctor.
 
 ---
 
-## Этап 4. Врачи и визиты (по мере походов)
+## Stage 4. Doctors and visits (as appointments happen)
 
-После каждого приёма:
-
-```
-/doctor был у врача
-```
-
-Запишется протокол, обновится контакт, зафиксируется расход, при необходимости создастся follow-up задача.
-
-Перед приёмом:
+After each appointment:
 
 ```
-/doctor подготовь к приёму невролога
+/doctor I saw a doctor
 ```
 
-Соберётся бриф: что беспокоит, что показывают анализы, какие вопросы задать.
+A visit note is recorded, the contact is updated, the expense is logged, and a follow-up task is created if needed.
 
-Это, пожалуй, самая недооценённая функция. Пятнадцать минут приёма проходят гораздо продуктивнее, когда вы приходите со структурированной картиной вместо «что-то устаю».
+Before an appointment:
+
+```
+/doctor prepare me for a neurologist appointment
+```
+
+This assembles a brief covering your concerns, lab findings, and questions to ask.
+
+This may be the most underrated feature. A fifteen-minute appointment is much more productive when you arrive with a structured account of your symptoms.
 
 ---
 
-## Этап 5. Регулярность (несколько минут в неделю)
+## Stage 5. Routine use (a few minutes per week)
 
-Дальше система живёт короткими касаниями.
+Keep the system current through brief check-ins.
 
-| Когда | Что |
-|-------|-----|
-| Начало сессии | `/day` — контекст, алерты, что требует внимания |
-| После взвешивания | `/body` |
-| Когда есть что сказать о самочувствии | `/mental` |
-| Раз в месяц | `/traction` — обзор прогресса по направлениям |
-| Конец сессии | `/wrap-up` — сохранить состояние и закоммитить |
-| Раз в месяц | `/wiki lint` — противоречия, сиротки, битые ссылки |
-
----
-
-## Этап 5a. Члены семьи (когда понадобится)
-
-Одна установка ведёт медкарты нескольких человек.
-
-```
-/profiles создать
-```
-
-Скилл спросит идентификатор, имя, связь, дату рождения и пол. Дата рождения
-обязательна: от неё зависят референсы, скрининг и включение педиатрического
-режима.
-
-**Профиль другого человека — вопрос не технический.** Взрослый должен знать,
-что его данные вносятся сюда и уходят в API модели. Для ребёнка вы должны
-быть законным представителем. Скилл спросит об этом прямо; отказ отвечать —
-повод не заводить профиль. Подробнее — раздел о данных третьих лиц
-в [DISCLAIMER.md](../DISCLAIMER.md).
-
-Переключение:
-
-```
-/profiles переключись на wife
-```
-
-Активный профиль виден в шапке дашборда и объявляется первой строкой в
-`/day`. Разовое чтение чужого профиля без переключения тоже возможно —
-достаточно назвать человека в запросе.
-
-**Детский профиль** включает педиатрический контур: возрастные референсы
-вместо взрослых, перцентили роста и веса, возрастной календарь прививок.
-Разбор ведёт педиатр.
+| When | What |
+|------|------|
+| Start of a session | `/day` — context, alerts, and items needing attention |
+| After weighing yourself | `/body` |
+| When you have something to record about how you feel | `/mental` |
+| Once a month | `/traction` — review progress across health areas |
+| End of a session | `/wrap-up` — save state and commit |
+| Once a month | `/wiki lint` — contradictions, orphan pages, and broken links |
 
 ---
 
-## Этап 5b. Граф связей
+## Stage 5a. Family members (when needed)
 
-Когда накопились анализы, визиты и гипотезы, соберите wiki-слой:
+One installation can maintain records for several people.
+
+```
+/profiles create
+```
+
+The skill asks for an identifier, name, relationship, date of birth, and sex. Date of birth is required: it determines reference intervals, screening, and whether pediatric mode is enabled.
+
+**Another person's profile is more than a technical matter.** An adult must know that their data is being entered here and sent to the model API. For a child, you must be their legal representative. The skill asks about this explicitly; declining to answer is a reason not to create the profile. See the third-party data section in [DISCLAIMER.md](../DISCLAIMER.md).
+
+To switch:
+
+```
+/profiles switch to wife
+```
+
+The active profile appears in the dashboard header and is announced on the first line of `/day`. You can also read another profile once without switching: name the person in your request.
+
+**A child's profile** enables pediatric workflows: age-specific reference intervals, height and weight percentiles, and an age-specific vaccination schedule. The pediatrician leads the review.
+
+---
+
+## Stage 5b. Relationship graph
+
+Once you have accumulated lab results, visits, and hypotheses, build the wiki layer:
 
 ```
 /wiki build
 ```
 
-Появятся страницы-сущности со ссылками друг на друга, а в дашборде — раздел
-«Граф связей».
+This creates linked entity pages and a “Relationship graph” section in the dashboard.
 
-Дальше главное — не картинка, а регулярная проверка:
+After that, regular checks matter more than the picture:
 
 ```
 /wiki lint
 ```
 
-Она находит противоречия между источниками, страницы, на которые никто не
-ссылается, и упоминания без своей записи. Это готовый рабочий список.
+This finds contradictions between sources, pages with no incoming links, and mentions without a record of their own. The result is a ready-made work list.
 
 ---
 
-## Этап 6. Оцифровка истории (опционально, долго)
+## Stage 6. Digitizing your history (optional, time-consuming)
 
-Старые анализы, детская карта, выписки. Кладите пачками в `Inbox/`, запускайте `/inbox`.
+Old lab results, childhood records, and discharge summaries: place batches in `Inbox/` and run `/inbox`.
 
-Смысл появляется, когда набирается история по одному маркеру за несколько лет: тренд говорит больше, чем точка. Но это работа на месяцы, и откладывать из-за неё остальное не нужно.
-
----
-
-## Частые вопросы
-
-**Можно пропустить контекст жизни и заполнить потом?**
-Можно, но заключения будут слабее. Система не сможет отличить «патология» от «третий месяц в дефиците калорий».
-
-**Что если данных почти нет?**
-Специалист честно скажет, чего не хватает, и предложит, с чего начать. Это тоже результат.
-
-**Система поставит диагноз?**
-Нет, и это заложено жёстко. Она выдвигает гипотезы, оценивает их доказательность и предлагает, чем проверить. Диагноз ставит врач.
-
-**Что делать с критическим результатом?**
-Система остановит обычную обработку и выведет находку первым сообщением. Дальше — к врачу, а не к следующему скиллу.
-
-**Как понять, что вывод надёжен?**
-По уровню доказательности рядом с утверждением: **A** — систематические обзоры и мета-анализы, **D** — механистическое рассуждение, **⚠️** — гипотеза без прямой базы. Перекрёстные гипотезы консилиума всегда D или ⚠️: они построены на сопоставлении, а не на исследовании.
+This becomes valuable once you have several years of history for one marker: a trend says more than a single point. But it can take months, so do not postpone everything else while doing it.
 
 ---
 
-⚕️ Система не ставит диагнозов и не заменяет врача. При признаках неотложного состояния обращайтесь в скорую помощь.
+## Frequently asked questions
+
+**Can I skip life context and fill it in later?**
+Yes, but the conclusions will be weaker. The system will not be able to distinguish disease from a third consecutive month in a calorie deficit.
+
+**What if I have almost no data?**
+The specialist will state what is missing and suggest where to start. That is useful too.
+
+**Will the system diagnose me?**
+No; this is a firm boundary. It proposes hypotheses, assesses their evidence, and suggests how to check them. A doctor makes the diagnosis.
+
+**What should I do with a critical result?**
+The system stops normal processing and shows the finding first. Next, contact a doctor rather than running another skill.
+
+**How do I know whether a conclusion is reliable?**
+Look at the evidence level beside the claim: **A** means systematic reviews and meta-analyses; **D** means mechanistic reasoning; **⚠️** means a hypothesis without direct evidence. Cross-specialty consilium hypotheses are always D or ⚠️ because they are based on comparison, not a study.
+
+---
+
+⚕️ The system does not diagnose conditions or replace a doctor. If you notice signs of a medical emergency, contact emergency services.

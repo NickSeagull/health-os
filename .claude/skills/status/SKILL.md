@@ -1,117 +1,117 @@
 ---
 name: status
 description: |
-  Текущий статус здоровья: активные направления, курсы лекарств, ближайшие визиты, открытые вопросы.
-  Триггеры: «статус», «что в работе», «status», «что сейчас», «покажи состояние»
+  Current health status: active directions, medication courses, upcoming visits, and open questions.
+  Triggers: “status”, “what’s in progress”, “status”, “what now”, “show the state”
 ---
 
-# Status — текущее состояние здоровья
+# Status — current health state
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Показать полную картину: что сейчас в работе, какие курсы идут, что просрочено, текущая фаза, расходы. Запускается в начале сессии или по запросу.
+Show the complete picture: what is in progress, which courses are active, what is overdue, the current phase, and costs. Run at the start of a session or on request.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### 1. Сбор данных (параллельно)
+### 1. Collect data (in parallel)
 
-Прочитать через Read tool:
-- `MEMORY.md` — долгосрочная память, активные треды
-- `Cache/active-context.md` — горячий контекст, что было в прошлой сессии
-- `Data/goals/YYYY.json` (v2) — направления, фазы, milestones
-- `Data/traction/reviews.jsonl` — последний snapshot (tail)
-- `Data/costs/YYYY.jsonl` — расходы (все строки)
-- `Data/medications/current.json` — активные курсы
-- `Data/doctors/contacts.json` — врачи
-- `Data/labs/_index.json` — последние анализы
-- `Data/mental/journal.jsonl` — последняя запись mood (tail)
-- `Data/body-metrics.csv` — последнее измерение (tail)
+Read using the Read tool:
+- `MEMORY.md` — long-term memory, active threads
+- `Cache/active-context.md` — hot context, what happened in the previous session
+- `Data/goals/YYYY.json` (v2) — directions, phases, milestones
+- `Data/traction/reviews.jsonl` — latest snapshot (tail)
+- `Data/costs/YYYY.jsonl` — costs (all rows)
+- `Data/medications/current.json` — active courses
+- `Data/doctors/contacts.json` — doctors
+- `Data/labs/_index.json` — latest tests
+- `Data/mental/journal.jsonl` — latest mood entry (tail)
+- `Data/body-metrics.csv` — latest measurement (tail)
 
-Через Glob:
-- `Data/doctors/visits/*.md` — последние визиты (3 шт.)
+Using Glob:
+- `Data/doctors/visits/*.md` — latest visits (3)
 
-### 2. Вывод
+### 2. Conclusion
 
 ```markdown
-## Статус здоровья — YYYY-MM-DD
+## Health status — YYYY-MM-DD
 
-### Текущая фаза
+### Current phase
 
-**Фаза N. [Название]** ([период])
-Прогресс фазы: X/Y milestones
+**Phase N. [Name]** ([period])
+Phase progress: X/Y milestones
 
-### Активные направления (по фазам)
+### Active directions (by phase)
 
-#### Фаза 1. Срочное
-| KR | Направление | Статус | Milestones | Следующий milestone | Дедлайн |
+#### Phase 1. Urgent
+| KR | Direction | Status | Milestones | Next milestone | Deadline |
 |----|-------------|--------|------------|---------------------|---------|
-| 5.0 | Гематолог | 🟡 | 0/4 | Направление от терапевта | 01.04 |
+| 5.0 | Hematology | 🟡 | 0/4 | Primary care referral | 01.04 |
 
-#### Фаза 2. Плановое
+#### Phase 2. Planned
 ...
 
-### Активные курсы лекарств
+### Active medication courses
 
-| Препарат | Дозировка | Осталось | Врач |
+| Medication | Dosage | Remaining | Doctor |
 |----------|-----------|----------|------|
-| [из medications/current.json, только status: active, с until] |
+| [from medications/current.json, only status: active, with until] |
 
-Постоянный приём: [список без until]
+Ongoing use: [list without until]
 
-### Ближайшие визиты и follow-up
+### Upcoming visits and follow-up
 
-- [из последних визитов — секция «Следующий визит»]
-- [просроченные follow-up — выделить]
+- [from recent visits — “Next visit” section]
+- [overdue follow-ups — highlight]
 
-### Последние события
+### Recent events
 
-- Последний визит: [дата, врач]
-- Последний анализ: [дата, тип]
-- Последнее измерение: [вес, дата]
-- Mood: [последняя запись]
-- Последний traction-ревью: [дата, из reviews.jsonl]
+- Last visit: [date, doctor]
+- Last test: [date, type]
+- Last measurement: [weight, date]
+- Mood: [latest entry]
+- Last traction review: [date, from reviews.jsonl]
 
-### Расходы
+### Costs
 
-| Статья | Сумма |
+| Item | Amount |
 |--------|-------|
-| За текущий месяц | X ₽ |
-| За 2026 (всего) | Y ₽ |
-| Оценка оставшегося | Z ₽ |
+| Current month | X ₽ |
+| 2026 total | Y ₽ |
+| Remaining estimate | Z ₽ |
 
-### Открытые вопросы
+### Open questions
 
-[Из MEMORY.md секция «Открытые вопросы»]
+[From the “Open questions” section of MEMORY.md]
 
-### Что изменилось с прошлой сессии
+### What changed since the previous session
 
-[Из Cache/active-context.md секция «Последняя сессия»]
+[From the “Last session” section of Cache/active-context.md]
 ```
 
-### 3. Алерты
+### 3. Alerts
 
-Проверить и показать если есть:
-- Milestone с дедлайном ≤7 дней → предупредить
-- Просроченный milestone → выделить
-- Курс заканчивается через ≤3 дня → предупредить
-- Follow-up просрочен → выделить
-- Ревакцинация просрочена → напомнить
-- Нет записей mood > 7 дней → предложить
-- Застой (direction.last_activity > 14 дней, status != monitoring) → отметить
+Check and show if present:
+- Milestone with a deadline ≤7 days away → warn
+- Overdue milestone → highlight
+- Course ending within ≤3 days → warn
+- Overdue follow-up → highlight
+- Overdue revaccination → remind
+- No mood entries for >7 days → suggest one
+- Stagnation (direction.last_activity > 14 days, status != monitoring) → note it
 
-## Правила
+## Rules
 
-- Показывать только факты, не домысливать
-- Если данных нет — «нет данных», не скрывать секцию
-- После показа — спросить: «Что делаем сегодня?»
+- Show facts only; do not infer
+- If data is missing, write “no data”; do not hide the section
+- After showing the status, ask: “What are we doing today?”
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a doctor before making treatment decisions.*

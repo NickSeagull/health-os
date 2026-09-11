@@ -19,29 +19,29 @@ export async function POST(request: Request) {
     const { date, specialty, doctor, clinic, brief, content, format } = body ?? {};
 
     const v = new Validator();
-    // date попадает в имя файла напрямую — без проверки через него уходили за пределы каталога
+    // date is inserted directly into the filename; without validation it could escape the directory.
     v.requireDate(date, "date");
     v.requireString(specialty, "specialty");
     v.requireString(brief, "brief");
     v.optionalEnum(format, "format", ["md", "json"] as const);
     if (doctor !== undefined && doctor !== null && typeof doctor !== "string") {
-      v.add("doctor: строка либо null");
+      v.add("doctor: string or null");
     }
     if (clinic !== undefined && typeof clinic !== "string") {
-      v.add("clinic: строка");
+      v.add("clinic: string");
     }
     if (format === "md" && content !== undefined && typeof content !== "string") {
-      v.add("content: строка");
+      v.add("content: string");
     }
 
     const invalid = v.response();
     if (invalid) return invalid;
 
-    // Кириллица транслитерируется: конвенция имён визитов — латиница, kebab-case
+    // Visit filenames use Latin characters in kebab-case.
     const slug = slugify(specialty);
     if (!slug) {
       return NextResponse.json(
-        { error: "specialty: не удалось построить имя файла" },
+        { error: "specialty: could not build a filename" },
         { status: 400 }
       );
     }
@@ -50,15 +50,15 @@ export async function POST(request: Request) {
     const filename = `${date}_${slug}.${ext}`;
     const filePath = resolveWithin(dataPath("doctors", "visits"), filename, [`.${ext}`]);
 
-    // Ключ дубликата визита — date + specialty (Блок 0), и он же даёт имя файла.
-    // Молча перезаписать протокол приёма нельзя
+    // Visit duplicate key: date + specialty (Block 0), which also determines the filename.
+    // Do not silently overwrite a visit record.
     const exists = await fs
       .access(filePath)
       .then(() => true)
       .catch(() => false);
     if (exists) {
       return conflict(
-        `Визит ${filename} уже записан. Дополните существующий протокол или уточните специальность`,
+        `Visit ${filename} is already recorded. Update the existing record or specify a different specialty`,
         { file: filename }
       );
     }
@@ -66,13 +66,13 @@ export async function POST(request: Request) {
     if (ext === "md") {
       const mdContent =
         content ||
-        `# ${brief}\n\n- **Дата:** ${date}\n- **Врач:** ${doctor || "—"}\n- **Клиника:** ${clinic || "—"}\n- **Специальность:** ${specialty}\n`;
+        `# ${brief}\n\n- **Date:** ${date}\n- **Doctor:** ${doctor || "—"}\n- **Clinic:** ${clinic || "—"}\n- **Specialty:** ${specialty}\n`;
       await safeWriteFile(filePath, mdContent);
     } else {
       await safeWriteJson(filePath, {
         version: 1,
         date,
-        type: "консультация",
+        type: "consultation",
         specialty,
         doctor: doctor || null,
         clinic: clinic || "",
@@ -89,15 +89,15 @@ export async function POST(request: Request) {
       index.visits.push({
         date,
         file: filename,
-        // format обязан совпадать с расширением file — инвариант Блока 5
+        // format must match the file extension; this is the Block 5 invariant.
         format: ext,
         specialty,
         doctor: doctor || null,
         clinic: clinic || "",
         brief,
       });
-      // Индекс держим отсортированным по дате: период вида «2005-2012»
-      // сортируется по первым четырём символам, поэтому сравниваем строки
+      // Keep the index sorted by date: a period such as "2005-2012" sorts
+      // by its first four characters, so string comparison is sufficient.
       index.visits.sort((a, b) => a.date.localeCompare(b.date));
       index.total = index.visits.length;
       index.generated = todayMoscow();

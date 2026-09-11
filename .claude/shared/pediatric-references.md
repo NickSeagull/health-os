@@ -1,181 +1,135 @@
-# Педиатрический контур
+# Pediatric Framework
 
-Обязательная рамка при возрасте пациента младше 18 лет. Возраст вычисляется
-из `profile.json` → `basic.date_of_birth` **в момент обращения**.
+Required when the patient is under 18. Calculate age from `profile.json` → `basic.date_of_birth` **at the time of the request**.
 
-Читается вместе с `specialist-contract.md`, `holistic-framework.md` и
-`critical-values.md`, а не вместо них.
+Read alongside `specialist-contract.md`, `holistic-framework.md`, and `critical-values.md`, not instead of them.
 
 ---
 
-## Блок 1. Главное: детские нормы — не взрослые с поправкой
+## Block 1. Pediatric reference intervals are not adjusted adult intervals
 
-Растущий организм отличается от взрослого не степенью, а **направлением**
-многих показателей. Значение, которое у взрослого означает патологию, у
-ребёнка бывает физиологической нормой — и наоборот.
+Many markers in a growing body differ from adult values in **direction**, not merely degree. A value indicating disease in an adult may be physiologically normal in a child, and vice versa.
 
-Это не тонкость и не редкий случай. Ошибка здесь порождает два одинаково
-плохих исхода: тревогу и лишние обследования там, где всё в порядке, либо
-пропуск реальной проблемы, замаскированной «нормальными» взрослыми цифрами.
+This is neither a subtle distinction nor a rare case. Errors cause two equally poor outcomes: anxiety and unnecessary examinations when nothing is wrong, or missed problems hidden by apparently “normal” adult values.
 
-**Правило:** взрослый референсный интервал к детскому анализу
-**не применяется никогда**, даже как ориентир, даже с оговоркой.
+**Rule: never apply an adult reference interval to a child's lab result**, even as an approximation or with a qualification.
 
 ---
 
-## Блок 2. Откуда берутся референсы
+## Block 2. Where reference intervals come from
 
-Порядок строго такой:
+Follow this order strictly:
 
-1. **Возрастной интервал из самого файла анализа.** Педиатрические
-   лаборатории печатают нормы по возрастным группам — это единственный
-   источник, привязанный к методу и оборудованию
-2. Если в файле интервал взрослый или отсутствует — **сказать об этом прямо**
-   и не интерпретировать значение количественно
-3. Нормы «по памяти» запрещены — как и для взрослых, но здесь цена ошибки выше:
-   детские интервалы дробятся на возрастные группы, различаются между
-   лабораториями сильнее взрослых и зависят от метода
+1. **The age-specific interval in the lab file itself.** Pediatric laboratories print intervals by age group; this is the only source tied to the method and equipment
+2. If the file contains an adult interval or no interval, **say so explicitly** and do not interpret the value quantitatively
+3. Reference values “from memory” are prohibited, as for adults, but the cost of error is higher: pediatric intervals are subdivided by age, vary more between laboratories, and depend on the method
 
-Допустимо без числовых норм: указать направление отклонения, назвать
-возрастные особенности из Блока 3 и сформулировать, какой референс нужен.
+Without numerical reference intervals, you may describe the direction of an abnormality, identify the age-specific characteristics in Block 3, and state which interval is needed.
 
 ---
 
-## Блок 3. Где детские показатели расходятся со взрослыми
+## Block 3. How pediatric markers differ from adult markers
 
-Качественные закономерности — чтобы понимать, **что** проверять. Числа
-берутся из файла анализа, не отсюда.
+These qualitative patterns identify **what** to check. Obtain numerical values from the lab file, not this document.
 
-| Показатель | Как отличается у детей | Почему |
-|------------|------------------------|--------|
-| **Щелочная фосфатаза** | Значительно выше взрослой нормы, пик в периоды быстрого роста и пубертата | Активность остеобластов в растущей кости. Взрослый верхний предел здесь бесполезен [уровень B] |
-| **Лейкоформула** | Примерно с 1 недели до 4–5 лет преобладают лимфоциты, а не нейтрофилы; два физиологических перекрёста | «Лимфоцитоз» у трёхлетнего — как правило, возрастная норма [уровень B] |
-| **Гемоглобин** | Высокий при рождении, физиологический надир около 2–3 месяцев, затем медленный рост до подростковых значений | Смена фетального гемоглобина на взрослый [уровень B] |
-| **Креатинин** | Существенно ниже взрослого и растёт с мышечной массой | Оценка СКФ по взрослым формулам неприменима — нужны детские [уровень B] |
-| **Лимфоузлы** | Пальпируемые шейные и паховые узлы малого размера — обычная находка | Активное созревание иммунной системы [уровень C] |
-| **ЧСС и частота дыхания** | Существенно выше взрослых, снижаются с возрастом | Пороги «тахикардии» — только возрастные [уровень B] |
-| **Артериальное давление** | Норма зависит от возраста, пола и **роста**, а не от фиксированного порога | Перцентильные таблицы; взрослый порог 140/90 к детям неприменим [уровень B] |
-| **ТТГ** | Выше взрослого в первые недели жизни, снижается к детским значениям | Постнатальная перестройка [уровень B] |
-| **Витамин D, железо, B12** | Потребности и пороги дефицита отличаются, скорость истощения запасов выше | Рост и малые депо [уровень B] |
+| Marker | Difference in children | Reason |
+|--------|------------------------|--------|
+| **Alkaline phosphatase** | Substantially higher than adult levels; peaks during rapid growth and puberty | Osteoblast activity in growing bone. The adult upper limit is not useful here [evidence level B] |
+| **Leukocyte differential** | Lymphocytes predominate over neutrophils from approximately 1 week to 4–5 years; two physiological crossover points | “Lymphocytosis” in a three-year-old is usually normal for age [evidence level B] |
+| **Hemoglobin** | High at birth, with a physiological nadir around 2–3 months, then a slow rise toward adolescent values | Transition from fetal to adult hemoglobin [evidence level B] |
+| **Creatinine** | Substantially lower than adult levels; rises with muscle mass | Adult GFR formulas do not apply; pediatric formulas are needed [evidence level B] |
+| **Lymph nodes** | Small palpable cervical and inguinal nodes are common | Active immune system maturation [evidence level C] |
+| **Heart rate and respiratory rate** | Substantially higher than adult rates; decline with age | Tachycardia thresholds must be age-specific [evidence level B] |
+| **Blood pressure** | Normal values depend on age, sex, and **height**, not a fixed threshold | Percentile tables; the adult 140/90 threshold does not apply to children [evidence level B] |
+| **TSH** | Higher than adult levels in the first weeks, then falls toward childhood values | Postnatal adaptation [evidence level B] |
+| **Vitamin D, iron, B12** | Requirements and deficiency thresholds differ; stores deplete faster | Growth and smaller reserves [evidence level B] |
 
-Источники уровня: руководства педиатрических обществ и стандартные
-референсные атласы. **Конкретные числа, DOI и названия статей здесь
-не приводятся намеренно** — см. `evidence-base.md`.
+Evidence sources: pediatric society guidelines and standard reference atlases. **Specific values, DOIs, and article titles are intentionally omitted**; see `evidence-base.md`.
 
 ---
 
-## Блок 4. Рост, вес и развитие — только перцентили
+## Block 4. Height, weight, and development — percentiles only
 
-Абсолютные значения роста и веса у ребёнка не означают ничего. Читаются
-только через перцентили или z-оценки по возрасту и полу — стандарты роста ВОЗ
-(0–5 лет) и references ВОЗ для 5–19 лет [уровень A].
+A child's absolute height and weight values are not meaningful in isolation. Interpret them through age- and sex-specific percentiles or z-scores: WHO growth standards for 0–5 years and WHO references for 5–19 years [evidence level A].
 
-Что реально информативно:
+What is informative:
 
-- **Положение на кривой** — перцентильный коридор
-- **Динамика коридора** — пересечение двух и более перцентильных линий вниз
-  или вверх значимее, чем само положение. Ребёнок стабильно на 10-м
-  перцентиле обычно здоров; ребёнок, ушедший с 50-го на 10-й, требует
-  внимания [уровень B]
-- **Соотношение** роста и веса, ИМТ по возрасту — «ИМТ 17» у ребёнка
-  интерпретируется только перцентилем
+- **Position on the curve**: the percentile band
+- **Changes between bands**: crossing two or more percentile lines upward or downward matters more than the position alone. A child consistently at the 10th percentile is usually healthy; a child dropping from the 50th to the 10th requires attention [evidence level B]
+- **Height-to-weight relationship and BMI for age**: interpret “BMI 17” in a child through percentiles only
 
-Записывать в `body-metrics.csv` как обычно, но интерпретировать —
-перцентильно. Без даты рождения перцентиль не считается: сказать об этом,
-а не подставлять взрослую логику.
+Write to `body-metrics.csv` as usual, but interpret using percentiles. Without a date of birth, do not calculate a percentile: explain the missing information instead of applying adult logic.
 
 ---
 
-## Блок 5. Прививки
+## Block 5. Vaccinations
 
-Календарь привязан к возрасту, а не к календарным датам, и различается
-между странами. Национальный календарь страны проживания берётся из
-`Data/context/environment.json`.
+Schedules are tied to age rather than calendar dates and differ between countries. Use the national schedule for the country of residence recorded in `Data/context/environment.json`.
 
-- Пропущенная доза чаще всего **не требует начинать курс заново** — существуют
-  догоняющие схемы [уровень A]
-- Интервалы между дозами имеют минимумы; введение раньше минимума может не
-  засчитываться
-- Расхождение фактических дат с календарём — повод показать список врачу,
-  а не самостоятельный вывод о необходимости ревакцинации
+- A missed dose usually **does not require restarting the course**; catch-up schedules exist [evidence level A]
+- Minimum intervals apply between doses; a dose given too early may not count
+- A discrepancy between actual dates and the schedule is a reason to show the record to a doctor, not independently conclude that revaccination is needed
 
-Система показывает расхождение и называет его. Схему догоняющей вакцинации
-назначает врач.
+The system identifies and displays discrepancies. A doctor prescribes the catch-up schedule.
 
 ---
 
-## Блок 6. Красные флаги, специфичные для детей
+## Block 6. Pediatric red flags
 
-Проверяются **до** обычного разбора, вместе с `critical-values.md`:
+Check **before** routine analysis, alongside `critical-values.md`:
 
-- Лихорадка у ребёнка **младше 3 месяцев** — неотложно, независимо от
-  самочувствия [уровень A]
-- Отказ от питья, отсутствие мочи более 8–12 часов, отсутствие слёз при
-  плаче — признаки обезвоживания
-- Вялость, необычная сонливость, трудность разбудить
-- Сыпь, не бледнеющая при надавливании
-- Затруднённое дыхание: втяжение уступчивых мест грудной клетки, кряхтящий
-  выдох, раздувание крыльев носа
-- Судороги
-- Остановка или регресс в наборе веса и в развитии
-- Внезапный отказ опираться на ногу, щадящая походка
+- Fever in a child **under 3 months**: urgent, regardless of how well the child appears [evidence level A]
+- Refusal to drink, no urine for more than 8–12 hours, or no tears when crying: signs of dehydration
+- Lethargy, unusual sleepiness, or difficulty waking
+- A rash that does not blanch under pressure
+- Difficulty breathing: chest retractions, grunting on expiration, or nasal flaring
+- Seizures
+- Arrest or regression in weight gain or development
+- Sudden refusal to bear weight on a leg or an antalgic gait
 
-При любом из них — вывести первым сообщением, рекомендовать неотложное
-обращение, обычный workflow не продолжать.
+For any of these, display the finding in the first message and recommend urgent medical assessment. Do not continue the normal workflow.
 
 ---
 
-## Блок 7. Что меняется в рассуждении
+## Block 7. What changes in reasoning
 
-Холистическая рамка применяется целиком, но контекст жизни у ребёнка другой:
+Apply the entire holistic framework, accounting for the child's different life context:
 
-- **Режим сна** — потребность выше и резко зависит от возраста; недосып
-  проявляется гиперактивностью, а не сонливостью [уровень B]
-- **Школа и нагрузка** — учебный стресс, буллинг, экранное время
-- **Питание** — избирательность в еде, реальный состав рациона
-- **Семейная среда** — конфликты, развод, появление сиблинга: у детей
-  психосоциальный стресс чаще соматизируется, чем вербализуется [уровень B]
-- **Инфекционная нагрузка** — сад и школа: 6–8 респираторных эпизодов в год
-  у дошкольника не являются иммунодефицитом [уровень B]
-- **Ростовые скачки** — объясняют боли в ногах, утомляемость, изменения аппетита
+- **Sleep schedule**: sleep needs are higher and strongly age-dependent; insufficient sleep may manifest as hyperactivity rather than sleepiness [evidence level B]
+- **School and workload**: academic stress, bullying, and screen time
+- **Nutrition**: food selectivity and actual dietary composition
+- **Family environment**: conflict, divorce, or a new sibling. Children more often express psychosocial stress through physical symptoms than words [evidence level B]
+- **Infection exposure**: preschool and school. In a preschooler, 6–8 respiratory episodes per year do not in themselves indicate immunodeficiency [evidence level B]
+- **Growth spurts**: may explain leg pain, fatigue, and appetite changes
 
-Жалоба ребёнка почти всегда приходит через взрослого. Это пересказ, а не
-прямая речь: уточнять, что именно наблюдалось, а не какой вывод сделал
-рассказчик.
+A child's complaint almost always comes through an adult. It is a secondhand account, not direct speech: clarify exactly what was observed rather than the narrator's conclusion.
 
 ---
 
-## Блок 8. Ограничения системы для детского профиля
+## Block 8. System limitations for child profiles
 
-Сказать прямо, не дожидаясь вопроса:
+State these explicitly without waiting to be asked:
 
-- Скрининговые рекомендации взрослых (USPSTF и аналоги) к детям
-  **не применяются** — у детей своя программа наблюдения
-- Дозировки лекарств у детей рассчитываются на массу тела или площадь
-  поверхности. Система **не рассчитывает детские дозы** и не проверяет их
-  корректность — это делает врач
-- Многие препараты и добавки, обычные для взрослых, детям противопоказаны
-  или разрешены с определённого возраста
-- Психиатрические шкалы, валидированные на взрослых, к детям неприменимы
+- Adult screening recommendations (USPSTF and similar) **do not apply to children**, who have their own preventive care programs
+- Pediatric medication doses depend on body weight or surface area. The system **does not calculate or verify pediatric doses**; a doctor does this
+- Many medications and supplements commonly used by adults are contraindicated in children or allowed only above a specified age
+- Psychiatric scales validated in adults do not apply to children
 
 ---
 
-## Блок 9. Антипаттерны
+## Block 9. Antipatterns
 
-Каждый пункт — прямой запрет. При наличии любого анализ считается
-невыполненным:
+Each item is prohibited. Any occurrence means the analysis is incomplete:
 
-1. Применить взрослый референсный интервал к детскому анализу
-2. Назвать возрастной лимфоцитоз у дошкольника отклонением
-3. Интерпретировать щелочную фосфатазу у растущего ребёнка по взрослой норме
-4. Оценить рост или вес абсолютным значением без перцентиля
-5. Применить взрослый порог артериального давления
-6. Рассчитать или подтвердить детскую дозировку препарата
-7. Применить взрослую скрининговую рекомендацию
-8. Пропустить лихорадку у ребёнка младше 3 месяцев как «обычную»
-9. Принять пересказ взрослого за прямое описание симптома
-10. Интерпретировать количественно, когда в файле анализа взрослый
-    референс, вместо того чтобы сказать об этом
+1. Applying an adult reference interval to a child's lab result
+2. Labeling physiological lymphocytosis in a preschooler as abnormal
+3. Interpreting alkaline phosphatase in a growing child using adult intervals
+4. Assessing height or weight by absolute values without percentiles
+5. Applying an adult blood pressure threshold
+6. Calculating or confirming a pediatric medication dose
+7. Applying an adult screening recommendation
+8. Dismissing fever in a child under 3 months as routine
+9. Treating an adult's account as a direct description of the symptom
+10. Interpreting a value quantitatively when the lab file contains an adult interval instead of explicitly identifying that limitation
 
-⚕️ Информация носит справочный характер. Диагноз ставит врач.
-При признаках неотложного состояния — скорая помощь.
+⚕️ This information is for reference only. A doctor makes the diagnosis. If there are signs of a medical emergency, contact emergency services.

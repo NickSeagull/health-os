@@ -12,28 +12,28 @@ const ISSUE_META: Record<
   { label: string; hint: string; icon: typeof AlertTriangle }
 > = {
   "dead-link": {
-    label: "Битые ссылки",
-    hint: "Упомянуто, но своей страницы не имеет — например, препарат назван в протоколе визита и отсутствует в списке лекарств",
+    label: "Broken links",
+    hint: "Mentioned without its own page — for example, a medication named in a visit protocol but missing from the medication list",
     icon: Unlink,
   },
   orphan: {
-    label: "Сиротки",
-    hint: "На страницу никто не ссылается: анализ загружен и не интерпретирован, гипотеза без следующего шага",
+    label: "Orphans",
+    hint: "No page links here: a lab report was uploaded but not interpreted, or a hypothesis has no next step",
     icon: CircleOff,
   },
   stale: {
-    label: "Устаревшее",
-    hint: "Источник обновился позже страницы — вывод остался от прошлых данных",
+    label: "Stale",
+    hint: "The source was updated after the page, so the conclusion is based on old data",
     icon: Clock,
   },
   "broken-frontmatter": {
-    label: "Метаданные не разбираются",
-    hint: "Frontmatter страницы сломан — чаще всего незакавыченное двоеточие в значении. Заголовок, статус и источники теряются, и страница выглядит так, будто их просто нет",
+    label: "Unreadable metadata",
+    hint: "The page frontmatter is malformed — usually an unquoted colon in a value. The title, status, and sources are lost, making the page appear to have none",
     icon: FileWarning,
   },
   "no-source": {
-    label: "Без источника",
-    hint: "Утверждение не опирается ни на одну запись в Data/ — это дефект страницы, а не стиль",
+    label: "No source",
+    hint: "The claim is not supported by any record in Data/ — this is a page defect, not a stylistic choice",
     icon: AlertTriangle,
   },
 };
@@ -47,10 +47,10 @@ export default async function WikiPage() {
       <div className="p-6">
         <Card>
           <CardHeader>
-            <CardTitle>Граф связей</CardTitle>
+            <CardTitle>Relationship graph</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            {e instanceof Error ? e.message : "Не удалось прочитать wiki"}
+            {e instanceof Error ? e.message : "Could not read the wiki"}
           </CardContent>
         </Card>
       </div>
@@ -68,11 +68,11 @@ export default async function WikiPage() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Граф связей</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Relationship graph</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Состояния, гипотезы, симптомы, врачи и источники — и связи между ними.
-          Значения показателей остаются в записях: страница ссылается на запись,
-          а не копирует её.
+          Conditions, hypotheses, symptoms, doctors, and sources — and the links between them.
+          Marker values stay in their records: a page links to a record
+          instead of copying it.
         </p>
       </div>
 
@@ -80,13 +80,13 @@ export default async function WikiPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-semibold">{pages.length}</div>
-            <div className="text-xs text-muted-foreground">страниц</div>
+            <div className="text-xs text-muted-foreground">pages</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-semibold">{edges.length}</div>
-            <div className="text-xs text-muted-foreground">связей</div>
+            <div className="text-xs text-muted-foreground">links</div>
           </CardContent>
         </Card>
         <Card>
@@ -94,7 +94,7 @@ export default async function WikiPage() {
             <div className="text-2xl font-semibold">
               {Object.keys(counts).length}
             </div>
-            <div className="text-xs text-muted-foreground">типов сущностей</div>
+            <div className="text-xs text-muted-foreground">entity types</div>
           </CardContent>
         </Card>
         <Card>
@@ -106,7 +106,7 @@ export default async function WikiPage() {
             >
               {issues.length}
             </div>
-            <div className="text-xs text-muted-foreground">требует внимания</div>
+            <div className="text-xs text-muted-foreground">need attention</div>
           </CardContent>
         </Card>
       </div>
@@ -116,10 +116,10 @@ export default async function WikiPage() {
       {issues.length > 0 && (
         <div className="space-y-4">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Здоровье wiki</h2>
+            <h2 className="text-lg font-semibold tracking-tight">Health wiki</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Рабочий список, а не украшение. Разобрать —{" "}
-              <code className="font-mono text-xs">/wiki lint</code> в Claude Code.
+              A working list, not decoration. Review it with{" "}
+              <code className="font-mono text-xs">/wiki lint</code> in Claude Code.
             </p>
           </div>
           {[...grouped.entries()].map(([kind, list]) => {
@@ -147,7 +147,7 @@ export default async function WikiPage() {
                     ))}
                     {list.length > 12 && (
                       <li className="text-xs text-muted-foreground">
-                        …и ещё {list.length - 12}
+                        …and {list.length - 12} more
                       </li>
                     )}
                   </ul>
@@ -161,7 +161,7 @@ export default async function WikiPage() {
       {pages.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Состав</CardTitle>
+            <CardTitle className="text-base">Contents</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">

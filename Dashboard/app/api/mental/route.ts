@@ -24,23 +24,23 @@ export async function POST(request: Request) {
     v.requireNumber(body?.stress, "stress", "score_1_10");
     v.requireNumber(body?.sleep_quality, "sleep_quality", "score_1_10");
     if (body?.notes !== undefined && typeof body.notes !== "string") {
-      v.add("notes: строка");
+      v.add("notes: string");
     }
     v.optionalArray(body?.tags, "tags");
 
-    // Ключ записи — ts, а не дата: за сутки допустимо несколько check-in (Блок 12)
+    // The record key is ts rather than date: multiple check-ins are allowed per day (Block 12).
     if (body?.ts !== undefined && !isIsoTimestamp(body.ts)) {
-      v.add("ts: отметка времени ISO 8601 с зоной, например 2026-07-31T12:00:00+03:00");
+      v.add("ts: ISO 8601 timestamp with time zone, e.g. 2026-07-31T12:00:00+03:00");
     }
     if (isIsoTimestamp(body?.ts) && isFutureDate(body.ts.slice(0, 10))) {
-      v.add(`ts: отметка из будущего (${body.ts})`);
+      v.add(`ts: timestamp is in the future (${body.ts})`);
     }
 
     const invalid = v.response();
     if (invalid) return invalid;
 
     const entry: MoodEntry = {
-      // Браузер отдаёт UTC («…Z»), схема требует +03:00. Момент времени тот же
+      // Browsers send UTC ("…Z"), while the schema requires +03:00. The instant is unchanged.
       ts: toMoscowTimestamp(body.ts ?? new Date().toISOString()),
       mood: body.mood,
       energy: body.energy,
@@ -52,9 +52,9 @@ export async function POST(request: Request) {
 
     await appendMoodEntry(entry);
 
-    // Красные флаги из Блока 4 critical-values.md. Дашборд пишет в журнал в обход
-    // /mental, поэтому проверку нужно повторить здесь — иначе запись «не хочу
-    // просыпаться» уходит на диск, и система на неё никак не отвечает
+    // Red flags from Block 4 of critical-values.md. The dashboard writes to the journal
+    // without going through /mental, so repeat the check here; otherwise an entry such as
+    // "I don't want to wake up" would be written to disk without any system response.
     const history = await readMoodJournal();
     const crisis = isMoodCrisis(entry, history);
 

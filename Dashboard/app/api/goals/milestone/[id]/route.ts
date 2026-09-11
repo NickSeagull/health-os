@@ -16,7 +16,7 @@ export async function PUT(
     v.optionalDate(updates?.completed_date, "completed_date");
     v.optionalNumber(updates?.cost_actual_rub, "cost_actual_rub", "cost_rub");
     if (updates?.notes !== undefined && typeof updates.notes !== "string") {
-      v.add("notes: строка");
+      v.add("notes: string");
     }
     const invalid = v.response();
     if (invalid) return invalid;
@@ -48,9 +48,9 @@ export async function PUT(
         milestone.completed_date = today;
       }
 
-      // last_activity двигаем только при смене статуса. Раньше её переставляла
-      // любая правка, включая заметку: направление выглядело свежим, хотя по нему
-      // ничего не происходило, и /traction считал активность по этой дате
+      // Move last_activity only when the status changes. Previously every edit,
+      // including a note, made the direction look fresh even when nothing happened,
+      // and /traction counted activity from that date.
       if (statusChanged) dir.last_activity = today;
 
       found = true;
@@ -61,8 +61,8 @@ export async function PUT(
       return NextResponse.json({ error: "Milestone not found" }, { status: 404 });
     }
 
-    // Пересчёт факта целиком: и по направлениям, и в cost_summary, и по фазам.
-    // Прежде by_phase[*].actual не обновлялся и расходился с итогом
+    // Recalculate actuals everywhere: by direction, in cost_summary, and by phase.
+    // Previously by_phase[*].actual was not updated and diverged from the total.
     await writeGoals(recalcActuals(goals));
     return NextResponse.json({ success: true });
   } catch (e) {

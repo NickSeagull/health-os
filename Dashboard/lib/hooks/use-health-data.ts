@@ -5,9 +5,9 @@ import useSWR, { type SWRConfiguration } from "swr";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 /**
- * `endpoint` = null либо пустая строка — запрос не отправляется.
- * Без этого пустой эндпоинт превращался в `/api/` и давал 404 на каждой
- * загрузке страницы анализов, пока маркер ещё не выбран.
+ * When `endpoint` is null or an empty string, do not send a request.
+ * Without this guard, an empty endpoint becomes `/api/` and returns a 404 on
+ * every lab-results page load until a marker is selected.
  */
 export function useHealthData<T>(
   endpoint: string | null,

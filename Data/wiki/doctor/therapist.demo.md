@@ -1,6 +1,6 @@
 ---
 type: doctor
-title: Терапевт
+title: Primary Care Physician
 slug: therapist
 status: active
 created: 2026-06-25
@@ -10,5 +10,5 @@ sources:
   - doctors/contacts.json
 ---
 
-Наблюдение по общему состоянию. На приёме разбиралась жалоба
-[[symptom/low-energy]], назначен контроль показателей через полгода.
+General health follow-up. The appointment addressed
+[[symptom/low-energy]], with follow-up testing planned in six months.

@@ -23,33 +23,33 @@ export function BasicInfoCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Основные данные</CardTitle>
+        <CardTitle>Basic information</CardTitle>
         <CardDescription>PHR — Personal Health Record</CardDescription>
       </CardHeader>
       <CardContent>
         <dl className="grid gap-2 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-muted-foreground">Имя</dt>
+            <dt className="text-muted-foreground">Name</dt>
             <dd className="font-medium">{b.full_name}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Дата рождения</dt>
-            <dd className="font-medium">{formatDate(b.date_of_birth)} ({calcAge(b.date_of_birth)} лет)</dd>
+            <dt className="text-muted-foreground">Date of birth</dt>
+            <dd className="font-medium">{formatDate(b.date_of_birth)} ({calcAge(b.date_of_birth)} years)</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Группа крови</dt>
+            <dt className="text-muted-foreground">Blood type</dt>
             <dd className="font-medium">{b.blood_type}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Рост</dt>
-            <dd className="font-medium">{b.height_cm} см</dd>
+            <dt className="text-muted-foreground">Height</dt>
+            <dd className="font-medium">{b.height_cm} cm</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Место рождения</dt>
+            <dt className="text-muted-foreground">Place of birth</dt>
             <dd className="font-medium">{b.birth_place}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Экстренный контакт</dt>
+            <dt className="text-muted-foreground">Emergency contact</dt>
             <dd className="font-medium">{b.emergency_contact.name} ({b.emergency_contact.relation})</dd>
           </div>
         </dl>

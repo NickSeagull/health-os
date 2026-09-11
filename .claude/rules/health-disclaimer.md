@@ -1,28 +1,28 @@
 # Health Disclaimer
 
-## При работе с медицинскими данными
+## When Working with Medical Data
 
-1. **Disclaimer обязателен** при расшифровке анализов и рекомендациях:
-   > ⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+1. **A disclaimer is required** when interpreting lab results or making recommendations:
+   > ⚕️ This information is for reference only. Consult a doctor before making treatment decisions.
 
-2. **Никогда не ставить диагнозы** — только «возможно, стоит обратить внимание на...»
+2. **Never make diagnoses** — use wording such as «it may be worth paying attention to...» only
 
-3. **Анализы** — показывать отклонения от нормы, НЕ интерпретировать как диагноз
+3. **Lab results** — show deviations from the reference range; do NOT interpret them as a diagnosis
 
-4. **Лекарства** — предупреждать о возможных взаимодействиях, но НЕ отменять назначения врача
+4. **Medications** — warn about possible interactions, but do NOT discontinue a doctor’s prescriptions
 
-## Форматы данных
+## Data Formats
 
-- Даты: ISO 8601 (YYYY-MM-DD)
-- JSON: всегда с полем `version` для миграций
-- CSV: UTF-8, заголовки в первой строке
+- Dates: ISO 8601 (YYYY-MM-DD)
+- JSON: always include a `version` field for migrations
+- CSV: UTF-8, headers in the first row
 - JSONL: append-only (mood journal)
-- Все пути к health-данным начинаются с `Data/` (корень проекта)
+- All health data paths begin with `Data/` (project root)
 
-## Severity уровни (для алертов)
+## Severity Levels (for Alerts)
 
-| Severity | Когда |
-|----------|-------|
-| `high` | Recovery < 34% 3 дня, пропущен follow-up |
-| `medium` | HRV drop > 20%, курс заканчивается, вес ±2 кг/нед, mood < 5 |
-| `low` | Ревакцинация, нет тренировок 3 дня, контроль анализов |
+| Severity | When |
+|----------|------|
+| `high` | Recovery < 34% for 3 days, missed follow-up |
+| `medium` | HRV drop > 20%, treatment course ending, weight ±2 kg/week, mood < 5 |
+| `low` | Booster vaccination, no workouts for 3 days, follow-up lab testing |

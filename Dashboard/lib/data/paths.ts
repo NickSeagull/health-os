@@ -2,21 +2,21 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Корень всех данных. Внутри него лежат профили, общая wiki и справочники.
+ * Root of all data. It contains profiles, the shared wiki, and reference data.
  */
 export const DATA_BASE = path.join(process.cwd(), "..", "Data");
 export const PROFILES_BASE = path.join(DATA_BASE, "profiles");
 export const CACHE_ROOT = path.join(process.cwd(), "..", "Cache");
 
 /**
- * Каталог с кешем метрик WHOOP.
+ * Directory containing the WHOOP metrics cache.
  *
- * По умолчанию — `Cache/whoop` внутри проекта. Раньше здесь был жёстко
- * зашит путь во внешний каталог конкретной установки: у всех остальных
- * раздел WHOOP просто оставался пустым, без всякого сообщения об ошибке.
+ * By default this is `Cache/whoop` inside the project. Previously this used a
+ * hard-coded path to a particular installation's external directory, leaving
+ * the WHOOP section empty for every other installation without reporting an error.
  *
- * Переопределяется переменной окружения `HEALTH_OS_WHOOP_DIR`
- * в `Dashboard/.env.local`, если кеш лежит в другом месте.
+ * Override it with `HEALTH_OS_WHOOP_DIR` in `Dashboard/.env.local` when the
+ * cache is stored elsewhere.
  */
 export const WHOOP_ROOT =
   process.env.HEALTH_OS_WHOOP_DIR || path.join(CACHE_ROOT, "whoop");
@@ -34,7 +34,7 @@ export type ProfileInfo = {
   isActive: boolean;
 };
 
-/** Каталоги профилей на диске, отсортированные по идентификатору. */
+/** Profile directories on disk, sorted by identifier. */
 export function listProfileIds(): string[] {
   try {
     return fs
@@ -49,28 +49,28 @@ export function listProfileIds(): string[] {
 
 const POINTER = path.join(PROFILES_BASE, "_active.json");
 
-// Указатель читается на каждое обращение к пути, поэтому результат кешируется
-// и сбрасывается по времени изменения файла. Так переключение профиля из
-// дашборда или из Claude Code подхватывается сразу, без перезапуска сервера,
-// и при этом не стоит одного чтения диска на каждый вызов dataPath().
+// Read the pointer on every path lookup, caching the result and invalidating it
+// when the file changes. This makes profile switches from the dashboard or Claude
+// Code take effect immediately without restarting the server, without an extra
+// disk read for every dataPath() call.
 let cached: { mtimeMs: number; id: string } | null = null;
 
 /**
- * Активный профиль — единый для дашборда и Claude Code.
+ * The active profile is shared by the dashboard and Claude Code.
  *
- * Источник истины один: `Data/profiles/_active.json`. Если бы дашборд держал
- * профиль отдельно (например, в cookie), две половины системы могли бы
- * разойтись и показывать данные разных людей, не сообщая об этом.
+ * There is one source of truth: `Data/profiles/_active.json`. If the dashboard
+ * kept the profile separately (for example, in a cookie), the two parts of the
+ * system could diverge and show different people's data without reporting it.
  *
- * Указатель сломан — молча подставлять «какой-нибудь» профиль нельзя:
- * так на экран попадут чужие данные под чужим именем. Единственное
- * исключение — когда профиль ровно один и выбор однозначен.
+ * A broken pointer must not silently select an arbitrary profile: that could
+ * put someone else's data on screen under the wrong name. The only exception is
+ * when exactly one profile exists and the choice is unambiguous.
  */
 export function activeProfileId(): string {
   const ids = listProfileIds();
   if (ids.length === 0) {
     throw new ProfileError(
-      "Профилей нет. Запустите ./setup.sh в корне проекта."
+      "No profiles found. Run ./setup.sh from the project root."
     );
   }
 
@@ -87,26 +87,26 @@ export function activeProfileId(): string {
     }
     if (ids.length === 1) return ids[0];
     throw new ProfileError(
-      `Указатель активного профиля ведёт на «${id}», а такого профиля нет. ` +
-        `Доступны: ${ids.join(", ")}. Исправьте Data/profiles/_active.json.`
+      `The active profile pointer refers to "${id}", but that profile does not exist. ` +
+        `Available profiles: ${ids.join(", ")}. Fix Data/profiles/_active.json.`
     );
   } catch (e) {
     if (e instanceof ProfileError) throw e;
     if (ids.length === 1) return ids[0];
     throw new ProfileError(
-      "Не удалось прочитать Data/profiles/_active.json, а профилей несколько. " +
-        `Доступны: ${ids.join(", ")}.`
+      "Could not read Data/profiles/_active.json and multiple profiles exist. " +
+        `Available profiles: ${ids.join(", ")}.`
     );
   }
 }
 
-/** Карточки всех профилей — для переключателя. */
+/** Cards for all profiles, used by the profile switcher. */
 export function listProfiles(): ProfileInfo[] {
   let active = "";
   try {
     active = activeProfileId();
   } catch {
-    /* переключатель должен работать и при сломанном указателе */
+    /* The switcher must work even when the pointer is broken. */
   }
   return listProfileIds().map((id) => {
     let basic: Record<string, unknown> = {};
@@ -116,7 +116,7 @@ export function listProfiles(): ProfileInfo[] {
       );
       basic = (raw?.basic ?? {}) as Record<string, unknown>;
     } catch {
-      /* профиль без разбираемого profile.json всё равно показываем */
+      /* Show a profile even when its profile.json cannot be parsed. */
     }
     return {
       id,
@@ -129,16 +129,16 @@ export function listProfiles(): ProfileInfo[] {
   });
 }
 
-/** Записать активный профиль. Идентификатор проверяется до записи. */
+/** Write the active profile. Validate the identifier before writing. */
 export function setActiveProfile(id: string): void {
-  if (!PROFILE_ID.test(id)) throw new ProfileError("Недопустимый идентификатор профиля");
-  if (!listProfileIds().includes(id)) throw new ProfileError(`Профиля «${id}» нет`);
+  if (!PROFILE_ID.test(id)) throw new ProfileError("Invalid profile identifier");
+  if (!listProfileIds().includes(id)) throw new ProfileError(`Profile "${id}" does not exist`);
 
   let prev: { history?: unknown[] } = {};
   try {
     prev = JSON.parse(fs.readFileSync(POINTER, "utf-8"));
   } catch {
-    /* указателя ещё нет — создаём с нуля */
+    /* The pointer does not exist yet; create it from scratch. */
   }
   const now = new Date().toISOString().slice(0, 19);
   const history = Array.isArray(prev.history) ? prev.history : [];
@@ -156,25 +156,25 @@ export function setActiveProfile(id: string): void {
   cached = null;
 }
 
-/** Корень данных активного профиля. */
+/** Data root for the active profile. */
 export function dataRoot(): string {
   return path.join(PROFILES_BASE, activeProfileId());
 }
 
 /**
- * Путь внутри активного профиля.
+ * Path inside the active profile.
  *
- * Вызывать **внутри функций**, а не в константах уровня модуля: константа
- * вычисляется один раз при импорте и после переключения профиля продолжила бы
- * указывать на каталог предыдущего человека.
+ * Call this **inside functions**, not in module-level constants: a constant is
+ * evaluated once at import time and would continue pointing to the previous
+ * person's directory after a profile switch.
  */
 export function dataPath(...segments: string[]) {
   return path.join(dataRoot(), ...segments);
 }
 
 /**
- * Путь к общесистемным данным — тем, что одинаковы для всех профилей:
- * справочник маркеров, карты специальностей, общая wiki с литературой.
+ * Path to system-wide data shared by all profiles: the marker reference,
+ * specialty maps, and the shared literature wiki.
  */
 export function sharedDataPath(...segments: string[]) {
   return path.join(DATA_BASE, ...segments);

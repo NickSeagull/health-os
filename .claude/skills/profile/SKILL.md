@@ -1,60 +1,60 @@
 ---
 name: profile
 description: |
-  PHR — базовая медкарта. Просмотр, создание, обновление профиля здоровья.
-  Триггеры: «медкарта», «health profile», «аллергии», «группа крови»
+  PHR — basic medical record. View, create, and update a health profile.
+  Triggers: «medical record», «health profile», «allergies», «blood type»
 ---
 
-# Health Profile — медкарта
+# Health Profile — medical record
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the short path literally.
+> Before writing, state whose profile the write targets.
 
-## Назначение
+## Purpose
 
-Управление базовым медицинским профилем (PHR). Просмотр, создание и обновление данных.
+Manage the basic personal health record (PHR). View, create, and update data.
 
 ## Workflow
 
-### Просмотр
+### View
 
-1. Прочитать `Data/profile.json`
-2. Показать в читаемом формате:
-   - Базовые данные (ФИО, дата рождения, группа крови, рост)
-   - Аллергии (таблица: аллерген, тип, тяжесть)
-   - Хронические заболевания (таблица: заболевание, с какого года, статус, врач)
-   - Семейный анамнез
-   - Текущие жалобы (таблица: область, описание, статус)
+1. Read `Data/profile.json`
+2. Show in a readable format:
+   - Basic information (full name, date of birth, blood type, height)
+   - Allergies (table: allergen, type, severity)
+   - Chronic conditions (table: condition, year of onset, status, doctor)
+   - Family history
+   - Current complaints (table: area, description, status)
 
-### Обновление
+### Update
 
-При запросе обновления:
-1. Спросить что обновить
-2. Прочитать текущий `Data/profile.json`
-3. Обновить нужные поля
-4. Сохранить через Write tool
+When an update is requested:
+1. Ask what to update
+2. Read the current `Data/profile.json`
+3. Update the relevant fields
+4. Save using the Write tool
 
-### Добавление аллергии
+### Add an allergy
 
-Формат:
+Format:
 ```json
 {
-  "allergen": "название",
-  "type": "пищевая|медикаментозная|контактная|респираторная",
-  "severity": "лёгкая|средняя|тяжёлая",
+  "allergen": "name",
+  "type": "food|drug|contact|respiratory",
+  "severity": "mild|moderate|severe",
   "since": "YYYY",
-  "reaction": "описание реакции"
+  "reaction": "description of the reaction"
 }
 ```
 
-### Добавление хронического заболевания
+### Add a chronic condition
 
-Формат:
+Format:
 ```json
 {
-  "condition": "название",
+  "condition": "name",
   "icd10": null,
   "since": "YYYY",
   "status": "active|remission|resolved",
@@ -63,10 +63,10 @@ description: |
 }
 ```
 
-## Правила
+## Rules
 
-- Не удалять записи — менять статус на `resolved`
-- Даты в ISO 8601
-- **Медданные не покидают каталог проекта** — запись PHI куда-либо вовне запрещена. Наружу, если это вообще нужно, идут только агрегаты: количества, статусы, метрики. Никаких названий препаратов, диагнозов, аллергенов, ФИО и дат рождения
+- Do not delete records — change the status to `resolved`
+- Dates in ISO 8601
+- **Medical data must not leave the project directory** — writing PHI anywhere outside it is prohibited. If anything needs to go outside at all, send only aggregates: counts, statuses, metrics. No medication names, diagnoses, allergens, full names, or dates of birth
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a doctor for treatment decisions.*

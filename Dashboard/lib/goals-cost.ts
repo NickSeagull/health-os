@@ -1,10 +1,10 @@
 import type { GoalsFile } from "@/lib/types/goal";
 
 /**
- * Пересчёт сметы и факта по целям — Блок 10 и Блок 13 `data-schemas.md`.
- * Общий модуль для роутов и для карточки бюджета: раньше роут считал факт по-своему,
- * а `cost-waterfall` рисовал столбцы по `directions[]`, подписывая их числом
- * из `cost_summary` — сумма по столбцам расходится с заголовком.
+ * Recalculate estimates and actuals for goals — Blocks 10 and 13 of `data-schemas.md`.
+ * Shared by routes and the budget card: previously the route calculated actuals one way,
+ * while `cost-waterfall` drew bars from `directions[]` and labeled them with a number
+ * from `cost_summary`, so the bar total differed from the header.
  */
 
 export const MILESTONE_STATUSES = [
@@ -26,7 +26,7 @@ export const DIRECTION_STATUSES = [
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
-/** Факт по направлению — сумма `cost_actual_rub` его milestones */
+/** Actual cost for a direction: the sum of its milestones' `cost_actual_rub`. */
 export function directionActual(
   milestones: { cost_actual_rub?: number | null }[]
 ): number {
@@ -34,12 +34,12 @@ export function directionActual(
 }
 
 /**
- * Пересчитывает `cost_summary.total_actual_rub` и `by_phase[*].actual`.
+ * Recalculate `cost_summary.total_actual_rub` and `by_phase[*].actual`.
  *
- * Прежний роут обновлял только `total_actual_rub`, оставляя `by_phase` в прежнем
- * состоянии: разбивка по фазам расходилась с итогом после первой же оплаты.
- * Смета (`estimate`) намеренно не трогается — расхождение показывает UI, чинить
- * его должен человек, а не роут задним числом (см. `estimateMismatch`).
+ * The previous route updated only `total_actual_rub`, leaving `by_phase` unchanged,
+ * so the phase breakdown diverged from the total after the first payment.
+ * Deliberately leave the estimate (`estimate`) untouched: the UI shows discrepancies,
+ * and a person, rather than a retrospective route, must fix them (see `estimateMismatch`).
  */
 export function recalcActuals(goals: GoalsFile): GoalsFile {
   for (const dir of goals.directions) {
@@ -68,11 +68,11 @@ export interface EstimateMismatch {
 }
 
 /**
- * Сравнивает объявленную смету с суммой по направлениям.
+ * Compare the declared estimate with the sum across directions.
  *
- * Расхождения возможны сразу в трёх местах: общий итог,
- * phase_1 23 000 против 43 000, phase_3 33 000 против 28 000. Показывать нужно
- * само расхождение — молчаливый выбор одного из чисел скрывает ошибку в данных.
+ * Discrepancies can occur in three places at once: the overall total,
+ * phase_1 23,000 versus 43,000, and phase_3 33,000 versus 28,000. Show the
+ * discrepancy itself; silently choosing one number hides a data error.
  */
 export function estimateMismatch(goals: GoalsFile): EstimateMismatch[] {
   const out: EstimateMismatch[] = [];
@@ -80,7 +80,7 @@ export function estimateMismatch(goals: GoalsFile): EstimateMismatch[] {
   const computedTotal = sum(goals.directions.map((d) => d.cost_estimate_rub ?? 0));
   if (goals.cost_summary?.total_estimate_rub !== computedTotal) {
     out.push({
-      scope: "Итого",
+      scope: "Total",
       declared: goals.cost_summary?.total_estimate_rub ?? 0,
       computed: computedTotal,
     });

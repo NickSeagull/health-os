@@ -1,9 +1,9 @@
 import type { Tooth, ToothMap, ToothStatus } from "@/lib/types/dental";
 
 /**
- * Пересчёт `summary` карты зубов и разбор номеров по ISO 3950 (FDI).
- * Модуль без серверных зависимостей — карту рисует клиентский компонент,
- * а роут пишет по тем же правилам, чтобы два источника записи не разошлись.
+ * Recompute the dental chart `summary` and parse tooth numbers under ISO 3950 (FDI).
+ * This module has no server dependencies: a client component renders the chart,
+ * while the route writes by the same rules so the two write sources cannot diverge.
  */
 
 export const TOOTH_STATUSES = [
@@ -16,10 +16,10 @@ export const TOOTH_STATUSES = [
   "root_canal",
 ] as const satisfies readonly ToothStatus[];
 
-/** Полный зубной ряд взрослого — константа, а не производная от данных */
+/** The complete adult dentition is a constant, not a data-derived value. */
 export const TOTAL_TEETH = 32;
 
-/** Все допустимые позиции: квадранты 1–4, зубы 1–8 в каждом */
+/** All valid positions: quadrants 1–4, with teeth 1–8 in each. */
 export const FDI_NUMBERS: string[] = [1, 2, 3, 4].flatMap((quadrant) =>
   [1, 2, 3, 4, 5, 6, 7, 8].map((tooth) => `${quadrant}${tooth}`)
 );
@@ -29,13 +29,13 @@ export function isFdiToothNumber(value: string): boolean {
 }
 
 /**
- * `teeth` разрежен: ключи есть только у зубов с известным статусом.
+ * `teeth` is sparse: keys exist only for teeth with a known status.
  *
- * Отсюда два правила Блока 6 `data-schemas.md`, которые прежний роут нарушал:
- * `total` — это всегда 32, а не число записей (иначе правка одного зуба
- * переписывала заголовок карты с «32 зубов» на «3 зубов»), а статусные счётчики
- * считаются только по присутствующим записям. Отсутствие ключа — «статус
- * неизвестен», и такой зуб не попадает ни в один счётчик.
+ * This follows two rules from Block 6 of `data-schemas.md` that the old route violated:
+ * `total` is always 32, not the number of records (otherwise editing one tooth
+ * would rewrite the chart header from "32 teeth" to "3 teeth"), and status counts
+ * include only present records. A missing key means "status unknown", so that
+ * tooth is excluded from every count.
  */
 export function recountToothSummary(teeth: Record<string, Tooth>): ToothMap["summary"] {
   const summary: ToothMap["summary"] = {
@@ -50,7 +50,7 @@ export function recountToothSummary(teeth: Record<string, Tooth>): ToothMap["sum
   };
 
   for (const tooth of Object.values(teeth ?? {})) {
-    // Проверка нужна на случай статуса с диска, которого нет в enum
+    // Needed for a status read from disk that is not in the enum.
     const status = tooth?.status;
     if (status && TOOTH_STATUSES.includes(status)) {
       summary[status] += 1;
@@ -60,7 +60,7 @@ export function recountToothSummary(teeth: Record<string, Tooth>): ToothMap["sum
   return summary;
 }
 
-/** Сколько зубов остались без записи — разница между рядом и известными статусами */
+/** Number of teeth without a record: the dentition size minus known statuses. */
 export function unknownToothCount(teeth: Record<string, Tooth>): number {
   return TOTAL_TEETH - Object.keys(teeth ?? {}).length;
 }

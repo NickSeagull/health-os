@@ -7,18 +7,21 @@ export interface MedsFile {
 }
 
 /**
- * Общий enum статуса — Блок 11 `data-schemas.md`.
- * В типах дашборда стояли `inactive`, `completed` и `suspended`, которых нет
- * ни в схеме, ни в данных; завершённые курсы уезжают в `medications/history.json`.
+ * Shared status enum — Block 11 of `data-schemas.md`.
+ * Dashboard types previously included `inactive`, `completed`, and `suspended`,
+ * none of which exists in the schema or data; completed courses go to
+ * `medications/history.json`.
  */
 export type MedStatus = "active" | "as_needed" | "paused" | "finished";
+export const MED_TIMINGS = ["morning", "day", "evening", "night"] as const;
+export type MedTiming = (typeof MED_TIMINGS)[number];
 
 export interface Medication {
   id: string;
   name: string;
   dosage: string;
   frequency: string;
-  timing: string[];
+  timing: MedTiming[];
   with_food: boolean;
   reason: string;
   doctor_id?: string;
@@ -35,7 +38,7 @@ export interface Supplement {
   brand?: string;
   dosage: string;
   frequency: string;
-  timing: string[];
+  timing: MedTiming[];
   reason: string;
   started: string;
   status: MedStatus;

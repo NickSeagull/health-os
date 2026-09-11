@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
 import type { MarkerTrendPoint } from "@/lib/types/lab";
 
 const KEY_MARKERS = [
-  "Гемоглобин", "Лейкоциты", "Тромбоциты", "СОЭ",
-  "Глюкоза", "Креатинин", "АЛТ", "АСТ",
-  "Холестерин общий", "ЛПНП", "ЛПВП", "Триглицериды",
-  "ТТГ", "Т4 свободный", "Тестостерон общий", "Кортизол",
-  "Витамин D", "Витамин B12", "Ферритин", "Железо",
+  "Hemoglobin", "White blood cells", "Platelets", "ESR",
+  "Glucose", "Creatinine", "ALT", "AST",
+  "Total cholesterol", "LDL", "HDL", "Triglycerides",
+  "TSH", "Free T4", "Total testosterone", "Cortisol",
+  "Vitamin D", "Vitamin B12", "Ferritin", "Iron",
 ];
 
 interface MarkerLatest {
@@ -64,9 +64,9 @@ export function MarkerStatusGrid() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ключевые маркеры</CardTitle>
+        <CardTitle>Key markers</CardTitle>
         <CardDescription>
-          Последние значения {markers.length} маркеров
+          Latest values for {markers.length} markers
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -77,7 +77,7 @@ export function MarkerStatusGrid() {
             ))}
           </div>
         ) : markers.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Нет данных</p>
+          <p className="text-sm text-muted-foreground">No data</p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {markers.map((m) => (

@@ -25,7 +25,7 @@ export function VisitsBySpecialty() {
 
   const counts: Record<string, number> = {};
   index?.visits?.forEach((v) => {
-    const s = v.specialty || "Другое";
+    const s = v.specialty || "Other";
     counts[s] = (counts[s] || 0) + 1;
   });
 
@@ -36,15 +36,15 @@ export function VisitsBySpecialty() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Визиты по специальностям</CardTitle>
-        <CardDescription>{index?.total ?? 0} визитов</CardDescription>
+        <CardTitle>Visits by specialty</CardTitle>
+        <CardDescription>{index?.total ?? 0} visits</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="h-[300px]">
@@ -65,7 +65,7 @@ export function VisitsBySpecialty() {
                     return (
                       <div className="rounded-lg border bg-popover p-2 text-sm shadow-md">
                         <p className="font-medium">{d.name}</p>
-                        <p>{d.count} визитов</p>
+                        <p>{d.count} visits</p>
                       </div>
                     );
                   }}

@@ -4,15 +4,15 @@ import { parse } from "csv-parse/sync";
 import matter from "gray-matter";
 
 /**
- * Резолвит filename внутри baseDir и гарантирует, что результат не выходит за его пределы.
+ * Resolve filename inside baseDir and ensure the result stays within it.
  *
- * Защита от path traversal. path.join сам по себе НЕ защищает: он схлопывает `..`,
- * но спокойно выпускает наружу — `path.join(base, "../../x")` вернёт путь вне base.
- * Через это читались произвольные файлы, включая конфиги с API-ключами, и записывались
- * файлы за пределы проекта.
+ * Protect against path traversal. path.join alone does NOT protect against it:
+ * it collapses `..` but still allows escape, so `path.join(base, "../../x")`
+ * returns a path outside base. This previously allowed arbitrary files to be read,
+ * including API-key configuration, and files outside the project to be written.
  *
- * @param allowedExtensions если задан, путь обязан оканчиваться на одно из расширений
- * @throws если filename пытается выйти за baseDir, содержит нулевой байт или запрещённое расширение
+ * @param allowedExtensions when provided, the path must end with one of these extensions
+ * @throws when filename escapes baseDir, contains a null byte, or uses a forbidden extension
  */
 export function resolveWithin(
   baseDir: string,
@@ -23,7 +23,7 @@ export function resolveWithin(
     throw new Error("invalid filename");
   }
 
-  // Декодируем, иначе %2F..%2F обходит проверку
+  // Decode first; otherwise %2F..%2F could bypass the check.
   let decoded: string;
   try {
     decoded = decodeURIComponent(filename);
@@ -38,7 +38,8 @@ export function resolveWithin(
   const base = path.resolve(baseDir);
   const target = path.resolve(base, decoded);
 
-  // Разделитель в конце обязателен: иначе /Data/labs-secret пройдёт проверку на /Data/labs
+  // The trailing separator is required; otherwise /Data/labs-secret would pass
+  // the check for /Data/labs.
   if (target !== base && !target.startsWith(base + path.sep)) {
     throw new Error("path escapes base directory");
   }

@@ -66,8 +66,8 @@ export function UpcomingEvents() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ближайшие события</CardTitle>
-        <CardDescription>Milestones + задачи</CardDescription>
+        <CardTitle>Upcoming events</CardTitle>
+        <CardDescription>Milestones + tasks</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -77,7 +77,7 @@ export function UpcomingEvents() {
             ))}
           </div>
         ) : upcoming.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Нет ближайших событий</p>
+          <p className="text-sm text-muted-foreground">No upcoming events</p>
         ) : (
           <div className="space-y-2">
             {upcoming.map((item, i) => (

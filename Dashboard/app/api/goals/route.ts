@@ -28,8 +28,8 @@ export async function PUT(request: Request) {
     const v = new Validator();
     v.requireArray(body?.directions, "directions");
 
-    // Обходим только то, что действительно массив: `directions: "строка"` роняло
-    // роут пятисоткой на `.entries()` вместо отказа по валидации
+    // Iterate only over actual arrays: `directions: "string"` previously made
+    // `.entries()` throw a 500 instead of returning a validation error.
     const directions = Array.isArray(body?.directions) ? body.directions : [];
     for (const [i, dir] of directions.entries()) {
       v.requireString(dir?.area, `directions[${i}].area`);
@@ -46,7 +46,7 @@ export async function PUT(request: Request) {
         v.requireString(m?.id, `${at}.id`);
         v.requireString(m?.title, `${at}.title`);
         v.requireEnum(m?.status, `${at}.status`, MILESTONE_STATUSES);
-        // deadline и есть плановая дата — будущее для неё нормально
+        // deadline is the planned date, so a future value is valid.
         v.optionalDate(m?.deadline, `${at}.deadline`, true);
         v.optionalDate(m?.completed_date, `${at}.completed_date`);
         v.optionalNumber(m?.cost_estimate_rub, `${at}.cost_estimate_rub`, "cost_rub");
@@ -60,13 +60,13 @@ export async function PUT(request: Request) {
     const merged: GoalsFile = {
       ...existing,
       ...(body as GoalsFile),
-      // version у файла целей = 2, сбрасывать его нельзя
+      // The goals file version is 2; do not reset it.
       version: existing.version ?? 2,
       cost_summary: { ...existing.cost_summary, ...(body?.cost_summary ?? {}) },
     };
 
-    // Факт всегда производный от milestones — иначе итог и разбивка по фазам
-    // расходятся с суммой по направлениям
+    // Actuals always derive from milestones; otherwise the total and phase
+    // breakdown diverge from the sum across directions.
     await writeGoals(recalcActuals(merged));
     return NextResponse.json({ success: true });
   } catch (e) {

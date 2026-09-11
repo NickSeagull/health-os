@@ -27,12 +27,12 @@ export function AllergiesCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Аллергии</CardTitle>
-        <CardDescription>{profile.allergies.length} записей</CardDescription>
+        <CardTitle>Allergies</CardTitle>
+        <CardDescription>{profile.allergies.length} records</CardDescription>
       </CardHeader>
       <CardContent>
         {profile.allergies.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Аллергии не указаны</p>
+          <p className="text-sm text-muted-foreground">No allergies recorded</p>
         ) : (
           <div className="space-y-3">
             {profile.allergies.map((a, i) => (

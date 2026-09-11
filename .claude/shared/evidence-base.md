@@ -1,202 +1,202 @@
-# Доказательная база — реестр источников
+# Evidence base - register of sources
 
-> Обязательный документ для всех AI-специалистов Health-OS. Читается перед началом любого анализа вместе с `holistic-framework.md`.
-
----
-
-## Зачем этот документ
-
-Медицина — дисциплина, построенная на данных. Утверждение без источника и без указания силы доказательств в медицинском контексте не отличается от догадки, но выглядит как факт. Это опаснее, чем прямое «не знаю».
-
-Документ задаёт: откуда брать доказательства, как оценивать их силу, как оформлять ссылку и что категорически запрещено.
-
-**Приоритет — международные англоязычные источники.** Российские допустимы только в оговорённых случаях (Блок 6) и всегда с явной пометкой.
+> A mandatory document for all Health-OS AI specialists. Read before any analysis begins along with `holistic-framework.md`.
 
 ---
 
-## Блок 1. Иерархия источников
+## Why this document
 
-Ищи доказательство сверху вниз. Опустился на уровень ниже — обязан это отметить.
+Medicine is a data-driven discipline. A statement without a source and without specifying the strength of the evidence in a medical context is no different from a guess, but it appears as a fact. This is more dangerous than a straight “I don’t know.”
 
-| Уровень | Тип источника | Когда использовать |
+The document asks where to get evidence, how to evaluate its strength, how to formalize a link, and what is strictly prohibited.
+
+**Priority - international English-language sources.** Russian ones are acceptable only in specified cases (Block 6) and always with an explicit marking.
+
+---
+
+## Block 1. Hierarchy of sources
+
+Look for evidence from top to bottom. I have dropped to a lower level - I must note this.
+
+| Level | Source type | When to use |
 |---------|---------------|--------------------|
-| **1** | Систематические обзоры, мета-анализы, клинические руководства | Основной уровень для любой рекомендации |
-| **2** | Руководства профильных международных обществ | Когда нет систематического обзора по вопросу |
-| **3** | Отдельные РКИ, крупные когортные исследования | Когда руководства не покрывают вопрос |
-| **4** | Обсервационные исследования, серии случаев | Только для формулировки гипотезы, не для рекомендации |
-| **5** | Механистическое рассуждение, мнение эксперта, экстраполяция | Допустимо только с явной пометкой «уровень D» |
+| **1** | Systematic reviews, meta-analyses, clinical guidelines | Basic level for any recommendation |
+| **2** | Guides of specialized international societies | When there is no systematic review on the issue |
+| **3** | Selected RCTs, large cohort studies | When guidelines do not cover a question |
+| **4** | Observational studies, case series | For hypothesis formulation only, not for recommendation |
+| **5** | Mechanistic Reasoning, Expert Opinion, Extrapolation | Acceptable only if explicitly marked "Level D" |
 
 ---
 
-## Блок 2. Уровни доказательности
+## Block 2. Levels of evidence
 
-Каждое содержательное утверждение маркируется уровнем. Отсутствие маркировки означает, что утверждение не проверено.
+Each meaningful statement is marked with a level. No marking means the claim has not been verified.
 
-| Уровень | Что за ним стоит | Как формулировать |
+| Level | What's behind it | How to formulate |
 |---------|------------------|-------------------|
-| **A** | Систематические обзоры и мета-анализы РКИ, руководства класса I | «Доказано», «рекомендовано руководством» |
-| **B** | Отдельные РКИ, крупные проспективные когорты | «Показано в исследованиях» |
-| **C** | Обсервационные, случай-контроль, малые серии | «Есть данные, что», «ассоциировано с» |
-| **D** | Мнение экспертов, механистическое рассуждение, экстраполяция с другой популяции | «Предположительно», «механистически ожидаемо» |
-| **⚠️** | Собственная гипотеза без прямой доказательной базы | «Гипотеза без прямой доказательной базы» |
+| **A** | Systematic reviews and meta-analyses of RCTs, class I guidelines | “Proven”, “recommended by management” |
+| **B** | Selected RCTs, large prospective cohorts | "Demonstrated in studies" |
+| **C** | Observational, case-control, small series | “There is evidence that”, “associated with” |
+| **D** | Expert opinion, mechanistic reasoning, extrapolation from another population | “Presumably”, “mechanistically expected” |
+| **⚠️** | Own hypothesis without direct evidence base | “Hypothesis without direct evidence base” |
 
-**Правило понижения:** если данные получены на другой популяции (другой возраст, пол, сопутствующие заболевания), понизь уровень на одну ступень и укажи причину.
+**Downgrade rule:** if the data were obtained from a different population (different age, sex, comorbidities), lower the level by one step and indicate the reason.
 
 ---
 
-## Блок 3. Международные источники общего назначения
+## Block 3. International general purpose sources
 
-| Источник | Домен | Что там искать |
+| Source | Domain | What to look for there |
 |----------|-------|----------------|
-| **Cochrane Library** | cochranelibrary.com | Систематические обзоры — золотой стандарт |
-| **PubMed / MEDLINE** | pubmed.ncbi.nlm.nih.gov | Первичная литература, поиск по теме |
-| **Europe PMC** | europepmc.org | Открытый доступ к полным текстам |
-| **UpToDate** | uptodate.com | Клинические обзоры (платный, но авторитетный) |
-| **BMJ Best Practice** | bestpractice.bmj.com | Алгоритмы ведения |
-| **NICE Guidance** | nice.org.uk | Руководства Великобритании, включая пороги обследования |
-| **USPSTF** | uspreventiveservicestaskforce.org | Скрининг и профилактика, с явными уровнями рекомендаций |
-| **WHO Guidelines** | who.int/publications | Глобальные нормативы, физическая активность, питание |
-| **StatPearls (NCBI Bookshelf)** | ncbi.nlm.nih.gov/books | Бесплатные рецензируемые обзоры по нозологиям |
-| **ClinicalTrials.gov** | clinicaltrials.gov | Идущие исследования, статус доказательности |
-| **medRxiv** | medrxiv.org | Препринты — ⚠️ не прошли рецензирование, уровень не выше C |
+| **Cochrane Library** | cochranelibrary.com | Systematic reviews are the gold standard |
+| **PubMed/MEDLINE** | pubmed.ncbi.nlm.nih.gov | Primary literature, search by topic |
+| **Europe PMC** | europepmc.org | Open access to full texts |
+| **UpToDate** | uptodate.com | Clinical reviews (paid, but reputable) |
+| **BMJ Best Practice** | bestpractice.bmj.com | Clinical management algorithms |
+| **NICE Guidance** | nice.org.uk | UK guidelines including screening thresholds |
+| **USPSTF** | uspreventiveservicestaskforce.org | Screening and prevention, with explicit levels of recommendations |
+| **WHO Guidelines** | who.int/publications | Global guidelines, physical activity, nutrition |
+| **StatPearls (NCBI Bookshelf)** | ncbi.nlm.nih.gov/books | Free peer-reviewed nosology reviews |
+| **ClinicalTrials.gov** | clinicaltrials.gov | Ongoing studies, evidence status |
+| **medRxiv** | medrxiv.org | Preprints - ⚠️ not peer-reviewed, grade C or better |
 
 ---
 
-## Блок 4. Источники по специальностям
+## Block 4. Sources by specialty
 
-Каждый специалист обязан знать свои профильные руководства и опираться на них в первую очередь.
+Each specialist must know his or her specialized guidelines and rely on them first.
 
-| Специальность | Профильные источники |
+| Specialty | Specialty sources |
 |---------------|---------------------|
-| **Кардиология** | ACC/AHA Guidelines, ESC Guidelines (escardio.org), SCORE2 (риск), ESH (гипертензия) |
-| **Эндокринология** | Endocrine Society Clinical Practice Guidelines, American Thyroid Association (ATA), ADA Standards of Care (диабет), European Society of Endocrinology |
-| **Гематология** | American Society of Hematology (ASH), British Society for Haematology (BSH), NCCN Guidelines (онкогематология), WHO Classification of Haematolymphoid Tumours |
-| **Гастроэнтерология** | ACG, AGA, United European Gastroenterology (UEG), Rome IV Criteria (функциональные расстройства), Maastricht Consensus (H. pylori) |
-| **Неврология** | American Academy of Neurology (AAN), European Academy of Neurology (EAN), ICHD-3 (классификация головных болей, ihs-headache.org) |
-| **Урология** | American Urological Association (AUA), European Association of Urology (uroweb.org) |
-| **Дерматология** | American Academy of Dermatology (AAD), EADV, British Association of Dermatologists (BAD) |
-| **ЛОР** | AAO-HNS (entnet.org), American Academy of Sleep Medicine (AASM) — апноэ и UARS |
-| **Ортопедия** | AAOS (orthoinfo.aaos.org), Scoliosis Research Society (SRS), SOSORT (консервативное лечение сколиоза) |
-| **Психиатрия** | APA Practice Guidelines, DSM-5-TR, ICD-11, NICE Mental Health Guidelines |
-| **Стоматология** | American Dental Association (ADA), European Federation of Periodontology (EFP), FDI World Dental Federation |
-| **Офтальмология** | American Academy of Ophthalmology (AAO) Preferred Practice Patterns, IMI (миопия) |
-| **Health coach** | ACSM (спортивная медицина), WHO Physical Activity Guidelines, AASM (сон), EFSA / NIH ODS (нутриенты) |
+| **Cardiology** | ACC/AHA Guidelines, ESC Guidelines (escardio.org), SCORE2 (risk), ESH (hypertension) |
+| **Endocrinology** | Endocrine Society Clinical Practice Guidelines, American Thyroid Association (ATA), ADA Standards of Care (diabetes), European Society of Endocrinology |
+| **Hematology** | American Society of Hematology (ASH), British Society for Haematology (BSH), NCCN Guidelines (oncohematology), WHO Classification of Haematolymphoid Tumors |
+| **Gastroenterology** | ACG, AGA, United European Gastroenterology (UEG), Rome IV Criteria (functional disorders), Maastricht Consensus (H. pylori) |
+| **Neurology** | American Academy of Neurology (AAN), European Academy of Neurology (EAN), ICHD-3 (classification of headaches, ihs-headache.org) |
+| **Urology** | American Urological Association (AUA), European Association of Urology (uroweb.org) |
+| **Dermatology** | American Academy of Dermatology (AAD), EADV, British Association of Dermatologists (BAD) |
+| **ENT** | AAO-HNS (entnet.org), American Academy of Sleep Medicine (AASM) - Apnea and UARS |
+| **Orthopedics** | AAOS (orthoinfo.aaos.org), Scoliosis Research Society (SRS), SOSORT (Conservative Treatment of Scoliosis) |
+| **Psychiatry** | APA Practice Guidelines, DSM-5-TR, ICD-11, NICE Mental Health Guidelines |
+| **Dentistry** | American Dental Association (ADA), European Federation of Periodontology (EFP), FDI World Dental Federation |
+| **Ophthalmology** | American Academy of Ophthalmology (AAO) Preferred Practice Patterns, IMI (myopia) |
+| **Health coach** | ACSM (sports medicine), WHO Physical Activity Guidelines, AASM (sleep), EFSA/NIH ODS (nutrients) |
 
 ---
 
-## Блок 5. Референсные и справочные базы
+## Block 5. Reference and reference databases
 
-| База | Назначение |
+| Base | Destination |
 |------|-----------|
-| **LOINC** | loinc.org — унифицированные коды лабораторных тестов |
-| **Testing.com (ранее Lab Tests Online)** | Референсные интервалы и клиническое значение маркеров |
-| **NIH Office of Dietary Supplements** | ods.od.nih.gov — витамины, минералы, дозировки, взаимодействия |
-| **DrugBank / Drugs.com Interaction Checker** | Лекарственные взаимодействия |
-| **MedlinePlus** | medlineplus.gov — справочная информация |
-| **Orphanet** | orpha.net — редкие заболевания |
-| **OMIM** | omim.org — наследственные заболевания и гены |
+| **LOINC** | loinc.org - Uniform Laboratory Test Codes |
+| **Testing.com (formerly Lab Tests Online)** | Reference intervals and clinical significance of markers |
+| **NIH Office of Dietary Supplements** | ods.od.nih.gov - vitamins, minerals, dosages, interactions |
+| **DrugBank / Drugs.com Interaction Checker** | Drug interactions |
+| **MedlinePlus** | medlineplus.gov - Help |
+| **Orphanet** | orpha.net - rare diseases |
+| **OMIM** | omim.org - hereditary diseases and genes |
 
 ---
 
-## Блок 6. Российские источники — когда допустимы
+## Block 6. Russian sources - when acceptable
 
-Используются **только** в трёх случаях и всегда с пометкой «российский источник»:
+Used **only** in three cases and always marked “Russian source”:
 
-1. **Нормативно-организационные вопросы** — порядок направления, ОМС, льготы, маршрутизация пациента. Здесь российские документы единственно применимы.
-2. **Референсные интервалы конкретной лаборатории** — если анализ сдан в Гемотесте или Инвитро, нормы берутся из их методики, потому что они зависят от метода измерения.
-3. **Отсутствие международного эквивалента** по узкому вопросу.
+1. **Regulatory and organizational issues** - referral procedure, compulsory medical insurance, benefits, patient routing. Here Russian documents are the only ones applicable.
+2. **Reference intervals of a specific laboratory** - if the analysis was carried out in Hemotest or Invitro, the standards are taken from their methodology, because they depend on the measurement method.
+3. **Lack of international equivalent** on a narrow issue.
 
-| Источник | Назначение |
+| Source | Destination |
 |----------|-----------|
-| Рубрикатор клинических рекомендаций Минздрава РФ (cr.minzdrav.gov.ru) | Официальные российские клинические рекомендации |
-| Методички лабораторий (Гемотест, Инвитро, KDL) | Референсные интервалы под конкретный метод |
+| Rubricator of clinical recommendations of the Ministry of Health of the Russian Federation (cr.minzdrav.gov.ru) | Official Russian clinical guidelines |
+| Laboratory manuals (Hemotest, Invitro, KDL) | Reference intervals for a specific method |
 
-**Запрет:** не использовать российские источники для обоснования терапевтических гипотез, если существует международное руководство по теме. При расхождении российских и международных рекомендаций — указать оба и назвать расхождение явно.
-
----
-
-## Блок 7. Формат ссылки
-
-Ссылка ставится сразу после утверждения, в квадратных скобках.
-
-```
-[орган или база, тема, год или диапазон, уровень X]
-```
-
-Примеры корректного оформления:
-
-- `[ATA Guidelines, ведение АИТ при эутиреозе, уровень B]`
-- `[Cochrane, селен при аутоиммунном тиреоидите, уровень A — эффект на титр антител, но не на клинические исходы]`
-- `[ESC Guidelines, синусовая тахикардия, уровень A]`
-- `[механистическое рассуждение, уровень D]`
-- `[⚠️ гипотеза без прямой доказательной базы]`
-
-**Обязательные элементы:** орган или база, тема, уровень. Год — если знаешь точно.
+**Prohibition:** do not use Russian sources to substantiate therapeutic hypotheses if there is international guidance on the topic. If there is a discrepancy between Russian and international recommendations, indicate both and clearly name the discrepancy.
 
 ---
 
-## Блок 8. Запрет на фабрикацию ссылок
+## Block 7. Link format
 
-Это самое важное правило документа.
+The link is placed immediately after the statement, in square brackets.
 
-**Конкретика допустима только вместе с URL, страницу по которому ты открыл.**
+```
+[organ or base, topic, year or range, level X]
+```
 
-У тебя есть узкий канал в сеть — белый список доменов из
-`.claude/shared/source-verification.md`. Он существует ради одной задачи:
-подтвердить, что цитируемое руководство существует и утверждает именно то,
-что ты собираешься написать.
+Examples of correct formatting:
 
-Из этого следует развилка:
+- `[ATA Guidelines, management of euthyroid autoimmune thyroiditis, level B]`
+- `[Cochrane, selenium for autoimmune thyroiditis, level A — effect on antibody titer, but not on clinical outcomes]`
+- `[ESC Guidelines, sinus tachycardia, level A]`
+- `[mechanistic reasoning, level D]`
+- `[⚠️ hypothesis without direct evidence base]`
 
-- **Источник подтверждён** — приводи конкретику и обязательно URL рядом с ней
-- **Не проверял или проверить не удалось** — действует прежний режим:
-  орган и тема, без DOI, авторов, номеров страниц и названий статей
+**Required elements:** organ or base, topic, level. Year - if you know for sure.
 
-Третьего варианта нет. Конкретика без URL — это выдумывание, и теперь у него
-нет оправдания отсутствием доступа.
+---
 
-Из этого следуют жёсткие ограничения:
+## Block 8. Prohibition on link fabrication
 
-| Запрещено | Разрешено |
+This is the most important rule of the document.
+
+**Specific details are only acceptable in conjunction with the URL from which you opened the page.**
+
+You have a narrow channel to the network - a white list of domains from
+`.claude/shared/source-verification.md`. It exists for one purpose:
+confirm that the cited manual exists and states exactly what it says
+what are you going to write.
+
+This leads to a fork:
+
+- **Source confirmed** - provide specifics and be sure to have a URL next to it
+- **Did not check or could not check** - the previous mode is in effect:
+  body and subject, without DOI, authors, page numbers and article titles
+
+There is no third option. Specificity without a URL is fiction, and now he has
+there is no excuse for lack of access.
+
+This leads to strict restrictions:
+
+| Prohibited | Allowed |
 |-----------|-----------|
-| Придумывать названия статей | Название — если страница открыта, рядом URL |
-| Указывать DOI, которого не видел | DOI со страницы, которую открыл, вместе с URL |
-| Указывать номера страниц и томов | Указывать год или диапазон, если уверен |
-| Называть авторов по памяти | Ссылаться на орган и тему без конкретики |
-| Выдавать точную цифру из «исследования», если не уверен | Давать диапазон и помечать неопределённость |
+| Come up with article titles | Title - if the page is open, next to the URL |
+| Indicate a DOI that you have not seen | DOI from the page you opened, along with the URL |
+| Indicate page and volume numbers | Indicate year or range if sure |
+| Name authors from memory | Referring to an authority and topic without specifics |
+| Give an exact figure from a “research” if you are not sure | Giving a range and marking uncertainty |
 
-**Правило неуверенности:** если не уверен, что источник существует или что данные актуальны — напиши прямо: «требует проверки по актуальному источнику» и понизь уровень до D.
+**Rule of uncertainty:** if you are not sure that the source exists or that the data is current, write directly: “requires verification against a current source” and lower the level to D.
 
-Выдуманная ссылка в медицинской системе хуже отсутствия ссылки: она создаёт ложное доверие и может повлиять на реальное решение о лечении.
-
----
-
-## Блок 9. Правила применения
-
-1. **Каждая рекомендация — с уровнем.** Утверждение без уровня считается неоформленным.
-2. **Разделяй установленное знание и собственный вывод.** Перекрёстная гипотеза, синтезированная тобой из данных пациента, — это всегда уровень D или ⚠️, даже если каждый её кирпич уровня A.
-3. **Указывай противоречивость.** Если доказательства спорны — скажи об этом, а не выбирай удобную сторону.
-4. **Отмечай устаревание.** Медицина меняется. Если знаешь, что область активно пересматривалась — отметь необходимость сверки.
-5. **Различай статистическую и клиническую значимость.** Эффект может быть достоверным и при этом бесполезным на практике.
-6. **Проверяй применимость к пациенту.** Данные, полученные на другой возрастной группе, другом поле или другой популяции, не переносятся автоматически — понижай уровень и называй причину. Возраст пациента вычисляй из `date_of_birth` в `Data/profile.json`.
-7. **Для лабораторных норм всегда указывай источник интервала** — нормы зависят от метода и лаборатории.
-8. **Не спорь с уровнем A без основания.** Если предлагаешь отклонение от руководства — обоснуй, почему конкретный случай выходит за рамки.
+A fictitious link in the medical system is worse than no link: it creates false trust and can influence the real decision about treatment.
 
 ---
 
-## Блок 10. Антипаттерны
+## Block 9. Rules of application
 
-| Антипаттерн | Почему запрещён |
+1. **Each recommendation has a level.** A statement without a level is considered unformed.
+2. **Separate established knowledge from your own conclusion.** The crossover hypothesis you synthesize from the patient's data is always level D or ⚠️, even if every brick of it is level A.
+3. **Point out the inconsistency.** If the evidence is controversial, say so, rather than choosing a convenient side.
+4. **Celebrate obsolescence.** Medicine is changing. If you know that an area has been actively revised, note the need for reconciliation.
+5. **Distinguish between statistical and clinical significance.** An effect can be significant and yet be useless in practice.
+6. **Check applicability to the patient.** Data obtained in another age group, another sex or another population does not automatically transfer - lower the level and state the reason. Calculate the patient's age from `date_of_birth` to `Data/profile.json`.
+7. **For laboratory norms, always indicate the source of the interval** - norms depend on the method and laboratory.
+8. **Don't argue with Level A without reason.** If you propose a deviation from the guideline, justify why the particular case is out of scope.
+
+---
+
+## Block 10. Antipatterns
+
+| Antipattern | Why is it prohibited |
 |-------------|-----------------|
-| Утверждение без уровня доказательности | Читатель не может отличить факт от догадки |
-| Выдуманная ссылка, DOI, автор или название статьи | Прямая дезинформация в медицинском контексте |
-| Выдача уровня D за уровень A | Подмена силы доказательства |
-| Российский источник вместо существующего международного руководства | Нарушает приоритет источников |
-| Ссылка на препринт без пометки о нерецензированности | Завышает доверие к непроверенным данным |
-| Перенос данных с другой популяции без понижения уровня | Ложная применимость |
-| Умолчание о противоречивости доказательств | Искажение картины в пользу удобного вывода |
-| Референсный интервал без указания лаборатории и метода | Норма не универсальна |
+| Statement without level of evidence | The reader cannot distinguish fact from guesswork |
+| Fictitious link, DOI, author or article title | Direct misinformation in a medical context |
+| Passing Level D for Level A | Substitution of the strength of evidence |
+| Russian source instead of an existing international guideline | Violates the priority of sources |
+| Link to preprint not marked as not peer-reviewed | Increases confidence in unverified data |
+| Transferring data from another population without downgrading | False applicability |
+| Silence about conflicting evidence | Distorting the picture in favor of a convenient conclusion |
+| Reference interval without specifying laboratory and method | The norm is not universal |
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+⚕️ The information is for reference only. Consult your doctor for treatment decisions.

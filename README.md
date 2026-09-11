@@ -1,332 +1,263 @@
 # Health-OS
 
-Персональная система управления здоровьем на базе Claude Code. Медкарта, анализы, визиты, лекарства и цели живут локальными файлами, а разбираются консилиумом AI-специалистов, который умеет спорить сам с собой.
+A personal health management system built on Claude Code. Medical records, lab results, visits, medications, and goals live in local files and are reviewed by a panel of AI specialists capable of challenging one another.
 
-<p align="center">
-  <a href="https://youtu.be/sA1rrgo8x64">
-    <img src="https://img.youtube.com/vi/sA1rrgo8x64/maxresdefault.jpg" width="760" alt="Полный разбор Health-OS — видео на YouTube">
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://youtu.be/sA1rrgo8x64"><img src="docs/img/youtube.png" width="22" align="top">&nbsp;&nbsp;<strong>Полный разбор системы на YouTube</strong></a><br>
-  <sub>Как устроена, что умеет и почему сделана именно так</sub>
-</p>
-
-<p align="center">
-  <img src="docs/img/author-avatar.png" width="22" align="top">&nbsp;
-  <strong>Александр Ярыгин</strong>&nbsp;
-  <a href="https://github.com/alxyrgin">@alxyrgin</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <img src="docs/img/glake-logo.png" width="18" align="top">&nbsp;
-  <a href="https://glake.ai/?utm_source=github&utm_medium=readme&utm_campaign=health-os">При&nbsp;поддержке&nbsp;Glake&nbsp;AI</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <img src="docs/img/telegram.png" width="18" align="top">&nbsp;
-  <a href="https://t.me/+oYugtGxjawYxZmVi">Подписаться&nbsp;на&nbsp;Telegram</a>
-</p>
+This repository is a personally maintained fork, distributed under the [MIT license](LICENSE).
 
 ---
 
-> ## ⚠️ Прочитайте до установки
+> ## ⚠️ Read before installing
 >
-> **Это не медицинское изделие.** Программа не зарегистрирована, не сертифицирована и не проходила клинических испытаний. Она не диагностирует, не лечит и не предотвращает заболевания.
+> **This is not a medical device.** The software is not registered or certified and has not undergone clinical trials. It does not diagnose, treat, or prevent disease.
 >
-> **Это не медицинская рекомендация.** Система построена на языковой модели. Модели ошибаются, уверенно излагают неверное и не видят вашего клинического контекста. Любое решение о диагностике и терапии принимает врач.
+> **This is not medical advice.** The system is built on a language model. Models make mistakes, confidently state falsehoods, and lack your clinical context. A physician must make all diagnostic and treatment decisions.
 >
-> **Некоммерческий проект.** Распространяется бесплатно по лицензии MIT, разрабатывается добровольно, не связан с оказанием медицинских услуг, не содержит рекламы и не монетизируется.
+> **Noncommercial project.** Distributed free of charge under the MIT license, developed voluntarily, unrelated to the provision of medical services, without advertising or monetization.
 >
-> **Предоставляется «как есть», без гарантий.** Вы используете программу **исключительно на собственный риск**. Авторы не несут ответственности за вред здоровью, ошибочные выводы, утрату или разглашение данных.
+> **Provided “as is,” without warranties.** You use the software **entirely at your own risk**. The authors are not liable for harm to health, incorrect conclusions, or the loss or disclosure of data.
 >
-> **Все демонстрационные данные вымышлены.** Демо-набор описывает несуществующего человека. Совпадения случайны.
+> **All demonstration data is fictional.** The demo dataset describes a nonexistent person. Any resemblance is coincidental.
 >
-> **За свои данные отвечаете вы.** У проекта нет серверной части, авторы не имеют доступа к вашим файлам. Но и защита этих файлов — шифрование диска, резервные копии, ограничение доступа, соблюдение законодательства вашей юрисдикции — целиком на вас.
+> **You are responsible for your data.** The project has no backend service, and the authors cannot access your files. Protecting those files—disk encryption, backups, access restrictions, and compliance with your jurisdiction’s laws—is entirely your responsibility.
 >
-> **Данные уходят в API языковой модели.** Иначе система не смогла бы их анализировать. Это основной канал выхода данных за пределы устройства — условия обработки определяет поставщик модели, а не этот проект.
+> **Data is sent to the language model API.** Otherwise, the system could not analyze it. This is the main channel through which data leaves your device; the model provider, not this project, determines the processing terms.
 >
-> Полные условия — **[DISCLAIMER.md](DISCLAIMER.md)**. Установка означает согласие с ними.
+> Full terms: **[DISCLAIMER.md](DISCLAIMER.md)**. Installing the software constitutes acceptance of them.
 >
-> 🚨 **При признаках неотложного состояния обращайтесь в скорую помощь.** Программа не является системой мониторинга и не способна вызвать помощь.
+> 🚨 **If you notice signs of a medical emergency, contact emergency services.** This software is not a monitoring system and cannot call for help.
 
 ---
 
-![Дашборд Health-OS на демонстрационных данных](docs/img/dashboard-overview.png)
+![Health-OS dashboard with demonstration data](docs/img/dashboard-overview.png)
 
-<p align="center"><sub>Дашборд на демо-наборе. Все данные вымышлены — реальных сведений о здоровье на снимке нет.</sub></p>
-
----
-
-## Зачем это нужно
-
-Медицинские данные человека размазаны по десятку мест: PDF из лаборатории, бумажка от врача, приложение фитнес-браслета, память. При этом медицина устроена так, что каждый специалист смотрит в свою зону — и причина симптома регулярно оказывается за её границей.
-
-Health-OS решает две задачи:
-
-1. **Собрать всё в одном месте** в структурированном виде, чтобы данные пятилетней давности можно было сопоставить со вчерашними.
-2. **Заставить систему рассуждать холистически** — искать первопричину, а не описывать отклонения, и учитывать образ жизни и среду наравне с анализами.
+<p align="center"><sub>The dashboard with the demo dataset. The screenshots show the English interface. All data is fictional; the screenshot contains no real health information.</sub></p>
 
 ---
 
-## Что внутри
+## Why this exists
 
-### 15 AI-специалистов
+A person’s medical information is scattered across a dozen places: lab PDFs, notes from doctors, a fitness tracker app, and memory. Meanwhile, each medical specialist focuses on their own area—and the cause of a symptom often lies outside it.
 
-Кардиолог, гематолог, эндокринолог, невролог, гастроэнтеролог, уролог, гинеколог, педиатр, дерматолог, ЛОР, ортопед, психиатр, стоматолог, офтальмолог и health-коуч. Каждый — отдельный агент со своей клинической зоной, работающий в изолированном контексте.
+Health-OS addresses two needs:
 
-Ключевой принцип: **в промпте специалиста нет ни одного факта о пациенте.** Клиническую картину он строит сам, читая данные. Промпт — это методология, а не медкарта, иначе он неизбежно устаревает и начинает утверждать то, что уже опровергнуто анализами.
-
-### Консилиум с настоящим спором
-
-Параллельный запуск специалистов сам по себе консилиумом не является — это набор монологов, где слабая гипотеза выглядит так же убедительно, как сильная. Здесь три раунда:
-
-| Раунд | Что происходит |
-|-------|----------------|
-| **1** | Независимые заключения **вслепую** — специалисты не видят выводов друг друга, иначе якорятся на первом озвученном |
-| **2** | Перекрёстная критика: те, чьи зоны пересеклись, обязаны оспорить коллег по существу |
-| **3** | Разрешение споров по уровню доказательности и синтез общей первопричины |
-
-**Искусственный консенсус запрещён.** Неразрешённое разногласие попадает в отчёт с обеими позициями — именно оно точно указывает, какое обследование нужно следующим. Сглаженная формулировка эту информацию уничтожает.
-
-**Чего это не даёт — сразу и прямо.** Пятнадцать агентов работают на одной языковой модели, поэтому их ошибки коррелированы: систематическое заблуждение модели воспроизведётся во всех ролях, включая адвоката дьявола. Согласие специалистов означает, что модель последовательна, а не что вывод верен. Это не пятнадцать независимых мнений и не независимое подтверждение диагноза.
-
-Ценность отчёта — в разделах «Неразрешённые разногласия» и «Пробелы в данных». Там написано, чего система не знает, и это самая надёжная её часть.
-
-### Учёт пола
-
-Пол определяет, какие состояния вероятны, какой скрининг показан по возрасту и как читаются одни и те же цифры. В профиле три независимых поля: `sex` для медицинских выводов, `gender_identity` для обращения к человеку, `hormone_therapy` для поправки на терапию. Смешивать их нельзя ни в одну сторону.
-
-Показательный пример — снижающийся ферритин. У женщины детородного возраста это прежде всего вопрос о менструальной кровопотере, у мужчины — показание к эндоскопии. Одни и те же цифры, разный первый шаг обследования. Без поля пола система выбрала бы неверное направление поиска и не сообщила бы об этом.
-
-Если пол не указан, специалист прямо говорит, какие выводы недоступны, — а не предполагает молча.
-
-### Профили членов семьи
-
-Одна установка ведёт медкарты нескольких человек: владельца, супруга, детей,
-пожилых родителей. Каждый профиль изолирован — данные одного человека не
-используются при разборе другого. Единственный канал наследственности —
-поле `family_history` в профиле самого пациента, заполняемое сознательно,
-а не автоматическим чтением чужих карт.
-
-Активный профиль **один на систему**: тот же указатель читают дашборд и
-Claude Code. Разойтись и показывать данные разных людей они не могут.
-
-Работа не с тем профилем — самая дорогая ошибка этой подсистемы, поэтому
-текущий человек всегда виден в шапке дашборда, объявляется первой строкой
-в `/day`, а проверка целостности отклоняет данные, записанные мимо профиля.
-
-**Детский профиль включает педиатрический контур.** Взрослые референсы к
-детским анализам не применяются: у растущего ребёнка щелочная фосфатаза
-кратно выше взрослой нормы и это норма, до 4–5 лет в лейкоформуле
-физиологически преобладают лимфоциты, а рост и вес читаются перцентилем по
-возрасту, а не абсолютным значением. Специалист, применивший взрослый
-интервал, выдал бы патологию там, где её нет. Педиатр ведёт детский случай
-и рецензирует заключения остальных.
-
-Профиль другого взрослого заводится с его ведома — см. раздел о данных
-третьих лиц в [DISCLAIMER.md](DISCLAIMER.md).
-
-### Граф связей
-
-JSON-файлы хранят значения: маркеры, даты, дозировки. Они точны, но между
-собой не связаны. Wiki-слой хранит **связи и суждения** — почему маркер
-важен, какая гипотеза его объясняет, кто из врачей что сказал.
-
-Метод — [LLM Wiki Андрея Карпаты](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f),
-адаптированный под медкарту. Ключевое отличие: **числа на страницы не
-переносятся.** У Карпаты источники неструктурированы, поэтому markdown —
-шаг вперёд. Здесь значения уже лежат в JSON, на них построены тренды и
-проверки. Страница ссылается на запись, а не копирует её: копия неизбежно
-разъезжается с оригиналом.
-
-Практическая ценность не в картинке, а в трёх проверках, которые человек
-делать устаёт, а агент — нет:
-
-| Проверка | Что находит в медкарте |
-|----------|------------------------|
-| **Противоречия** | Кардиолог сказал одно, невролог другое. Гипотеза утверждает «маркер стабилен», свежий анализ показывает падение |
-| **Сиротки** | Анализ загружен и никем не интерпретирован. Гипотеза без следующего шага. Назначение врача, о котором забыли |
-| **Битые ссылки** | Препарат назван в протоколе визита и отсутствует в списке лекарств |
-
-Противоречие не разрешается автоматически: показываются обе позиции и то,
-что их рассудит. Расхождение между источниками — это и есть находка.
-
-### Холистическая рамка
-
-Обязательна для всех специалистов. Не декларация «мыслите шире», а конкретная машинерия:
-
-- **Каузальная лестница** из пяти уровней: сигнал → орган → регуляция → первопричина → контекст жизни. Остановка на втором уровне считается незавершённым анализом
-- **13 сквозных осей** (вегетативная, ГГН, тиреоидная, воспаление, циркадные ритмы, оксигенация и другие) с указанием, какие специальности каждая пересекает
-- **Матрица контекста жизни**: география, климат, жильё, работа, питание, сон, движение, вещества, соцсреда
-- **Правило приоритета**: модифицируемый бытовой фактор проверяется раньше редкой патологии
-
-Методологическая основа — биопсихосоциальная модель Энгеля, аллостатическая нагрузка, парадигма экспосома. Это системная медицина, а не альтернативная.
-
-### Доказательная база
-
-Каждое содержательное утверждение маркируется уровнем **A/B/C/D/⚠️**. Приоритет международных источников: Cochrane, PubMed, NICE, USPSTF, WHO, руководства профильных обществ.
-
-Отдельное жёсткое правило — **ссылки подтверждаются, а не выдумываются.** У специалистов есть узкий канал в сеть, ограниченный белым списком доменов, ради одной задачи: проверить, что цитируемое руководство существует и говорит именно то, что ему приписывают. Конкретика — DOI, автор, номер руководства — допустима только с открываемым URL, страницу по которому агент открыл. Без URL остаётся прежний режим: орган и тема, без конкретики.
-
-**Данные пациента в поисковый запрос не попадают.** Запрос формулируется как вопрос о литературе, обезличенно, и показывается вам до отправки. Каждый запрос пишется в журнал — иначе утверждение о приватности непроверяемо. Подробнее — `.claude/shared/source-verification.md`.
-
-### Реагирование на критическое
-
-Пороги неотложных состояний, при которых обычный workflow останавливается: panic values по лабораторным маркерам, гипертонический криз, красные флаги психического состояния с немедленным выводом контактов экстренной помощи.
-
-### 24 скилла и дашборд
-
-Скиллы покрывают весь цикл: приём документов, расшифровка анализов, визиты, лекарства, зубы, прививки, метрики тела, настроение, цели, поиск врача и анализов. Дашборд на Next.js показывает тренды и карточки. Преимущественно на чтение, но часть роутов умеет писать в `Data/` — путь резолвится через `resolveWithin()`, ввод валидируется. Привязан к `127.0.0.1`, CSRF-защиты нет: см. `docs/SECURITY.md`.
-
-![Раздел анализов](docs/img/dashboard-labs.png)
-
-<p align="center"><sub>Раздел анализов на демо-данных: тренд маркера, отклонения, ключевые показатели.</sub></p>
+1. **Collect everything in one place**, in a structured form that makes it possible to compare data from five years ago with yesterday’s results.
+2. **Make the system reason holistically**: look for root causes rather than merely describe abnormalities, and consider lifestyle and environment alongside lab results.
 
 ---
 
+## What is included
+
+### 15 AI specialists
+
+A cardiologist, hematologist, endocrinologist, neurologist, gastroenterologist, urologist, gynecologist, pediatrician, dermatologist, ENT specialist, orthopedist, psychiatrist, dentist, ophthalmologist, and health coach. Each is a separate agent with its own clinical scope and isolated context.
+
+The central principle: **a specialist’s prompt contains no patient facts.** The specialist builds the clinical picture by reading the data. A prompt is a methodology, not a medical record; otherwise, it inevitably becomes outdated and starts asserting things that newer results have already disproved.
+
+### A specialist panel with genuine debate
+
+Running specialists in parallel does not, by itself, create a panel review. It creates a collection of monologues in which a weak hypothesis sounds just as convincing as a strong one. Here, there are three rounds:
+
+| Round | What happens |
+|-------|--------------|
+| **1** | Independent, **blinded** assessments: specialists cannot see one another’s conclusions, preventing anchoring on the first opinion |
+| **2** | Cross-critique: specialists whose areas overlap must challenge their colleagues on substantive grounds |
+| **3** | Disputes are resolved according to the strength of the evidence, followed by synthesis of a shared root-cause hypothesis |
+
+**Artificial consensus is prohibited.** Unresolved disagreements appear in the report with both positions intact: they identify precisely which investigation is needed next. Smoothing over the wording destroys that information.
+
+**What this does not provide—stated plainly.** All fifteen agents use the same language model, so their errors are correlated: a systematic misconception can recur in every role, including the devil’s advocate. Agreement means the model is consistent, not that its conclusion is correct. These are not fifteen independent opinions or independent confirmation of a diagnosis.
+
+The report’s value lies in its “Unresolved disagreements” and “Data gaps” sections. They describe what the system does not know, making them its most dependable part.
+
+### Accounting for sex
+
+Sex affects which conditions are likely, which age-based screenings are indicated, and how the same numbers are interpreted. The profile has three independent fields: `sex` for medical reasoning, `gender_identity` for addressing the person, and `hormone_therapy` for accounting for treatment. They must not be conflated in either direction.
+
+Falling ferritin is an illustrative example. In a woman of reproductive age, the first question concerns menstrual blood loss; in a man, it is an indication for endoscopy. The same numbers lead to different first steps in investigation. Without a sex field, the system could pursue the wrong direction without acknowledging it.
+
+If sex is unspecified, the specialist explicitly states which conclusions cannot be drawn rather than silently making an assumption.
+
+### Family member profiles
+
+One installation manages records for several people: the owner, a spouse, children, or older parents. Each profile is isolated; one person’s data is not used when reviewing another person. The only channel for hereditary information is the patient’s own `family_history` field, filled in deliberately rather than by automatically reading someone else’s records.
+
+There is **one active profile for the entire system**: the dashboard and Claude Code read the same pointer. They cannot diverge and display different people’s data.
+
+Working in the wrong profile is the most costly error in this subsystem, so the current person is always visible in the dashboard header, announced on the first line of `/day`, and checked by the integrity validator, which rejects data written outside a profile.
+
+**A child profile activates pediatric handling.** Adult reference intervals must not be applied to children’s lab results: alkaline phosphatase in a growing child can normally be several times the adult upper limit; lymphocytes physiologically predominate in the differential count until age 4–5; and height and weight are interpreted as age-based percentiles rather than absolute values. Applying adult intervals would label normal findings as pathological. The pediatrician leads the child’s case and reviews the other specialists’ assessments.
+
+Create another adult’s profile only with their knowledge; see the third-party data section in [DISCLAIMER.md](DISCLAIMER.md).
+
+### Relationship graph
+
+JSON files store values: markers, dates, and doses. They are precise but disconnected. The wiki layer stores **relationships and judgments**: why a marker matters, which hypothesis explains it, and what each doctor said.
+
+The approach adapts [Andrej Karpathy’s LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) to medical records. The key difference: **numbers are not copied onto pages.** Karpathy’s sources are unstructured, making Markdown an improvement. Here, values already live in JSON and power trends and validation. A page links to a record rather than copying it; a copy inevitably drifts from the original.
+
+The practical value is not the visualization, but three checks that people tire of performing and agents do not:
+
+| Check | What it finds in the medical record |
+|-------|-------------------------------------|
+| **Contradictions** | A cardiologist and a neurologist said different things. A hypothesis says “the marker is stable,” but a new result shows a decline |
+| **Orphans** | An uploaded result nobody interpreted. A hypothesis without a next step. A forgotten doctor’s instruction |
+| **Broken links** | A medication mentioned in a visit note but absent from the medication list |
+
+Contradictions are not resolved automatically: both positions are shown, along with what would settle the issue. The discrepancy between sources is itself the finding.
+
+### Holistic framework
+
+Mandatory for every specialist. This is not simply an instruction to “think more broadly,” but a concrete mechanism:
+
+- A five-level **causal ladder**: signal → organ → regulation → root cause → life context. Stopping at the second level counts as an incomplete analysis
+- **13 cross-cutting axes**—autonomic, HPA, thyroid, inflammation, circadian rhythms, oxygenation, and others—with the specialties each intersects
+- A **life-context matrix**: geography, climate, housing, work, nutrition, sleep, movement, substances, and social environment
+- A **priority rule**: investigate a modifiable everyday factor before a rare disease
+
+The methodological foundations are Engel’s biopsychosocial model, allostatic load, and the exposome paradigm. This is systems medicine, not alternative medicine.
+
+### Evidence base
+
+Every substantive claim is labeled **A/B/C/D/⚠️**. International sources take priority: Cochrane, PubMed, NICE, USPSTF, WHO, and specialty society guidelines.
+
+A separate strict rule: **references must be verified, not invented.** Specialists have a narrow, domain-allowlisted web channel for one purpose: checking that a cited guideline exists and says what is attributed to it. Specifics—DOI, author, or guideline number—are permitted only with an accessible URL whose page the agent has opened. Without a URL, the fallback remains the issuing body and topic, without specifics.
+
+**Patient data must not appear in search queries.** Queries are formulated as de-identified literature questions and shown to you before submission. Every query is logged; otherwise, the privacy claim would be unverifiable. See `.claude/shared/source-verification.md` for details.
+
+### Responding to critical findings
+
+Emergency thresholds stop the normal workflow: laboratory panic values, hypertensive crises, and mental-health red flags, with emergency contact information displayed immediately.
+
+### 24 skills and a dashboard
+
+Skills cover the full cycle: document intake, lab interpretation, visits, medications, dental care, vaccinations, body metrics, mood, goals, and finding doctors and tests. The Next.js dashboard displays trends and cards. It is mostly read-oriented, but some routes write to `Data/`; paths are resolved through `resolveWithin()` and input is validated. It is bound to `127.0.0.1`. For CSRF protection and its limitations, see [docs/SECURITY.md](docs/SECURITY.md).
+
+![Lab results section](docs/img/dashboard-labs.png)
+
+<p align="center"><sub>The lab results section with demo data: marker trends, abnormalities, and key indicators.</sub></p>
+
 ---
 
-## Для чего это годится, а для чего нет
+## What it is—and is not—suitable for
 
-Разделение прямое, без смягчений. Оно совпадает с тем, к чему приходят
-внешние рецензенты, и лучше сказать это самому.
+The distinction is direct, without softening. It matches the conclusions of external reviewers and is worth stating upfront.
 
-| Задача | Вердикт |
-|--------|---------|
-| Хранить документы, анализы и историю в одном месте | **Да** — основной сценарий |
-| Строить динамику показателей за годы | **Да**, со сверкой извлечённых цифр с оригиналом |
-| Находить противоречия между источниками и пропущенные назначения | **Да** — то, что человек делать устаёт |
-| Готовить сводку и вопросы к приёму | **Да** — пожалуй, самый недооценённый сценарий |
-| Получать второе информационное мнение | **Осторожно** — только с проверяемыми источниками и как вход для разговора с врачом |
-| Искать «первопричину» | **Нет** — гипотеза системы не является установленной причиной |
-| Ставить диагноз или исключать заболевание | **Нет** — заложено запретом |
-| Менять лекарства, дозировки, план обследования | **Нет** — только после врача |
-| Оценивать неотложное состояние | **Нет** — при подозрении звоните в скорую |
+| Task | Verdict |
+|------|---------|
+| Keep documents, lab results, and history in one place | **Yes**—the main use case |
+| Track indicators over years | **Yes**, provided extracted numbers are checked against the originals |
+| Find contradictions between sources and missed instructions | **Yes**—work that people tire of doing |
+| Prepare a summary and questions for an appointment | **Yes**—perhaps the most underrated use case |
+| Obtain a second informational opinion | **With caution**—only with verifiable sources and as input for a discussion with a physician |
+| Find a “root cause” | **No**—a system-generated hypothesis is not an established cause |
+| Diagnose or rule out disease | **No**—explicitly prohibited |
+| Change medications, doses, or an investigation plan | **No**—only after consulting a physician |
+| Assess a medical emergency | **No**—if you suspect one, call emergency services |
 
-Причина, по которой правая половина таблицы выглядит именно так: у проекта
-нет клинических испытаний, нет тестового набора с эталонными диагнозами,
-не измерены чувствительность и специфичность, нет независимой врачебной
-валидации. Пока этого нет, любой вывод системы остаётся гипотезой, а не
-заключением.
+The reasons for these limits: the project has no clinical trials, no test set with reference diagnoses, no measured sensitivity or specificity, and no independent physician validation. Until those exist, every system output remains a hypothesis, not a clinical conclusion.
 
-## Приватность
+## Privacy
 
-Проект спроектирован из предположения, что **медданные не должны покидать устройство**.
+The project is designed around the premise that **medical data should not leave the device for storage**. Analysis still sends data to the model API, as explained above.
 
-| Механизм | Как работает |
-|----------|--------------|
-| Локальный git | Репозиторий без remote. Пушить некуда по построению |
-| Инвертированный `.gitignore` | Игнорируется всё содержимое `Data/`, исключения перечислены поимённо. Ошибка приводит к тому, что файл не попадёт в git, а не к утечке |
-| Оригиналы вне контроля версий | PDF и сканы содержат PHI в сыром виде и переживают в истории любое удаление |
-| Дашборд только на loopback | `127.0.0.1`, без доступа из локальной сети. Часть роутов пишет в `Data/`, поэтому привязка к loopback — основная защита |
-| Промпты без PII | Ни один агент не содержит данных пациента |
-| Изоляция профилей | Данные одного члена семьи не читаются при разборе другого; проверка целостности отклоняет записи мимо профиля |
-| Поиск без данных пациента | Запрос к сети — обезличенный вопрос о литературе, показывается до отправки и пишется в журнал |
+| Mechanism | How it works |
+|-----------|--------------|
+| Local git | A repository without remotes: there is nowhere to push by design |
+| Inverted `.gitignore` | All of `Data/` is ignored, with explicitly named exceptions. Mistakes cause a file to be omitted from git rather than leaked |
+| Originals outside version control | PDFs and scans contain raw PHI and survive deletion in git history |
+| Loopback-only dashboard | `127.0.0.1`, inaccessible from the local network. Some routes write to `Data/`, so loopback binding is the primary boundary |
+| PII-free prompts | No agent contains patient data |
+| Profile isolation | One family member’s data is not read when reviewing another; integrity checks reject writes outside profiles |
+| Searches without patient data | Web queries are de-identified literature questions, displayed before submission and logged |
 
-Подробнее — [docs/SECURITY.md](docs/SECURITY.md).
+See [docs/SECURITY.md](docs/SECURITY.md) for details.
 
 ---
 
-## Быстрый старт
+## Quick start
 
-### Сначала — посмотреть на демо-данных
+### First, explore the demo
 
-Прежде чем вносить своё, разверните набор вымышленного пациента и осмотритесь:
+Before entering your own information, deploy the fictional patient dataset and look around:
 
 ```bash
-git clone <репозиторий> health-os && cd health-os
+git clone <repository> health-os && cd health-os
 ./setup.sh --demo
 cd Dashboard && npm install && npm run dev
 ```
 
-Дашборд откроется на `http://127.0.0.1:3000`.
+The dashboard is available at `http://127.0.0.1:3000`.
 
-### Затем — своя установка
+### Then, set up your own installation
 
-Демо и рабочий режим **не смешиваются**: перед переходом очистите `Data/`, иначе индексы разойдутся с файлами. Команда очистки — в [INSTALL.md](INSTALL.md).
+Demo and live data **must not be mixed**: clear `Data/` before switching, or indexes will no longer match the files. The cleanup command is in [INSTALL.md](INSTALL.md#block-6b-switching-from-demo-to-your-own-data).
 
 ```bash
 ./setup.sh
 ```
 
-Затем откройте проект в Claude Code и запустите:
+Then open the project in Claude Code and run:
 
 ```
 /onboarding
 ```
 
-Скилл проведёт discovery-интервью и соберёт стартовую медкарту.
+The skill conducts a discovery interview and creates your initial medical record.
 
-Подробная установка — [INSTALL.md](INSTALL.md). Пошаговый онбординг — [docs/ONBOARDING.md](docs/ONBOARDING.md).
+Detailed installation: [INSTALL.md](INSTALL.md). Step-by-step onboarding: [docs/ONBOARDING.md](docs/ONBOARDING.md).
 
 ---
 
-## Требования
+## Requirements
 
-- **macOS или Linux.** На Windows — через WSL2: установка и хуки написаны на bash
+- **macOS or Linux.** On Windows, use WSL2: installation and hooks are written in Bash
 - [Claude Code](https://claude.com/claude-code)
-- Python 3.10+ — для скрипта проверки целостности
-- `jq` — для хуков сессий
-- Node.js 20+ и npm — только для дашборда, система работает и без него
+- Python 3.10+ for the integrity-checking script
+- `jq` for session hooks
+- Node.js 20+ and npm for the dashboard only; the system works without it
 
-Опционально: MCP-серверы для WHOOP, Todoist и Google Calendar.
-
----
-
-## Документация
-
-| Файл | О чём |
-|------|-------|
-| **[DISCLAIMER.md](DISCLAIMER.md)** | **Условия использования и отказ от ответственности — прочитать первым** |
-| [INSTALL.md](INSTALL.md) | Установка по шагам |
-| [docs/ONBOARDING.md](docs/ONBOARDING.md) | Первые дни работы с системой |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Как устроено внутри |
-| [docs/SECURITY.md](docs/SECURITY.md) | Модель угроз и правила |
-| [CLAUDE.md](CLAUDE.md) | Инструкции для Claude Code |
-| [.claude/shared/](.claude/shared/) | Рамки рассуждения и схемы данных |
+Optional: MCP servers for WHOOP, Todoist, and Google Calendar.
 
 ---
 
-## Ограничения, о которых стоит знать заранее
+## Documentation
 
-- **Система не заменяет врача** и не предназначена для самодиагностики
-- **Доступ в сеть узкий и односторонний** — специалисты могут подтвердить источник по белому списку доменов (Cochrane, PubMed, NICE, USPSTF, WHO), но не ищут свободно. Данные пациента в запросы не попадают
-- **Качество выводов зависит от полноты данных.** Пустая медкарта даст пустой анализ
-- **Проект ориентирован на российский контекст** в части ОМС, лабораторий и маршрутизации, но клиническая часть универсальна
-- **Это персональный инструмент**, а не медицинская информационная система: нет многопользовательского режима, аудита доступа и сертификации
-
----
-
-## Автор
-
-<table>
-<tr>
-<td width="90" align="center" valign="top">
-  <img src="docs/img/author-avatar.png" width="72">
-</td>
-<td valign="top">
-
-**Александр Ярыгин** — [@alxyrgin](https://github.com/alxyrgin)
-
-При поддержке <img src="docs/img/glake-logo.png" width="14" align="top"> [**Glake AI**](https://glake.ai/?utm_source=github&utm_medium=readme_footer&utm_campaign=health-os) — команды, которая занимается ИИ-решениями для бизнеса.
-
-Health-OS вырос из личной задачи: собрать разрозненную медкарту в одно место и заставить систему рассуждать о ней целиком, а не по кусочкам. Проект сделан для себя и открыт как есть.
-
-<img src="docs/img/youtube.png" width="14" align="top"> [Полный разбор системы на YouTube](https://youtu.be/sA1rrgo8x64) — как устроена и почему именно так
-<img src="docs/img/telegram.png" width="14" align="top"> [Подписаться на Telegram](https://t.me/+oYugtGxjawYxZmVi) — про ИИ, продукт и разработку
-
-</td>
-</tr>
-</table>
-
-Проект остаётся некоммерческим: он бесплатен, не содержит рекламы, не продаёт услуг и не собирает ваши данные. Ссылки выше — указание авторства, а не предложение чего-либо купить.
+| File | Contents |
+|------|----------|
+| **[DISCLAIMER.md](DISCLAIMER.md)** | **Terms of use and disclaimer—read first** |
+| [INSTALL.md](INSTALL.md) | Step-by-step installation |
+| [docs/ONBOARDING.md](docs/ONBOARDING.md) | Your first days with the system |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Internal design |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model and rules |
+| [CLAUDE.md](CLAUDE.md) | Instructions for Claude Code |
+| [.claude/shared/](.claude/shared/) | Reasoning frameworks and data schemas |
 
 ---
 
-## Лицензия
+## Development checks
 
-MIT — см. [LICENSE](LICENSE).
+From the repository root, run `python3 .claude/scripts/check-english.py` to detect Cyrillic text or filenames in tracked and non-ignored source files. Binary assets require visual review. Keep documentation, interface text, and bundled data in English.
 
-Лицензия распространяется на код и промпты. Ваши медицинские данные принадлежат вам и остаются на вашем устройстве.
+For the dashboard, run `npm test`, `npm run check:english`, and `npm run build` from `Dashboard/`. The regression tests cover English visit metadata, marker aliases and units, medication timing, specialty colors, and crisis wording.
 
 ---
 
-⚕️ Информация, которую выдаёт система, носит справочный характер. Для принятия решений о лечении обратитесь к врачу. При признаках неотложного состояния звоните в скорую помощь.
+## Limitations to know upfront
+
+- **The system does not replace a physician** and is not intended for self-diagnosis
+- **Web access is narrow and purpose-limited**: specialists can verify sources on allowlisted domains (Cochrane, PubMed, NICE, USPSTF, WHO), but cannot browse freely. Patient data must not enter queries
+- **The quality of conclusions depends on data completeness.** An empty medical record produces an empty analysis
+- **The project targets the Russian context** for compulsory medical insurance (OMS), laboratories, and care navigation, but its clinical framework is universal
+- **This is a personal tool**, not a medical information system: it has no multi-user access controls, access audit, or certification
+
+---
+
+## License
+
+MIT—see [LICENSE](LICENSE).
+
+The license covers the code and prompts. Your medical data belongs to you and is stored on your device.
+
+---
+
+⚕️ Information produced by the system is for reference only. Consult a physician before making treatment decisions. If you notice signs of a medical emergency, call emergency services.

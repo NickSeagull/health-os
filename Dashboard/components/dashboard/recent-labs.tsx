@@ -24,8 +24,8 @@ export function RecentLabs() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Последние анализы</CardTitle>
-        <CardDescription>Последних исследований: {recent?.length ?? 0}</CardDescription>
+        <CardTitle>Recent labs</CardTitle>
+        <CardDescription>Recent tests: {recent?.length ?? 0}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -35,7 +35,7 @@ export function RecentLabs() {
             ))}
           </div>
         ) : !recent?.length ? (
-          <p className="text-sm text-muted-foreground">Нет данных</p>
+          <p className="text-sm text-muted-foreground">No data</p>
         ) : (
           <div className="space-y-3">
             {recent.map((lab) => (
@@ -52,11 +52,11 @@ export function RecentLabs() {
                 <div className="flex items-center gap-2 ml-2">
                   {lab.flags?.length ? (
                     <Badge variant="destructive" className="text-xs">
-                      {lab.flags.length} флаг
+                      {lab.flags.length} flag{lab.flags.length === 1 ? "" : "s"}
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="text-xs">
-                      ОК
+                      OK
                     </Badge>
                   )}
                 </div>
@@ -68,7 +68,7 @@ export function RecentLabs() {
           href="/labs"
           className="mt-3 inline-block text-xs text-muted-foreground hover:text-foreground"
         >
-          Все анализы →
+          All labs →
         </Link>
       </CardContent>
     </Card>

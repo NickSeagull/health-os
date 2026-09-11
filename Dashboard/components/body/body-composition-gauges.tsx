@@ -57,7 +57,7 @@ function GaugeBar({
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{min}</span>
         <span>
-          Цель: {targetMin}–{targetMax}
+          Target: {targetMin}–{targetMax}
         </span>
         <span>{max}</span>
       </div>
@@ -73,9 +73,9 @@ export function BodyCompositionGauges() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Показатели состава тела</CardTitle>
+        <CardTitle>Body composition metrics</CardTitle>
         <CardDescription>
-          {latest ? `Последнее измерение: ${latest.date}` : "Нет данных"}
+          {latest ? `Latest measurement: ${latest.date}` : "No data"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,12 +87,12 @@ export function BodyCompositionGauges() {
           </div>
         ) : !latest ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных InBody
+            No InBody data
           </p>
         ) : (
           <div className="space-y-6">
             <GaugeBar
-              label="Процент жира"
+              label="Body fat percentage"
               value={latest.metrics.body_fat_pct}
               min={5}
               max={40}
@@ -101,22 +101,22 @@ export function BodyCompositionGauges() {
               unit="%"
             />
             <GaugeBar
-              label="Мышечная масса"
+              label="Muscle mass"
               value={latest.metrics.skeletal_muscle_mass_kg}
               min={20}
               max={50}
               targetMin={35}
               targetMax={45}
-              unit="кг"
+              unit="kg"
             />
             <GaugeBar
-              label="Висцеральный жир"
+              label="Visceral fat"
               value={latest.metrics.visceral_fat_level}
               min={0}
               max={20}
               targetMin={1}
               targetMax={9}
-              unit="ур."
+              unit="level"
             />
             <GaugeBar
               label="InBody Score"
@@ -125,7 +125,7 @@ export function BodyCompositionGauges() {
               max={100}
               targetMin={75}
               targetMax={90}
-              unit="балл"
+              unit="points"
             />
           </div>
         )}

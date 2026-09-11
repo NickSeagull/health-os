@@ -1,117 +1,117 @@
 ---
 name: onboarding
 description: |
-  Точка входа в health-систему. Discovery-интервью для сбора медкарты, текущих проблем, врачей, лекарств, анализов.
-  Триггеры: «настрой здоровье», «health onboarding», «собери медкарту», «начни с здоровья»
+  Entry point to the health system. Discovery interview to collect medical records, current problems, doctors, medications, tests.
+  Triggers: “health setup”, “health onboarding”, “collect a medical record”, “start with health”
 ---
 
-# Health Onboarding — Discovery-интервью
+# Health Onboarding - Discovery interview
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading and writing, determine the active profile by
+> `.claude/shared/profile-resolution.md`. Short path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before recording, tell whose profile it goes to.
 
-## Назначение
+## Purpose
 
-Первый запуск health-системы. Структурированное discovery-интервью для сбора всех медицинских данных и создания traction-плана по направлениям здоровья.
+First launch of the health system. Structured discovery interview to collect all medical data and create a traction plan in health areas.
 
-## Повторный запуск
+## Restart
 
-**Первым делом — определить режим.** Прочитать `Data/profile.json` и проверить содержательные массивы:
+**First thing is to determine the mode.** Read `Data/profile.json` and check the content arrays:
 
 ```
-allergies[] непуст  ИЛИ  chronic_conditions[] непуст  ИЛИ  current_complaints[] непуст
+allergies[] is not empty OR chronic_conditions[] is not empty OR current_complaints[] is not empty
 ```
 
-Если верно хотя бы одно — медкарта уже наполнена, работать в **режиме дополнения**:
-1. Прочитать текущее состояние всех файлов
-2. Показать статус заполнения:
-   - ✅ Заполнено: [список]
-   - ⚠️ Частично: [список]
-   - ❌ Пусто: [список]
-3. Предложить дополнить пробелы — точечно, по тем блокам, где данных нет
-4. НЕ проводить полное интервью заново
+If at least one thing is true — the medical record is already populated; work in **addition mode**:
+1. Read the current status of all files
+2. Show filling status:
+   - ✅ Completed: [list]
+   - ⚠️ Partially: [list]
+   - ❌ Empty: [list]
+3. Offer to fill in the gaps - pointwise, in those blocks where there is no data
+4. DO NOT re-do the full interview.
 
-**`basic.full_name` индикатором не является.** Оно может быть пустой строкой при полностью заполненной медкарте — пациент просто не назвал имя системе, которая ведёт данные только о нём. Гейт по `full_name` отправил бы скилл по ветке первого запуска и уничтожил бы данные, накопленные за месяцы.
+**`basic.full_name` is not an indicator.** It can be an empty string when the medical record is fully populated — the patient simply did not give a name to the system, which stores only their data. A gate on `full_name` would send the skill down the first-launch branch and destroy data accumulated over months.
 
-### Запрет на перезапись
+### Prohibition of overwriting
 
-Действует в обоих режимах:
+Valid in both modes:
 
-- **Существующие данные не перезаписывать без явного подтверждения пользователя.** Новое значение поверх непустого поля — только после вопроса «в профиле уже записано X, заменить на Y?» и ответа «да»
-- Массивы (`allergies`, `chronic_conditions`, `current_complaints`, `medications`, `doctors`) **дополнять**, а не пересоздавать. Запись целого массива поверх старого запрещена
-- Поле `version` в каждом JSON сохранять как есть
-- Если данные противоречат друг другу — не выбирать самому, показать оба варианта пользователю
-- Сомневаешься, первый это запуск или повторный, — считать повторным. Цена лишнего вопроса ниже цены потерянной медкарты
+- **Do not overwrite existing data without explicit confirmation from the user.** Put a new value over a non-empty field only after asking “X is already written in the profile; replace it with Y?” and receiving “yes”
+- Arrays (`allergies`, `chronic_conditions`, `current_complaints`, `medications`, `doctors`) are **added**, not recreated. Writing an entire array over an old one is prohibited
+- Field `version` in each JSON is saved as is
+- If the data contradicts each other, do not choose yourself, show both options to the user
+- If you doubt whether this is the first launch or a repeat, consider it a repeat. The price of an extra question is lower than the price of a lost medical card
 
-## Workflow первого запуска
+## First launch workflow
 
-Проводить интервью БЛОКАМИ. После каждого блока — сохранять данные в соответствующие файлы.
+Conduct interviews in BLOCKS. After each block, save the data to the appropriate files.
 
-Тайминги блоков ниже — ориентировочные, для понимания масштаба разговора. Не подгонять под них темп и не торопить пользователя.
+The block timings below are approximate for understanding the scale of the conversation. Do not adjust the pace to them and do not rush the user.
 
-### Блок 1. Базовый профиль (~5 мин)
+### Block 1. Basic profile (~5 min)
 
-Спросить:
-1. **Биологический пол** — `male` / `female` / `intersex`. Спрашивать нейтрально и объяснить, зачем: «От этого зависят референсные интервалы анализов и то, какие обследования показаны по возрасту». Это не формальность — без пола часть выводов система построить не сможет
-2. Группа крови (если знаешь)
-3. Рост и текущий вес
-4. Аллергии (лекарственные, пищевые, другие) — для каждой: аллерген, тип, тяжесть
-5. Хронические заболевания (если есть) — что, с какого года, статус
-6. Операции и госпитализации в прошлом
-7. Семейный анамнез — основные заболевания у ближайших родственников
+Ask:
+1. **Biological sex** - `male` / `female` / `intersex`. Ask neutrally and explain why: “Reference intervals and age-based screening recommendations depend on this.” This is more than a formality; without this information, the system cannot produce some conclusions.
+2. Blood type (if you know)
+3. Height and current weight
+4. Allergies (drug, food, others) - for each: allergen, type, severity
+5. Chronic diseases (if any) - what, since what year, status
+6. Previous surgeries and hospitalizations
+7. Family history - major diseases in close relatives
 
-**Про пол — три отдельных поля, не одно:**
+**About gender - three separate fields, not one:**
 
-- `basic.sex` — биологический пол. Определяет референсы и скрининг
-- `basic.gender_identity` — как человек себя идентифицирует, если это отличается от `sex` и он захотел сказать. **Отдельным вопросом не спрашивать**: заполняется, только если пользователь сам поднял тему. Влияет на обращение, не на медицину
-- `basic.hormone_therapy` — заместительная терапия или гормональная контрацепция: тип, препараты, с какого года. Спросить, если человек упомянул. Сдвигает ожидаемые значения гормонов, картины крови и липидов
+- `basic.sex` - biological sex. Determines references and screening
+- `basic.gender_identity` - how a person identifies, if it differs from `sex` and they want to share it. **Do not ask as a separate question**: fill it only if the user raises the topic. It affects forms of address, not clinical interpretation
+- `basic.hormone_therapy` - replacement therapy or hormonal contraception: type, drugs, from what year. Ask if the person mentioned it. Shifts expected values ​​of hormones, blood patterns and lipids
 
-Если пользователь не хочет отвечать про пол — записать `not_specified`, не настаивать и предупредить, что часть анализа будет недоступна.
+If the user does not want to answer about sex, write `not_specified`, do not insist, and warn that part of the analysis will be unavailable.
 
-→ Сохранить в `Data/profile.json` (basic, allergies, chronic_conditions, family_history)
-→ Сохранить в `Data/history.json` (операции, госпитализации)
+→ Save to `Data/profile.json` (basic, allergies, chronic_conditions, family_history)
+→ Save to `Data/history.json` (operations, hospitalizations)
 
-### Блок 2. Текущие проблемы и направления (~10 мин)
+### Block 2. Current problems and directions (~10 min)
 
-**Прочитай `Data/goals/YYYY.json` → `directions[]`.** Дальше две ветки.
+**Read `Data/goals/YYYY.json` → `directions[]`.** Then there are two branches.
 
-**Если массив непуст** (повторный запуск либо направления уже заведены) — идти по нему: для каждого направления спросить по схеме ниже. Список не хардкодить: его состав меняется, зашитый перечень молча пропустит новые.
+**If the array is not empty** (a restart or previously entered directions) — follow it: for each direction, ask according to the scheme below. The list cannot be hardcoded: its composition changes, and a hardcoded list would silently miss new directions.
 
-**Если массив пуст** — так будет на первой установке, и это нормально. Направления не спрашиваются по списку, а **собираются из ответов**:
+**If the array is empty**, this will be the case on the first installation, and this is normal. Directions are not asked from a list, but are **collected from responses**:
 
-1. Задать открытый вопрос: «Что беспокоит по здоровью прямо сейчас? Перечисли всё, что приходит в голову — потом разложим по направлениям».
-2. Пройтись по ориентировочному чек-листу областей, чтобы человек ничего не забыл. Спрашивать коротко, без давления, пропускать при «не беспокоит»:
+1. Ask an open-ended question: “What are your health concerns right now? List everything that comes to mind — then we’ll sort them into directions.”
+2. Go through an indicative checklist of areas so that the person does not forget anything. Ask briefly, without pressure, skip if “does not bother”:
 
-   общее самочувствие и энергия · сон · ЖКТ · сердце и давление · гормоны · почки и мочевыделение · нервная система и головные боли · опорно-двигательный аппарат · кожа · зубы · зрение · ЛОР · ментальное здоровье · репродуктивное здоровье
+   general well-being and energy · sleep · Gastrointestinal tract · heart and blood pressure · hormones · kidneys and urination · nervous system and headaches · musculoskeletal system · skin · teeth · vision · ENT · mental health · reproductive health
 
-3. Из того, что человек назвал, сформировать `directions[]` — по одному направлению на область, где есть жалоба. Пустые области не заводить: направление без содержания только засоряет цели.
-4. Присвоить `kr` последовательно (`KR5.0`, `KR5.1`, …), `area` — название области, `status` — `not_started`.
-5. Записать в `Data/goals/YYYY.json`, где `YYYY` — текущий год.
+3. From what the person names, form `directions[]` — one direction per area with a complaint. Do not create empty areas: a direction without content only clutters the goals.
+4. Assign `kr` sequentially (`KR5.0`, `KR5.1`, ...), `area` - the name of the area, `status` - `not_started`.
+5. Write to `Data/goals/YYYY.json`, where `YYYY` is the current year.
 
-Для каждого направления — по одной схеме:
-- что беспокоит, когда началось, был ли у врача, диагноз, текущее лечение
+For each direction - one scheme:
+- what worries you, when it started, did you see a doctor, diagnosis, current treatment
 
-Формулировку адаптировать под `area`: для «Стоматология» — «что нужно лечить, был ли у стоматолога, есть ли план», для «Гормоны» — «проверялся ли, есть ли жалобы», для «Ментальное здоровье» — мягче и без давления.
+Adapt the wording to `area`: for “Dentistry” — “what needs treatment, have you seen a dentist, is there a plan”; for “Hormones” — “has this been checked, are there any complaints”; for “Mental Health” — use gentler wording without pressure.
 
-Если направление пациента не беспокоит — пометить и идти дальше, не выспрашивать.
+If the patient is not concerned about the direction, mark it and move on, do not ask.
 
-В конце — открытый вопрос: «Есть ли что-то ещё, что беспокоит и не попало в список?» Новую жалобу записать даже если она не ложится ни в одно из направлений.
+At the end there is an open question: “Is there anything else that worries you that didn’t make the list?” Write down a new complaint even if it does not fit in any of the directions.
 
-→ Обновить `Data/profile.json` → `current_complaints[]`
-→ Для каждой жалобы: `{ "area": "", "description": "", "since": "", "status": "investigating" }`
+→ Update `Data/profile.json` → `current_complaints[]`
+→ For each complaint: `{ "area": "", "description": "", "since": "", "status": "investigating" }`
 
-### Блок 3. Врачи (~3 мин)
+### Block 3. Doctors (~3 min)
 
-Спросить:
-- У каких врачей наблюдаешься?
-- Для каждого: ФИО, специальность, клиника, контакт (если есть)
-- Когда был последний визит к каждому?
+Ask:
+- Which doctors do you see?
+- For everyone: full name, specialty, clinic, contact (if any)
+- When was the last visit to each?
 
-→ Сохранить в `Data/doctors/contacts.json`
+→ Save to `Data/doctors/contacts.json`
 
-Полная схема — `.claude/shared/data-schemas.md`. Реальный формат файла: обёртка `{version, doctors[]}`, запись добавляется в массив `doctors[]`, поле `version` не трогается.
+The complete scheme is `.claude/shared/data-schemas.md`. Real file format: `{version, doctors[]}` wrapper, the record is added to the `doctors[]` array, the `version` field is not touched.
 
 ```json
 {
@@ -124,285 +124,285 @@ allergies[] непуст  ИЛИ  chronic_conditions[] непуст  ИЛИ  cur
 }
 ```
 
-**Важно:** поля `id` у врачей нет — ссылки строятся по составному ключу «имя + специальность». Полей `email` и `last_visit` в схеме тоже нет, не выдумывать их. Допустимые статусы: `active`, `historical`, `rejected`.
+**Important:** Doctors do not have an `id` field — links are built using the composite key “name + specialty.” The fields `email` and `last_visit` are not in the schema either, so do not invent them. Acceptable statuses: `active`, `historical`, `rejected`.
 
-### Блок 4. Лекарства и БАДы (~3 мин)
+### Block 4. Medicines and dietary supplements (~3 min)
 
-Спросить:
-- Что сейчас принимаешь? (название, дозировка, частота, время приёма)
-- Кто назначил?
-- БАДы / витамины?
+Ask:
+- What are you taking now? (name, dosage, frequency, time of administration)
+- Who prescribed them?
+- Dietary supplements/vitamins?
 
-→ Сохранить в `Data/medications/current.json`
+→ Save to `Data/medications/current.json`
 
-Полная схема — `.claude/shared/data-schemas.md`. В файле **четыре массива**, и запись кладётся в тот, которому соответствует:
+The complete scheme is `.claude/shared/data-schemas.md`. There are **four arrays** in the file, and the entry is placed in the one that corresponds to:
 
-| Массив | Что туда | Префикс id |
+| Array | What's there | Prefix id |
 |--------|----------|-----------|
-| `medications[]` | Рецептурные и безрецептурные лекарства | `med_` |
-| `supplements[]` | БАДы и витамины | `sup_` |
-| `topical[]` | Наружные средства: кремы, мази, капли | `top_` |
-| `protocols[]` | Схемы лечения из нескольких компонентов | `prot_` |
+| `medications[]` | Prescription and Over-the-Counter Medicines | `med_` |
+| `supplements[]` | Dietary supplements and vitamins | `sup_` |
+| `topical[]` | External means: creams, ointments, drops | `top_` |
+| `protocols[]` | Multicomponent treatment regimens | `prot_` |
 
 ```json
 // medications[]
-{ "id": "med_01", "name": "", "dosage": "", "frequency": "", "timing": ["утро"],
+{ "id": "med_01", "name": "", "dosage": "", "frequency": "", "timing": ["morning"],
   "with_food": true, "reason": "", "doctor_id": null, "started": "", "until": null,
   "side_effects": [], "status": "active", "notes": "" }
 
 // supplements[]
 { "id": "sup_01", "name": "", "brand": "", "dosage": "", "frequency": "",
-  "timing": ["утро"], "reason": "", "started": "", "status": "active" }
+  "timing": ["morning"], "reason": "", "started": "", "status": "active" }
 
 // topical[]
 { "id": "top_01", "name": "", "type": "", "frequency": "", "reason": "", "status": "active" }
 ```
 
-**Важно:** `id` инкрементальный в пределах своего массива, с ведущим нулём до двух знаков. Перед записью нового препарата — сверить с `Data/profile.json` → `allergies[]` на предмет противопоказаний.
+**Important:** `id` is incremental within its array, with leading zero to two digits. Before registering a new drug, check with `Data/profile.json` → `allergies[]` for contraindications.
 
-### Блок 5. Анализы (~2 мин)
+### Block 5. Tests (~2 min)
 
-Спросить:
-- Есть ли результаты анализов на руках? (PDF, фото, бумажные)
-- Когда сдавал последний раз?
-- Какие типы анализов есть?
+Ask:
+- Do you have test results on hand? (PDF, photo, paper)
+- When did you last have tests done?
+- What types of tests do you have?
 
-→ НЕ создавать записи — составить чеклист документов для последующей загрузки
-→ Вывести: «Положи файлы (PDF, сканы, фото) в каталог `Inbox/` и запусти `/inbox` — он разберёт их и разложит по `Data/`»
+→ DO NOT create records — make a checklist of documents for later upload
+→ Output: “Put the files (PDFs, scans, photos) in the `Inbox/` directory and run `/inbox` — it will parse them and arrange them in `Data/`.”
 
-`Inbox/` + `/inbox` — единственная точка входа для файлов. `/labs` работает с уже оцифрованными результатами: расшифровка, тренды, ручной ввод. PDF в `/labs` не передавать.
+`Inbox/` + `/inbox` is the only entry point for files. `/labs` works with already digitized results: interpretation, trends, and manual entry. Do not transfer PDFs to `/labs`.
 
-### Блок 6. Стоматология (~2 мин)
+### Block 6. Dentistry (~2 min)
 
-Спросить:
-- Общее состояние зубов (своими словами)
-- Что лечили / удаляли / ставили (коронки, импланты, пломбы)
-- Есть ли план лечения от стоматолога?
-- Когда последний раз был у стоматолога?
+Ask:
+- General condition of teeth (in your own words)
+- What was treated/removed/placed (crowns, implants, fillings)
+- Is there a treatment plan for the dentist?
+- When was the last time you visited a dentist?
 
-→ Заполнить `Data/dental/tooth-map.json` — по возможности (номера зубов по ISO 3950)
-→ Заполнить `Data/dental/procedures.json` — известные процедуры
+→ Fill in `Data/dental/tooth-map.json` - if possible, using tooth numbers according to ISO 3950
+→ Fill in `Data/dental/procedures.json` - known procedures
 
-### Блок 7. Прививки (~1 мин)
+### Block 7. Vaccinations (~1 min)
 
-Спросить:
-- Какие прививки помнишь? (COVID, грипп, другие)
-- Есть ли сертификат вакцинации?
+Ask:
+- What vaccinations do you remember? (COVID, flu, others)
+- Is there a vaccination certificate?
 
-→ Заполнить `Data/vaccinations.json`
+→ Fill in `Data/vaccinations.json`
 
-### Блок 8. Fitness и метрики тела (~2 мин)
+### Block 8. Fitness and body metrics (~2 min)
 
-Спросить:
-- Текущий вес (если не сказал в блоке 1), целевой вес
-- Тренировки: тип, частота, где занимаешься
+Ask:
+- Current weight (if not mentioned in block 1), target weight
+- Training: type, frequency, where you do it
 
-**WHOOP** — это MCP-сервер (`.mcp.json`), а не агент. Если сервер подключён — подтянуть последние метрики его инструментами. Если MCP недоступен (сервер не поднят, нет авторизации, инструменты не отвечают) — не блокировать блок: записать данные со слов пользователя, пометить «WHOOP не подключён — метрики восстановления не собраны» и продолжить.
+**WHOOP** is an MCP server (`.mcp.json`), not an agent. If the server is connected, retrieve the latest metrics using its tools. If MCP is unavailable (the server is not running, authorization is missing, or the tools do not respond), do not block onboarding: record what the user reports, mark “WHOOP is not connected — recovery metrics were not collected,” and continue.
 
-→ Первая запись в `Data/body-metrics.csv`
-→ Обновить `Data/goals/YYYY.json` → fitness_target
+→ First entry in `Data/body-metrics.csv`
+→ Update `Data/goals/YYYY.json` → fitness_target
 
-### Блок 9. Ментальное здоровье (~2 мин)
+### Block 9. Mental health (~2 min)
 
-Спросить:
-- Общий уровень стресса (1–10)
-- Качество сна субъективно (1–10)
-- Есть ли тревожность / выгорание
-- Ходишь ли к психологу
+Ask:
+- General stress level (1–10)
+- Sleep quality is subjective (1–10)
+- Is there anxiety or burnout?
+- Do you see a psychologist?
 
-→ Первая запись в `Data/mental/journal.jsonl`:
+→ First entry in `Data/mental/journal.jsonl`:
 ```json
-{"ts":"<текущие дата и время в ISO 8601 с офсетом +03:00>","mood":0,"energy":0,"stress":0,"sleep_quality":0,"notes":"onboarding — первичная оценка","tags":["onboarding"]}
+{"ts":"<current date and time in ISO 8601 with offset +03:00>","mood":0,"energy":0,"stress":0,"sleep_quality":0,"notes":"onboarding — initial assessment","tags":["onboarding"]}
 ```
 
-Значение `ts` брать из системного времени (`date +"%Y-%m-%dT%H:%M:%S%z"`), числовые поля — из ответов пользователя. Плейсхолдеры в файл не писать: строка вида `2026-XX-XXTXX:XX:XX` невалидна и ломает разбор JSONL.
+The value of `ts` is taken from the system time (`date +"%Y-%m-%dT%H:%M:%S%z"`), the numeric fields are taken from the user’s responses. Placeholders should not be written to the file: a line like `2026-XX-XXTXX:XX:XX` is invalid and breaks JSONL parsing.
 
-### Блок 9a. Репродуктивное здоровье (~3 мин, зависит от пола)
+### Block 9a. Reproductive health (~3 min, depends on biological sex)
 
-Состав вопросов определяется полем `basic.sex`. Тема чувствительная: спрашивать нейтрально, без оценок, любой вопрос можно пропустить. Если человек не хочет отвечать — записать в `_needs_input[]` и идти дальше.
+The composition of questions is determined by the `basic.sex` field. The topic is sensitive: ask neutrally, without judgment; any question can be skipped. If a person does not want to answer, write it in `_needs_input[]` and move on.
 
-Объяснить, зачем спрашиваешь: «Это тот же уровень контекста, что питание и сон. Без него система будет искать редкие причины там, где объяснение на поверхности».
+Explain why you are asking: “This is the same level of context as nutrition and sleep. Without it, the system may look for rare causes when the explanation is in the available context.”
 
-**Если `sex` = `female`:**
+**If `sex` = `female`:**
 
-1. Цикл: регулярный или нет, длительность, дата последней менструации
-2. Объём кровопотери: обильные менструации или обычные. **Вопрос обязателен** — это самая частая причина дефицита железа, и без него система пойдёт искать источник в ЖКТ
-3. Болезненность менструаций, влияние на работоспособность
-4. Беременности и роды в анамнезе
-5. Контрацепция: тип, с какого года
-6. Менопаузальный статус, если по возрасту актуально: приливы, изменения цикла
-7. Когда последний раз были цитология шейки матки, ВПЧ-тест, УЗИ малого таза, маммография
+1. Cycle: regular or not, duration, and date of last menstruation
+2. Amount of blood loss: heavy menstruation or normal. **The question is required** — this is the most common cause of iron deficiency, and without it the system may look for a source in the gastrointestinal tract
+3. Painful menstruation and impact on performance
+4. Pregnant and history of childbirth
+5. Contraception: type, from what year
+6. Menopausal status, if relevant by age: hot flashes, changes cycle
+7. When was the last time you had cervical cytology, HPV test, pelvic ultrasound, mammography?
 
-**Если `sex` = `male`:**
+**If `sex` = `male`:**
 
-1. Мочеиспускание: частота, ночные подъёмы, напор струи
-2. Была ли когда-нибудь сдача ПСА, когда
-3. Жалобы по репродуктивной части, если есть
+1. Urination: frequency, night rises, stream pressure
+2. Have you ever had a PSA test, and when?
+3. Reproductive concerns, if any
 
-**Если `sex` = `intersex` либо `not_specified`:** спросить, какие органы присутствуют, и от этого выстроить набор вопросов. Скрининг определяется наличием органа, а не идентичностью.
+**If `sex` = `intersex` or `not_specified`:** ask which organs are present, then build the questions from that. Screening is determined by organ presence, not identity.
 
-→ Записать в `Data/profile.json` → блок `reproductive`:
+→ Write to `Data/profile.json` → block `reproductive`:
 
 ```json
-// для female
+// for female
 { "cycle_regular": null, "cycle_length_days": null, "last_period": null,
   "flow": null, "dysmenorrhea": null, "pregnancies": null, "births": null,
   "contraception": null, "menopause_status": null,
   "last_cervical_screening": null, "last_mammography": null, "_needs_input": [] }
 
-// для male
+// for male
 { "urinary_symptoms": null, "last_psa": null, "notes": null, "_needs_input": [] }
 ```
 
-**Правила:**
+**Rules:**
 
-- Обильные менструации — не «особенность», а состояние, влияющее на обмен железа. Зафиксировать факт, не давая оценок
-- Пропущенный скрининг отметить как пробел, но не давить и не пугать
-- Не задавать вопросов, не следующих из `sex`. Мужчине не нужен вопрос про цикл, женщине — про простату
+- Heavy menstruation is not a “special characteristic” but a condition that affects iron metabolism. Record the fact without judgment
+- Mark a missed screening as a blank, but do not push or intimidate
+- Do not ask questions that do not follow from `sex`. A man doesn’t need a question about the menstrual cycle, and a woman doesn’t need a question about the prostate
 
-### Блок 10. Контекст жизни и среды (~7 мин)
+### Block 10. Context of life and environment (~7 min)
 
-Обязательный блок. На этих данных построена холистическая рамка (`.claude/shared/holistic-framework.md`), которой пользуются все 13 AI-специалистов и консилиум. Без них специалисты работают вслепую и уходят искать редкие причины там, где ответ в образе жизни.
+This block is mandatory. The holistic framework (`.claude/shared/holistic-framework.md`) is built on this data and used by all 13 AI specialists and the consilium. Without it, specialists work blindly and search for rare causes when the answer is in lifestyle.
 
-#### 10a. Привычки и поведение → `Data/profile.json` → `lifestyle`
+#### 10a. Habits and behavior → `Data/profile.json` → `lifestyle`
 
-Спросить:
-- **Питание:** считаешь ли калории, текущая фаза (дефицит / поддержание / профицит), типичный приём пищи, история веса
-- **Вода:** сколько литров в сутки
-- **Кофеин:** сколько кофе, чая, энергетиков в день и во сколько последний приём
-- **Алкоголь:** как часто, сколько
-- **Никотин:** сигареты, вейп, кальян, жевательный — что и как часто
-- **Сон:** во сколько ложишься и встаёшь в будни, во сколько в выходные, сколько часов выходит, при какой длительности страдаешь
-- **Экраны и свет:** экранное время в день, во сколько выключаешь экраны вечером, сколько дневного света утром
-- **Тренировки:** тип, частота, где занимаешься
-- **Работа:** сфера, сидячая или нет
+Ask:
+- **Nutrition:** do you count calories, what is the current phase (deficit / maintenance / surplus), typical food intake, weight history
+- **Water:** how many liters per day
+- **Caffeine:** how much coffee, tea, energy drinks per day and what time is the last dose?
+- **Alcohol:** how often, how much
+- **Nicotine:** cigarettes, vape, hookah, chewing - what and how often
+- **Sleep:** what time do you go to bed and get up on weekdays, what time on weekends, how many hours do you sleep, and at what duration do you start to feel unwell?
+- **Screens and light:** screen time per day, what time do you turn off screens in the evening, how much daylight in the morning
+- **Workouts:** type, frequency, where you do it
+- **Work:** sphere, sedentary or not
 
-Отдельно про регулярность сна: нерегулярный режим бьёт по здоровью сильнее короткой длительности, поэтому спрашивать фактическое время засыпания и подъёма, а не желаемое.
+Separately about regular sleep: an irregular sleep schedule has a stronger impact on health than a short sleep duration, so ask the actual time of falling asleep and getting up, and not the desired one.
 
-→ Записать в `Data/profile.json` → `lifestyle`: подобъекты `nutrition`, `hydration`, `caffeine`, `alcohol`, `smoking`, `sleep`, `sleep_regularity`, `screen_and_light`, `exercise`, `work`
-→ Всё, на что пользователь не ответил, перечислить в `lifestyle._needs_input[]` строкой «поле — что именно спросить и почему это важно»
+→ Write to `Data/profile.json` → `lifestyle`: subobjects `nutrition`, `hydration`, `caffeine`, `alcohol`, `smoking`, `sleep`, `sleep_regularity`, `screen_and_light`, `exercise`, `work`
+→ List everything that the user did not answer in `lifestyle._needs_input[]` with the line “field - what exactly to ask and why it is important”
 
-#### 10b. Среда и обстоятельства → `Data/context/environment.json`
+#### 10b. Environment and circumstances → `Data/context/environment.json`
 
-Спросить:
-- **География:** город, район, ближайшее метро, с какого года здесь живёшь, где жил раньше
-- **Медицина:** ОМС, ДМС (если есть — какой), готовность ездить, предельное время в пути
-- **Жильё:** тип, этаж, увлажнитель или очиститель воздуха, сырость и плесень, животные, темнота и тишина в спальне, температура
-- **Работа и нагрузка:** удалёнка или офис, график, часов у экрана, когнитивная нагрузка, давление дедлайнов, дорога до работы
-- **Циркадные:** утренний свет, экраны вечером, время на улице, сменный график, перелёты со сменой часовых поясов
-- **Стресс и опора:** основные стрессоры, финансовый и рабочий стресс, есть ли на кого опереться, значимые события за последний год
-- **Хронологические якоря:** переезды, смены работы, потери, операции, длительные болезни — с датами. Нужны, чтобы соотносить начало симптомов с событиями жизни
+Ask:
+- **Geography:** city, district, nearest metro, since what year you have lived here, where you lived before
+- **Healthcare access:** compulsory medical insurance, voluntary medical insurance (if any - which one), willingness to travel, maximum travel time
+- **Housing:** type, floor, humidifier or air purifier, dampness and mold, animals, darkness and silence in the bedroom, temperature
+- **Work and workload:** remote work or office, schedule, hours at a screen, cognitive load, deadline pressure, commute
+- **Circadian:** morning light, evening screens, time outside, shift schedule, jet lag
+- **Stress and support:** main stressors, financial and work stress, is there anyone to lean on, significant events over the past year
+- **Chronological anchors:** moves, job changes, losses, operations, long-term illnesses - with dates. Needed to correlate onset of symptoms with life events
 
-→ Записать в `Data/context/environment.json`: `location`, `healthcare_access`, `housing`, `work`, `circadian_context`, `stress_context` (в него — `chronology_anchors`), обновить `updated`
-→ `climate` заполнить производно от `location`: широта, длина светового дня, отопительный сезон, перепады давления. Это выводится из географии, спрашивать не нужно
-→ `air_and_water` — качество воздуха, близость к шоссе, источник и жёсткость воды
-→ Незаполненное — в `_needs_input[]`
+→ Write to `Data/context/environment.json`: `location`, `healthcare_access`, `housing`, `work`, `circadian_context`, and `stress_context` (including `chronology_anchors`); update `updated`
+→ Fill `climate` from `location`: latitude, daylight length, heating season, and pressure changes. This is derived from geography; do not ask for it
+→ `air_and_water` — air quality, proximity to a highway, water source and hardness
+→ Put blank fields in `_needs_input[]`
 
-Оба файла заполняются частично — это нормально. Пустое поле, честно помеченное в `_needs_input`, лучше выдуманного значения. Ничего не додумывать за пользователя.
+Both files may be partially filled — this is normal. An empty field honestly marked in `_needs_input` is better than an invented value. Do not fill in anything on the user’s behalf.
 
-### Блок 11. Цели и traction-план (~3 мин)
+### Block 11. Goals and traction plan (~3 min)
 
-1. Показать текущие KR из O5 и собранные данные
-2. Спросить: «Всё верно? Что скорректировать?»
-3. Установить приоритеты: что лечить первым?
-4. Ближайшие шаги (next actions) по каждому направлению
+1. Show current KR from O5 and collected data
+2. Ask: “Is everything correct? What should I adjust?”
+3. Set priorities: what to treat first?
+4. Next actions in each direction
 
-→ Обновить `Data/goals/YYYY.json` — goal, next_action, deadline для каждого направления
-→ Обновить `Goals/health-goals.md`
-→ Создать задачи в Todoist (follow-up визиты, анализы) — через MCP todoist `add-tasks`
-→ Создать события в Google Calendar (если есть конкретные даты)
+→ Update `Data/goals/YYYY.json` — `goal`, `next_action`, and `deadline` for each direction
+→ Update `Goals/health-goals.md`
+→ Create tasks in Todoist (follow-up visits, tests) — via the Todoist MCP `add-tasks`
+→ Create events in Google Calendar (if there are specific dates)
 
-## Финал
+## Final
 
-После всех блоков:
+After all blocks:
 
-1. **Сводка** — что заполнено, что нужно донести:
+1. **Summary** - what is filled in, what needs to be conveyed:
    ```
-   ✅ Профиль заполнен
-   ✅ 3 врача добавлены
-   ✅ 2 препарата зафиксированы
-   ✅ Контекст жизни и среды собран (пробелы: caffeine, housing)
-   ⚠️ Анализы: положи PDF в Inbox/ и запусти /inbox
-   ⚠️ Зубы: уточни номера при следующем визите
+   ✅ Profile is complete
+   ✅ 3 doctors added
+   ✅ 2 medications recorded
+   ✅ Life and environmental context collected (gaps: caffeine, housing)
+   ⚠️ Tests: put PDFs in Inbox/ and run /inbox
+   ⚠️ Teeth: confirm the tooth numbers at your next visit
    ```
 
-2. **Traction-таблица** — строки по всем направлениям из `Data/goals/YYYY.json` → `directions[]`, а не по фиксированному списку:
+2. **Traction table** — rows for all directions from `Data/goals/YYYY.json` → `directions[]`, rather than a fixed list:
    ```
-   | Направление | Статус | Следующий шаг | Дедлайн |
+   | Direction | Status | Next step | Deadline |
    |-------------|--------|---------------|---------|
-   | [area из directions[0]] | — | — | — |
-   | [area из directions[1]] | — | — | — |
+   | [area from directions[0]] | — | — | — |
+   | [area from directions[1]] | — | — | — |
    | ... | | | |
    ```
-   Строк столько, сколько направлений в файле.
+   There are as many lines as there are directions in the file.
 
-3. **Про сохранение данных.** Коммитить содержимое `Data/` не нужно и не получится: каталог целиком закрыт `.gitignore`. Это предохранитель — так случайно опубликовать свою медкарту невозможно, даже выполнив `git add -A`.
+3. **About saving data.** Committing the contents of `Data/` is neither necessary nor possible: the entire directory is covered by `.gitignore`. This safeguard makes it impossible to accidentally publish your medical record, even by running `git add -A`.
 
-   Сказать об этом пользователю прямо, одной фразой: «Данные записаны в файлы на твоём диске. Под контроль версий они намеренно не попадают — так их нельзя случайно опубликовать. Резервная копия — это твоя копия каталога, а не git».
+   Tell the user directly, in one phrase: “The data is written to files on your disk. They are deliberately not under version control, so they cannot be accidentally published. The backup is your copy of the directory, not git.”
 
-   Если в ходе онбординга изменились файлы вне `Data/` — например `MEMORY.md`, — их можно закоммитить обычным порядком, показав список через `git status --short` и спросив подтверждение. Push не делать: у проекта нет remote по построению.
+   If files outside `Data/` changed during onboarding — for example `MEMORY.md` — they can be committed in the usual way after showing the list with `git status --short` and asking for confirmation. Do not push: the project has no remote by design.
 
-4. **Передать эстафету в ритм работы.** Онбординг — разовое событие, дальше система живёт короткими касаниями. Не обрывать разговор на коммите: человек только что заполнил медкарту и не знает, что делать завтра. Показать ритм явно:
+4. **Hand off to the ongoing work rhythm.** Onboarding is a one-time event; afterward the system runs through brief sessions. Do not end the conversation at the commit: the person has just filled out a medical record and does not know what to do tomorrow. Show the rhythm explicitly:
 
    ```
-   Медкарта заведена. Дальше система работает так:
+   The medical record is set up. From here, the system works like this:
 
-     Начало сессии   /day        — что изменилось, что требует внимания
-     В процессе      по задаче   — /labs, /doctor, /body, /mental, /inbox
-     Конец сессии    /wrap-up    — сохранит контекст, обновит память, сделает коммит
+     Start of session   /day        — what changed, what requires attention
+     During a task     /labs, /doctor, /body, /mental, /inbox
+     End of session    /wrap-up    — save context, update memory, make a commit
 
-   /wrap-up — единственный способ не потерять наработанное между сессиями.
-   Он пишет лог, обновляет активный контекст и фиксирует изменения в git.
-   Без него следующая сессия начнётся почти с чистого листа.
+   /wrap-up is the only way not to lose what you have gained between sessions.
+   It writes a log, updates the active context and commits changes to git.
+   Without it, the next session will start almost from scratch.
 
-   Ближайший шаг: положи PDF анализов в Inbox/ и запусти /inbox.
-   Дальше по этапам — docs/ONBOARDING.md
+   The next step: put test PDFs in Inbox/ and run /inbox.
+   The remaining stages are in docs/ONBOARDING.md.
    ```
 
-   Если остались незаполненные блоки — назвать их здесь же и сказать, что вернуться можно в любой момент: `/profile` для точечной правки либо повторный `/onboarding`, который войдёт в режим дополнения и не будет переспрашивать пройденное.
+   If there are unfilled blocks, name them here and say that you can return at any time: `/profile` for spot editing, or repeated `/onboarding`, which will enter the addition mode and will not repeat what has been completed.
 
-## Пауза и возобновление
+## Pause and resume
 
-Интервью длинное и многошаговое, прерывание — штатная ситуация. Прогресс держать в `Cache/checkpoint.yml` (см. `.claude/rules/active-context.md`).
+The interview is long and multi-step, interruption is a normal situation. Keep progress in `Cache/checkpoint.yml` (see `.claude/rules/active-context.md`).
 
-**В начале интервью** записать:
+**At the beginning of the interview** write down:
 ```yaml
 active: true
 task_id: "onboarding-YYYY-MM-DD"
-task_title: "Health onboarding — discovery-интервью"
+task_title: "Health onboarding — discovery interview"
 skill: "onboarding"
 current_step: "block_1"
 total_steps: 11
-started_at: "<ISO 8601 из системного времени>"
-last_updated: "<ISO 8601 из системного времени>"
+started_at: "<ISO 8601 from system time>"
+last_updated: "<ISO 8601 from system time>"
 context:
   blocks_done: []
   blocks_remaining: ["block_1", ..., "block_11"]
   notes: ""
 ```
 
-**После каждого блока** обновлять `current_step`, `blocks_done`, `blocks_remaining`, `last_updated`.
+**After each block** update `current_step`, `blocks_done`, `blocks_remaining`, `last_updated`.
 
-**При просьбе о паузе** — сохранить данные текущего блока, обновить checkpoint, назвать пользователю, на чём остановились и чем продолжить:
+**If the user asks to pause** — save the current block’s data, update the checkpoint, and tell the user where you stopped and how to continue:
 ```
-Остановились на блоке N из 11 ([название]).
-Продолжить: /onboarding — подхватит с этого места.
+We stopped at block N of 11 ([name]).
+Continue with /onboarding — it will pick up from here.
 ```
 
-**При возобновлении** — прочитать `Cache/checkpoint.yml`; если `active: true` и `skill: onboarding`, начать с `current_step`, а не сначала. Пройденные блоки не переспрашивать.
+**When resuming** — read `Cache/checkpoint.yml`; if `active: true` and `skill: onboarding`, start from `current_step`, not from the beginning. Do not ask questions about completed blocks.
 
-**После блока 11** — `active: false`, поля обнулить.
+**After block 11** - `active: false`, reset the fields.
 
-## Правила
+## Rules
 
-- Вопросы задавать БЛОКАМИ, не все сразу
-- После каждого блока — подтверждение «Всё верно? Идём дальше?»
-- Если пользователь не знает ответ — пропустить, пометить как пробел в `_needs_input[]`. Не додумывать значения
-- **Существующие данные не перезаписывать без явного подтверждения** — см. «Запрет на перезапись» выше
-- Списки направлений и специалистов читать из данных (`Data/goals/YYYY.json`), не хардкодить
-- Файлы (PDF, сканы, фото) — только через `Inbox/` + `/inbox`. Не через `/labs`
-- Disclaimer при сборе данных: «Эти данные хранятся локально и в git. Решения о лечении — только с врачом.»
-- Не торопить — тайминги блоков ориентировочные, при просьбе о паузе фиксировать прогресс в checkpoint
-- **Медданные не покидают каталог проекта** — запись PHI куда-либо вовне запрещена. Наружу, если это вообще нужно, идут только агрегаты: количества, статусы, метрики. Никаких названий препаратов, диагнозов, аллергенов, ФИО и дат рождения
+- Ask questions in BLOCKS, not all at once
+- After each block — confirm “Is everything correct? Shall we continue?”
+- If the user does not know the answer, skip it and mark it as a blank in `_needs_input[]`. Do not invent a value
+- **Do not overwrite existing data without explicit confirmation** - see “Prohibition of overwriting” above
+- Read lists of directions and specialists from the data (`Data/goals/YYYY.json`), do not hardcode
+- Files (PDFs, scans, photos) — only through `Inbox/` + `/inbox`. Not via `/labs`
+- Disclaimer when collecting data: “This data is stored locally and in git. Treatment decisions are made only with a physician.”
+- Do not rush — block timings are approximate; when the user asks to pause, record progress in the checkpoint
+- **Medical data does not leave the project directory** — recording PHI anywhere outside is prohibited. If external exchange is needed at all, only aggregates go outside: quantities, statuses, metrics. No medication names, diagnoses, allergens, full names, or dates of birth
 
-**Критерий завершения:** режим (первый запуск / дополнение) определён по содержательным массивам профиля; пройдены все 11 блоков либо явно помечены пропущенные; `Data/profile.json` (включая `lifestyle`) и `Data/context/environment.json` записаны, незаполненное перечислено в `_needs_input[]`; ни одно непустое поле не перезаписано без подтверждения пользователя; traction-таблица покрывает все направления из `directions[]`; `Cache/checkpoint.yml` деактивирован; коммит сделан после показа списка файлов и согласия пользователя; пользователю показан ритм дальнейшей работы (/day → задачи → /wrap-up) и назван ближайший шаг.
+**Completion criterion:** mode (first launch / addition) is determined by the content arrays of the profile; all 11 blocks have been completed or the missing ones are clearly marked; `Data/profile.json` (including `lifestyle`) and `Data/context/environment.json` are written, the empty ones are listed in `_needs_input[]`; no non-empty fields are overwritten without user confirmation; traction table covers all directions from `directions[]`; `Cache/checkpoint.yml` deactivated; the commit is made after the list of files is shown and the user agrees; the user is shown the rhythm of further work (/day → tasks → /wrap-up) and the next step is named.

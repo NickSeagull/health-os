@@ -13,17 +13,17 @@ export interface LabIndexEntry {
 }
 
 /**
- * В Data/labs/ сосуществуют ТРИ поколения схемы:
- *   v1 — плоский `markers[]` в корне (большинство файлов)
- *   v2 — `panels[].markers[]` (партия 2026-03-15)
- *   v3 — `studies[].markers[]` (урологические файлы 2022)
- * Читать нужно все три: игнорирование v2 и v3 скрывало 28% маркеров.
- * Для сбора использовать collectMarkers() из lib/data/labs.ts.
+ * Data/labs/ contains THREE schema generations:
+ *   v1 — flat root `markers[]` (most files)
+ *   v2 — `panels[].markers[]` (the 2026-03-15 batch)
+ *   v3 — `studies[].markers[]` (the 2022 urology files)
+ * Read all three: ignoring v2 and v3 hid 28% of the markers.
+ * Use collectMarkers() from lib/data/labs.ts to collect them.
  */
 export interface LabFileData {
   version: number;
   date: string;
-  /** Имя лаборатории: в v1/v3 поле называется `lab`, в v2 — `laboratory` */
+  /** Laboratory name: `lab` in v1/v3 and `laboratory` in v2. */
   lab?: string;
   laboratory?: string;
   type: string;
@@ -33,12 +33,12 @@ export interface LabFileData {
   original_file?: string;
   original_files?: string[];
   archive_path?: string;
-  /** Дата готовности результата (v2) */
+  /** Date the result became available (v2). */
   analysis_date?: string;
-  /** То же в v3 */
+  /** Same meaning in v3. */
   result_date?: string;
   order_number?: string;
-  /** База — `Data/labs/`, то есть `pdfs/x.pdf` → `Data/labs/pdfs/x.pdf` */
+  /** Base is `Data/labs/`: `pdfs/x.pdf` → `Data/labs/pdfs/x.pdf`. */
   pdf_path?: string | null;
   markers?: LabMarker[];
   panels?: LabPanel[];
@@ -49,7 +49,7 @@ export interface LabFileData {
   notes?: string;
 }
 
-/** Заголовок панели лежит в `name` — так во всех четырёх файлах v2 на диске */
+/** Panel title is stored in `name`, as in all four v2 files on disk. */
 export interface LabPanel {
   name?: string | null;
   markers?: LabMarker[];
@@ -62,7 +62,7 @@ export interface LabStudy {
   markers?: LabMarker[];
 }
 
-/** В части файлов summary — объект со счётчиками, в части — связный текст */
+/** In some files summary is a counter object; in others it is prose. */
 export interface LabSummaryCounts {
   total?: number;
   normal?: number;
@@ -72,9 +72,9 @@ export interface LabSummaryCounts {
 }
 
 /**
- * Enum статусов — Блок 1 `data-schemas.md`. Прежде в union входили
- * `positive`, `negative` и `borderline`, которых нет ни в одном из 471 маркера
- * на диске и нет в каноническом перечне: тип разрешал писать несуществующие статусы.
+ * Status enum — Block 1 of `data-schemas.md`. The union previously included
+ * `positive`, `negative`, and `borderline`, none of which appears in the 471 markers
+ * on disk or in the canonical list; the type allowed nonexistent statuses to be written.
  */
 export type MarkerStatus =
   | "normal"
@@ -88,17 +88,17 @@ export type MarkerStatus =
 export interface LabMarker {
   name: string;
   value: number | string;
-  /** Не опускается даже при безразмерном результате — тогда `""` */
+  /** Included even for a unitless result, in which case it is `""`. */
   unit: string;
-  /** Вместо `value`, когда и результат, и референс словесные */
+  /** Used instead of `value` when both the result and reference are textual. */
   value_text?: string;
   reference_min?: number | null;
   reference_max?: number | null;
-  /** Словесный референс: «Не обнаружено» */
+  /** Textual reference, such as "Not detected". */
   reference_text?: string;
   reference_range?: string;
   status: MarkerStatus;
-  /** В v2 всегда null; новых значений не вводить */
+  /** Always null in v2; do not introduce new values. */
   flag?: null;
   note?: string;
   interpretation?: string;
@@ -109,11 +109,11 @@ export interface MarkerTrendPoint {
   value: number;
   unit: string;
   status: string;
-  /** `null` при одностороннем референсе — так лежит в данных */
+  /** `null` for a one-sided reference, as stored in the data. */
   reference_min?: number | null;
   reference_max?: number | null;
   lab: string;
-  /** true, если единица отличается от канонической и точка несопоставима напрямую */
+  /** true when the unit differs from canonical and the point is not directly comparable. */
   unitMismatch?: boolean;
 }
 

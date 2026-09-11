@@ -76,11 +76,11 @@ export function VisitEditorJson({
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error("Save failed");
-      toast.success("Визит сохранён");
+      toast.success("Visit saved");
       mutate("/api/visits");
       onClose();
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
     setSaving(false);
   }
@@ -88,37 +88,37 @@ export function VisitEditorJson({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">Редактирование</h3>
+        <h3 className="text-sm font-medium">Edit</h3>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" type="button" onClick={onClose}>
             <X className="h-3 w-3 mr-1" />
-            Отмена
+            Cancel
           </Button>
           <Button size="sm" type="submit" disabled={saving}>
             <Save className="h-3 w-3 mr-1" />
-            {saving ? "Сохранение..." : "Сохранить"}
+            {saving ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <Label>Дата</Label>
+          <Label>Date</Label>
           <Input {...register("date")} />
         </div>
         <div>
-          <Label>Специальность</Label>
+          <Label>Specialty</Label>
           <Input {...register("specialty")} />
         </div>
         <div>
-          <Label>Врач</Label>
+          <Label>Doctor</Label>
           <Input {...register("doctor")} />
         </div>
         <div>
-          <Label>Клиника</Label>
+          <Label>Clinic</Label>
           <Input {...register("clinic")} />
         </div>
         <div>
-          <Label>Тип приёма</Label>
+          <Label>Visit type</Label>
           <Input {...register("type")} />
         </div>
         <div>
@@ -127,15 +127,15 @@ export function VisitEditorJson({
         </div>
       </div>
       <div>
-        <Label>Причина обращения</Label>
+        <Label>Reason for visit</Label>
         <Textarea {...register("reason")} rows={2} />
       </div>
       <div>
-        <Label>Находки (каждая с новой строки)</Label>
+        <Label>Findings (one per line)</Label>
         <Textarea {...register("findings")} rows={3} />
       </div>
       <div>
-        <Label>Диагноз (каждый с новой строки)</Label>
+        <Label>Diagnosis (one per line)</Label>
         <Textarea {...register("diagnosis")} rows={2} />
       </div>
     </form>

@@ -22,30 +22,30 @@ export async function POST(request: Request) {
     const { date, lab, type, markers, summary, notes } = body ?? {};
 
     const v = new Validator();
-    // date попадает в имя файла напрямую — без проверки через него уходили за пределы каталога
+    // date is inserted directly into the filename; without validation it could escape the directory.
     v.requireDate(date, "date");
     v.requireString(type, "type");
     v.requireString(lab, "laboratory");
     v.requireArray(markers, "markers");
 
     const list: unknown[] = Array.isArray(markers) ? markers : [];
-    if (list.length === 0) v.add("markers: нужен хотя бы один маркер");
+    if (list.length === 0) v.add("markers: at least one marker is required");
 
     list.forEach((raw, i) => {
       const m = raw as Partial<LabMarker>;
       if (!m || typeof m !== "object") {
-        v.add(`markers[${i}]: объект маркера`);
+        v.add(`markers[${i}]: marker object required`);
         return;
       }
       if (typeof m.name !== "string" || m.name.trim() === "") {
-        v.add(`markers[${i}].name: обязательное поле`);
+        v.add(`markers[${i}].name: required field`);
       }
       if (m.value === undefined || m.value === null || m.value === "") {
-        v.add(`markers[${i}].value: обязательное поле`);
+        v.add(`markers[${i}].value: required field`);
       }
-      // unit не опускается даже при безразмерном результате — тогда "" (Блок 1)
+      // unit is required even for a unitless result; use "" in that case (Block 1).
       if (typeof m.unit !== "string") {
-        v.add(`markers[${i}].unit: строка, для безразмерного результата — пустая`);
+        v.add(`markers[${i}].unit: string; use an empty string for a unitless result`);
       }
       v.requireEnum(m.status, `markers[${i}].status`, MARKER_STATUSES);
     });
@@ -53,11 +53,11 @@ export async function POST(request: Request) {
     const invalid = v.response();
     if (invalid) return invalid;
 
-    // Кириллица транслитерируется: все 60 существующих файлов названы латиницей
+    // Existing lab files use Latin filenames.
     const slug = slugify(type);
     if (!slug) {
       return NextResponse.json(
-        { error: "type: не удалось построить имя файла, укажите тип латиницей" },
+        { error: "type: could not build a filename; provide the type in Latin characters" },
         { status: 400 }
       );
     }
@@ -65,23 +65,23 @@ export async function POST(request: Request) {
     const filename = `${date}_${slug}.json`;
     const filePath = resolveWithin(dataPath("labs"), filename, [".json"]);
 
-    // Молча перезаписывать существующий файл запрещено (Блок 0): за одну дату
-    // в Data/labs/ лежит до шести разных анализов, имя не уникально само по себе
+    // Silent overwrite is forbidden (Block 0): Data/labs/ can contain up to six
+    // different tests for one date, so the filename is not unique by date alone.
     const exists = await fs
       .access(filePath)
       .then(() => true)
       .catch(() => false);
     if (exists) {
       return conflict(
-        `Файл ${filename} уже существует. Уточните тип, чтобы имя стало различимым`,
+        `File ${filename} already exists. Specify the type so the filename is unique`,
         { file: filename }
       );
     }
 
     const typed = list as LabMarker[];
 
-    // Канон для новых записей — v2 с panels[] (Блок 1). Прежде роут писал плоский
-    // markers[] с полем `lab`, то есть создавал файлы в схеме, от которой ушли
+    // New records use the v2 canonical schema with panels[] (Block 1). Previously
+    // the route wrote flat markers[] with a `lab` field, creating outdated files.
     const labData = {
       version: 1,
       date,
@@ -89,10 +89,10 @@ export async function POST(request: Request) {
       laboratory: lab,
       source: "manual_entry",
       pdf_path: null,
-      // В v2 summary — объект счётчиков, свободный текст уходит в notes
+      // In v2, summary is a counter object; free text goes into notes.
       summary: countMarkerStatuses(typed),
-      // Заголовок панели на диске лежит в `name` — так во всех четырёх файлах v2.
-      // В data-schemas.md Блок 1 указан ключ `panel`, но такого ключа в данных нет
+      // The panel title is stored in `name`, as in all four v2 files.
+      // Block 1 of data-schemas.md lists `panel`, but that key is absent from the data.
       panels: [{ name: type, markers: typed }],
       notes: [summary, notes].filter(Boolean).join(" ") || undefined,
     };
@@ -110,8 +110,8 @@ export async function POST(request: Request) {
         markers_count: typed.length,
         flags: markerFlags(typed),
       });
-      // Индекс отсортирован по дате по возрастанию (Блок 2). push() в конец
-      // рушил порядок для всех, кто на него полагается
+      // Keep the index sorted by ascending date (Block 2). Pushing to the end
+      // broke ordering for every consumer that relies on it.
       index.analyses.sort((a, b) => a.date.localeCompare(b.date));
       await safeWriteJson(indexPath, index);
     }

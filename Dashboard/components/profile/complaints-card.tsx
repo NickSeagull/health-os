@@ -22,8 +22,8 @@ export function ComplaintsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Текущие жалобы</CardTitle>
-        <CardDescription>{profile.current_complaints.length} активных</CardDescription>
+        <CardTitle>Current complaints</CardTitle>
+        <CardDescription>{profile.current_complaints.length} active</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2 max-h-[400px] overflow-auto">
@@ -39,7 +39,7 @@ export function ComplaintsCard() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">{c.description}</p>
-              <p className="text-xs text-muted-foreground mt-1">С {c.since}</p>
+              <p className="text-xs text-muted-foreground mt-1">Since {c.since}</p>
             </div>
           ))}
         </div>

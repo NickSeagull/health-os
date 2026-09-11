@@ -1,140 +1,140 @@
 ---
 name: goals
 description: |
-  Прогресс по OKR O5 (здоровье), автообновление из WHOOP/labs/visits.
-  Триггеры: «цели здоровья», «health KR», «прогресс здоровья»
+  Progress on OKR O5 (health), automatically updated from WHOOP/labs/visits.
+  Triggers: “health goals”, “health KR”, “health progress”
 ---
 
-# Health Goals — цели и прогресс (v2)
+# Health Goals — goals and progress (v2)
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Отслеживание прогресса по OKR O5 «Решить вопросы со здоровьем». Работа с фазами, milestones, стоимостью. Автообновление из данных WHOOP, анализов и визитов.
+Track progress on OKR O5 “Resolve health issues”. Work with phases, milestones, and costs. Automatically update from WHOOP, test, and visit data.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### Просмотр прогресса
+### View progress
 
-1. Прочитать `Data/goals/YYYY.json` (v2 — с phases[], milestones[])
-2. Прочитать `Goals/health-goals.md`
-3. Для KR5.6 (фитнес) — подтянуть данные WHOOP за текущий месяц
+1. Read `Data/goals/YYYY.json` (v2 — with phases[], milestones[])
+2. Read `Goals/health-goals.md`
+3. For KR5.6 (fitness), retrieve WHOOP data for the current month
 
-Показать обзор по фазам:
+Show overview by phase:
 
 ```
-## OKR O5. Решить вопросы со здоровьем
+## OKR O5. Resolve health issues
 
-### Фаза 1. Срочное (март–апрель)
-| KR | Направление | Статус | Прогресс | Следующий milestone | Дедлайн |
+### Phase 1. Urgent (March–April)
+| KR | Direction | Status | Progress | Next milestone | Deadline |
 |----|-------------|--------|----------|---------------------|---------|
-| 5.0 | Гематолог | 🟡 investigating | ░░░░ 0/4 | Направление от терапевта | 01.04 |
-| 5.1 | Урология | 🔴 not_started | ░░░░ 0/4 | Записаться | 01.04 |
-| 5.5 | Гормоны | 🔴 not_started | ░░░ 0/3 | Сдать панель | 01.04 |
+| 5.0 | Hematology | 🟡 investigating | ░░░░ 0/4 | Primary care referral | 01.04 |
+| 5.1 | Urology | 🔴 not_started | ░░░░ 0/4 | Book an appointment | 01.04 |
+| 5.5 | Hormones | 🔴 not_started | ░░░ 0/3 | Get the panel tested | 01.04 |
 
-### Фаза 2. Плановое (апрель–июнь)
+### Phase 2. Planned (April–June)
 ...
 
-### Фаза 3. Поддержка (Q3)
+### Phase 3. Maintenance (Q3)
 ...
 
-Общий прогресс O5: ░░░░░░░░░░ 0/41 milestones
-💰 Расходы: 0 / ~159 000 ₽ (оценка)
+Overall O5 progress: ░░░░░░░░░░ 0/41 milestones
+💰 Costs: 0 / ~159,000 ₽ (estimate)
 ```
 
-### Детальный просмотр direction
+### Detailed direction view
 
-По запросу «подробнее KR5.X»:
-1. Показать ВСЕ milestones для direction:
+On “details KR5.X”:
+1. Show ALL milestones for the direction:
 ```
-### KR5.4. Стоматология — in_progress
+### KR5.4. Dentistry — in_progress
 
-| # | Milestone | Тип | Статус | Дедлайн | ОМС | Стоимость |
+| # | Milestone | Type | Status | Deadline | OMS | Cost |
 |---|-----------|-----|--------|---------|-----|-----------|
-| 1 | Чистка | procedure | ⬜ | 15.04 | ❌ | ~5 000 |
-| 2 | План лечения | visit | ⬜ | 30.04 | ❌ | ~2 000 |
-| 3 | Лечение кариеса | procedure | ⬜ | 31.05 | ❌ | ~15 000 |
-| 4 | Коронка | procedure | ⬜ | 30.06 | ❌ | ~20 000 |
-| 5 | Консультация имплант | visit | ⬜ | 30.06 | ❌ | ~2 000 |
-| 6 | Мост/имплант | procedure | ⬜ | 30.09 | ❌ | ~35 000 |
+| 1 | Cleaning | procedure | ⬜ | 15.04 | ❌ | ~5,000 |
+| 2 | Treatment plan | visit | ⬜ | 30.04 | ❌ | ~2,000 |
+| 3 | Caries treatment | procedure | ⬜ | 31.05 | ❌ | ~15,000 |
+| 4 | Crown | procedure | ⬜ | 30.06 | ❌ | ~20,000 |
+| 5 | Implant consultation | visit | ⬜ | 30.06 | ❌ | ~2,000 |
+| 6 | Bridge/implant | procedure | ⬜ | 30.09 | ❌ | ~35,000 |
 
-Зависимости: 2→1, 3→2, 4→3, 5→3, 6→5
-Оценка: ~79 000 ₽ | Факт: 0 ₽
-Связанные визиты: нет
-Связанные анализы: нет
+Dependencies: 2→1, 3→2, 4→3, 5→3, 6→5
+Estimate: ~79,000 ₽ | Actual: 0 ₽
+Related visits: none
+Related tests: none
 ```
 
-2. Показать связанные визиты и анализы из `related_visits[]` / `related_labs[]`
+2. Show related visits and tests from `related_visits[]` / `related_labs[]`
 
-### Обновление milestone
+### Update a milestone
 
-При запросе или после визита/анализов:
-1. Спросить: какой milestone обновить
-2. Обновить `Data/goals/YYYY.json`:
+When requested or after a visit/test:
+1. Ask which milestone to update
+2. Update `Data/goals/YYYY.json`:
    - `milestones[].status` → `completed` / `in_progress` / `skipped`
-   - `directions[].last_activity` → текущая дата
-   - `directions[].cost_actual_rub` — пересчитать из milestones
-   - `cost_summary` — пересчитать агрегаты
-3. Обновить `directions[].status` — если все milestones completed → `monitoring` / `resolved`
-4. Пересчитать progress bar
+   - `directions[].last_activity` → the current date
+   - `directions[].cost_actual_rub` — recalculate from milestones
+   - `cost_summary` — recalculate aggregates
+3. Update `directions[].status`; if all milestones are completed → `monitoring` / `resolved`
+4. Recalculate the progress bar
 
-### Авто-детект завершённых milestones
+### Auto-detect completed milestones
 
-При запуске проверить:
-1. `Data/doctors/visits/_index.json` — новые визиты, совпадающие с milestone type=visit
-2. `Data/labs/_index.json` — новые анализы, совпадающие с milestone type=lab
-3. Если milestone.todoist_task_id → проверить статус задачи в Todoist
+On launch, check:
+1. `Data/doctors/visits/_index.json` — new visits matching milestone type=visit
+2. `Data/labs/_index.json` — new tests matching milestone type=lab
+3. If milestone.todoist_task_id is present, check the task status in Todoist
 
-Предложить пользователю: «Обнаружен визит [X] — пометить milestone [Y] как completed?»
+Offer the user: “Visit [X] detected — mark milestone [Y] as completed?”
 
-### Создание Todoist-задачи из milestone
+### Create a Todoist task from a milestone
 
-При создании нового milestone или по запросу:
-1. Создать задачу в Todoist (проект «Здоровье», секция по фазе)
-2. Записать `todoist_task_id` в milestone
-3. Установить deadline и priority
+When creating a new milestone or on request:
+1. Create a task in Todoist (the “Health” project, section by phase)
+2. Write `todoist_task_id` to the milestone
+3. Set the deadline and priority
 
-### Сводка расходов
+### Cost summary
 
 ```
-💰 Расходы по здоровью
+💰 Health costs
 
-| Фаза | Оценка | Факт | Δ |
+| Phase | Estimate | Actual | Δ |
 |------|--------|------|---|
-| 1. Срочное | 23 000 | 0 | −23 000 |
-| 2. Плановое | 106 000 | 0 | −106 000 |
-| 3. Поддержка | 30 000 | 0 | −30 000 |
-| **Итого** | **159 000** | **0** | |
+| 1. Urgent | 23,000 | 0 | −23,000 |
+| 2. Planned | 106,000 | 0 | −106,000 |
+| 3. Maintenance | 30,000 | 0 | −30,000 |
+| **Total** | **159,000** | **0** | |
 
-ОМС-экономия: ~XX 000 ₽
+OMS savings: ~XX,000 ₽
 ```
 
-### Обновление KR5.6 (Фитнес)
+### Update KR5.6 (Fitness)
 
-При каждом запуске:
-1. Получить WHOOP strain за текущий месяц
-2. Посчитать количество activities
-3. Обновить прогресс milestone `kr5.6_m1`
+On every launch:
+1. Get WHOOP strain for the current month
+2. Count the activities
+3. Update milestone `kr5.6_m1` progress
 
-### Синхронизация Goals
+### Goals synchronization
 
-После ЛЮБОГО обновления goals:
-1. Пересгенерировать `Goals/health-goals.md` — все 12 KR, фазы, чекбоксы
+After ANY goals update:
+1. Regenerate `Goals/health-goals.md` — all 12 KRs, phases, and checkboxes
 
-## Правила
+## Rules
 
-- Прогресс = объективные данные (визиты, анализы, тренировки)
-- Статусы: not_started → investigating → in_progress → monitoring → resolved
-- Стоимость: всегда два пути (ОМС / частно)
-- При обновлении — каскадно обновлять `Goals/health-goals.md`, cost_summary
-- Детект застоя: если `last_activity` > 2 недель назад и status != monitoring/resolved → предупредить
+- Progress = objective data (visits, tests, workouts)
+- Statuses: not_started → investigating → in_progress → monitoring → resolved
+- Costs: always show both paths (public insurance / private)
+- On update, cascade updates to `Goals/health-goals.md` and `cost_summary`
+- Detect stagnation: if `last_activity` was more than 2 weeks ago and status != monitoring/resolved, warn
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a doctor before making treatment decisions.*

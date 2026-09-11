@@ -2,673 +2,673 @@
   "version": 3,
   "specialists": {
     "hematologist": {
-      "name_ru": "Гематолог",
+      "name": "Hematologist",
       "primary_markers": [
         {
-          "name": "Гемоглобин (Hb)",
-          "description": "Кислородотранспортная функция, анемии, полицитемии"
+          "name": "Hemoglobin",
+          "description": "Oxygen-carrying function, anemia, polycythemia"
         },
         {
-          "name": "Эритроциты (RBC)",
-          "description": "Красные кровяные клетки"
+          "name": "Red blood cells (RBC)",
+          "description": "Red blood cells"
         },
         {
-          "name": "Гематокрит (Ht)",
-          "description": "Объёмная доля эритроцитов"
+          "name": "Hematocrit (Ht)",
+          "description": "Packed cell volume"
         },
         {
           "name": "MCV",
-          "description": "Средний объём эритроцита"
+          "description": "Mean red-cell volume"
         },
         {
           "name": "MCH",
-          "description": "Среднее содержание Hb в эритроците"
+          "description": "Mean hemoglobin content per red cell"
         },
         {
           "name": "MCHC",
-          "description": "Средняя концентрация Hb в эритроците"
+          "description": "Mean hemoglobin concentration in red cells"
         },
         {
           "name": "RDW",
-          "description": "Ширина распределения эритроцитов"
+          "description": "Red-cell distribution width"
         },
         {
-          "name": "Лейкоциты (WBC)",
-          "description": "Общее число белых клеток"
+          "name": "White blood cells (WBC)",
+          "description": "Total white-cell count"
         },
         {
-          "name": "Нейтрофилы (%, абс.)",
-          "description": "Бактериальные инфекции, нейтропении"
+          "name": "Neutrophils (%, absolute)",
+          "description": "Bacterial infections, neutropenia"
         },
         {
-          "name": "Лимфоциты (%, абс.)",
-          "description": "Вирусные инфекции, лимфопролиферативные"
+          "name": "Lymphocytes (%, absolute)",
+          "description": "Viral infections, lymphoproliferative disorders"
         },
         {
-          "name": "Моноциты (%, абс.)",
-          "description": "Хронические инфекции, моноцитоз"
+          "name": "Monocytes (%, absolute)",
+          "description": "Chronic infections, monocytosis"
         },
         {
-          "name": "Эозинофилы (%, абс.)",
-          "description": "Аллергии, паразитозы"
+          "name": "Eosinophils (%, absolute)",
+          "description": "Allergies, parasitic infections"
         },
         {
-          "name": "Базофилы (%, абс.)",
-          "description": "Аллергические и миелопролиферативные"
+          "name": "Basophils (%, absolute)",
+          "description": "Allergic and myeloproliferative disorders"
         },
         {
-          "name": "Тромбоциты (PLT)",
-          "description": "Свёртывание, тромбоцитозы/пении"
+          "name": "Platelets (PLT)",
+          "description": "Coagulation, thrombocytosis/thrombocytopenia"
         },
         {
           "name": "MPV",
-          "description": "Средний объём тромбоцита"
+          "description": "Mean platelet volume"
         },
         {
           "name": "PDW",
-          "description": "Ширина распределения тромбоцитов"
+          "description": "Platelet distribution width"
         },
         {
-          "name": "Тромбоцитокрит (PCT)",
-          "description": "Объёмная доля тромбоцитов"
+          "name": "Plateletcrit (PCT)",
+          "description": "Plateletcrit"
         },
         {
-          "name": "СОЭ",
-          "description": "Скорость оседания эритроцитов — маркер воспаления"
+          "name": "ESR",
+          "description": "Erythrocyte sedimentation rate — marker of inflammation"
         },
         {
-          "name": "Ретикулоциты",
-          "description": "Молодые эритроциты — активность эритропоэза"
+          "name": "Reticulocytes",
+          "description": "Young red cells — erythropoietic activity"
         },
         {
-          "name": "Альфа-1 глобулин",
-          "description": "Белковая фракция — острофазный ответ"
+          "name": "Alpha-1 globulin",
+          "description": "Protein fraction — acute-phase response"
         },
         {
-          "name": "Альфа-2 глобулин",
-          "description": "Белковая фракция — острофазный ответ, гаптоглобин, церулоплазмин"
+          "name": "Alpha-2 globulin",
+          "description": "Protein fraction — acute-phase response, haptoglobin, ceruloplasmin"
         },
         {
-          "name": "Бета-глобулин",
-          "description": "Белковая фракция — трансферрин, компоненты комплемента"
+          "name": "Beta globulin",
+          "description": "Protein fraction — transferrin, complement components"
         },
         {
-          "name": "Гамма-глобулин",
-          "description": "Белковая фракция — иммуноглобулины. M-градиент требует исключения миеломы и MGUS"
+          "name": "Gamma globulin",
+          "description": "Protein fraction — immunoglobulins. An M-gradient requires exclusion of myeloma and MGUS"
         },
         {
-          "name": "Цветовой показатель",
-          "description": "Насыщение эритроцита гемоглобином — тип анемии"
+          "name": "Color index",
+          "description": "Red-cell hemoglobin saturation — anemia type"
         },
         {
-          "name": "Нейтрофилы сегментоядерные",
-          "description": "Зрелые нейтрофилы. Отдельный показатель от общих нейтрофилов"
+          "name": "Segmented neutrophils",
+          "description": "Mature neutrophils. Separate marker from total neutrophils"
         },
         {
-          "name": "Группа крови",
-          "description": "Трансфузиологическая принадлежность"
+          "name": "Blood type",
+          "description": "Blood-group compatibility for transfusion"
         },
         {
-          "name": "Резус-фактор",
-          "description": "Трансфузиологическая принадлежность"
+          "name": "Rh factor",
+          "description": "Blood-group compatibility for transfusion"
         }
       ],
       "secondary_markers": [
         {
-          "name": "Ферритин",
-          "description": "Депо железа"
+          "name": "Ferritin",
+          "description": "Iron stores"
         },
         {
-          "name": "Железо сывороточное",
-          "description": "Транспортное железо"
+          "name": "Serum iron",
+          "description": "Transport iron"
         },
         {
-          "name": "ОЖСС",
-          "description": "Общая железосвязывающая способность"
+          "name": "TIBC",
+          "description": "Total iron-binding capacity"
         },
         {
-          "name": "Витамин B12",
-          "description": "Мегалобластная анемия"
+          "name": "Vitamin B12",
+          "description": "Megaloblastic anemia"
         },
         {
-          "name": "Фолиевая кислота",
-          "description": "Мегалобластная анемия"
+          "name": "Folate",
+          "description": "Megaloblastic anemia"
         },
         {
-          "name": "ЛДГ",
-          "description": "Гемолиз, лимфопролиферация"
+          "name": "LDH",
+          "description": "Hemolysis, lymphoproliferation"
         },
         {
-          "name": "Гаптоглобин",
-          "description": "Гемолитические анемии"
+          "name": "Haptoglobin",
+          "description": "Hemolytic anemias"
         }
       ],
       "red_flags": [
-        "Лимфоциты >50% или абс. >5.0 — иммунофенотипирование обязательно",
-        "Hb >170 или Ht >52% — исключить истинную полицитемию (JAK2)",
-        "Тромбоциты >450 или <100 — костный мозг?",
-        "WBC >15 или <3 — системное заболевание"
+        "lymphocytes >50% or abs. >5.0 — immunophenotyping required",
+        "Hb >170 or Ht >52% — exclude true polycythemia (JAK2)",
+        "platelets >450 or <100 — bone marrow?",
+        "WBC >15 or <3 — systemic disease"
       ],
       "visit_hint": "Data/doctors/visits/*hemato*"
     },
     "endocrinologist": {
-      "name_ru": "Эндокринолог",
+      "name": "Endocrinologist",
       "primary_markers": [
         {
-          "name": "ТТГ",
-          "description": "Тиреотропный гормон — регулятор щитовидной железы"
+          "name": "TSH",
+          "description": "Thyroid-stimulating hormone — thyroid regulation"
         },
         {
-          "name": "Т3 свободный",
-          "description": "Активный гормон щитовидной железы"
+          "name": "Free T3",
+          "description": "Active thyroid hormone"
         },
         {
-          "name": "Т4 свободный",
-          "description": "Тироксин свободный"
+          "name": "Free T4",
+          "description": "Free thyroxine"
         },
         {
-          "name": "Анти-ТПО",
-          "description": "Антитела к тиреопероксидазе — аутоиммунный тиреоидит"
+          "name": "Anti-TPO",
+          "description": "Thyroid peroxidase antibodies — autoimmune thyroiditis"
         },
         {
-          "name": "АКТГ",
-          "description": "Адренокортикотропный гормон — ось гипоталамус-гипофиз-надпочечники"
+          "name": "ACTH",
+          "description": "Adrenocorticotropic hormone — hypothalamic-pituitary-adrenal axis"
         },
         {
-          "name": "Кортизол",
-          "description": "Гормон стресса, надпочечники"
+          "name": "Cortisol",
+          "description": "Stress hormone; adrenal glands"
         },
         {
-          "name": "Ренин",
-          "description": "РААС — ренин-ангиотензин-альдостероновая система"
+          "name": "Renin",
+          "description": "RAAS — renin-angiotensin-aldosterone system"
         },
         {
-          "name": "Альдостерон",
-          "description": "Минералокортикоид, электролитный баланс"
+          "name": "Aldosterone",
+          "description": "Mineralocorticoid; electrolyte balance"
         },
         {
-          "name": "Эстрадиол",
-          "description": "Эстрогены у мужчин — гинекомастия, ожирение"
+          "name": "Estradiol",
+          "description": "Estrogens in men — gynecomastia, obesity"
         },
         {
-          "name": "Тестостерон",
-          "description": "Андрогены, гипогонадизм"
+          "name": "Total testosterone",
+          "description": "Androgens, hypogonadism"
         },
         {
-          "name": "Пролактин",
-          "description": "Пролактинома, гинекомастия"
+          "name": "Prolactin",
+          "description": "Prolactinoma, gynecomastia"
         },
         {
-          "name": "Витамин D (25-OH)",
-          "description": "Кальциевый обмен, иммуномодуляция"
+          "name": "Vitamin D",
+          "description": "Calcium metabolism, immunomodulation"
         },
         {
-          "name": "ГСПГ (глобулин, связывающий половые гормоны)",
-          "description": "Определяет биодоступную фракцию половых гормонов"
+          "name": "SHBG (sex hormone-binding globulin)",
+          "description": "Determines the bioavailable fraction of sex hormones"
         },
         {
-          "name": "Индекс свободных андрогенов",
-          "description": "Расчётный показатель биодоступного тестостерона"
+          "name": "Free androgen index",
+          "description": "Calculated measure of bioavailable testosterone"
         }
       ],
       "secondary_markers": [
         {
-          "name": "Инсулин",
-          "description": "Инсулинорезистентность"
+          "name": "Insulin",
+          "description": "Insulin resistance"
         },
         {
           "name": "HbA1c",
-          "description": "Гликированный гемоглобин — средний сахар за 3 месяца"
+          "description": "Glycated hemoglobin — average glucose over three months"
         },
         {
-          "name": "С-пептид",
-          "description": "Продукция инсулина"
+          "name": "C-peptide",
+          "description": "Insulin production"
         },
         {
-          "name": "Глюкоза",
-          "description": "Углеводный обмен"
+          "name": "Glucose",
+          "description": "Carbohydrate metabolism"
         },
         {
-          "name": "Кальций общий",
-          "description": "Паратгормон, костный обмен"
+          "name": "Total calcium",
+          "description": "Parathyroid hormone; bone metabolism"
         }
       ],
       "red_flags": [
-        "АКТГ >2N + кортизол N/↓ — субклинический гипокортицизм, проба с синактеном",
-        "Ренин >3N — вторичный гиперальдостеронизм, стеноз почечных артерий",
-        "ТТГ >10 или <0.1 — явный гипо/гипертиреоз",
-        "Эстрадиол >200 у мужчины — исключить гормонпродуцирующую опухоль",
-        "Пролактин >1000 — МРТ гипофиза обязательно"
+        "ACTH >2N + Cortisol N/↓ — subclinical adrenal insufficiency, test with Synacthen",
+        "Renin >3N — secondary hyperaldosteronism; renal-artery stenosis",
+        "TSH >10 or <0.1 — overt hypo/hyperthyroidism",
+        "Estradiol >200 in a man — exclude hormone-producing tumor",
+        "Prolactin >1000 — MRI pituitary required"
       ],
       "visit_hint": "Data/doctors/visits/*endocrin*"
     },
     "urologist": {
-      "name_ru": "Уролог",
+      "name": "Urologist",
       "primary_markers": [
         {
-          "name": "ПСА",
-          "description": "Простатический специфический антиген"
+          "name": "PSA",
+          "description": "Prostate-specific antigen"
         },
         {
-          "name": "ОАМ",
-          "description": "Общий анализ мочи"
+          "name": "Urinalysis",
+          "description": "Urinalysis"
         },
         {
-          "name": "Бакпосев мочи",
-          "description": "Микробиологическое исследование"
+          "name": "Urine culture",
+          "description": "Microbiological examination"
         },
         {
-          "name": "Креатинин",
-          "description": "Функция почек"
+          "name": "Creatinine",
+          "description": "Kidney function"
         },
         {
-          "name": "СКФ",
-          "description": "Скорость клубочковой фильтрации"
+          "name": "eGFR",
+          "description": "Estimated glomerular filtration rate"
         },
         {
-          "name": "Мочевина",
-          "description": "Азотистый обмен, функция почек"
+          "name": "Urea",
+          "description": "Nitrogen metabolism; kidney function"
         },
         {
-          "name": "Мочевая кислота",
-          "description": "Подагра, нефропатия"
+          "name": "Uric acid",
+          "description": "Gout, nephropathy"
         },
         {
-          "name": "Микроальбумин мочи",
-          "description": "Ранние признаки нефропатии"
+          "name": "Urine microalbumin",
+          "description": "Early signs of nephropathy"
         }
       ],
       "secondary_markers": [
         {
-          "name": "Калий",
-          "description": "Электролитный баланс (связь с ренином)"
+          "name": "Potassium",
+          "description": "Electrolyte balance (connection with renin)"
         },
         {
-          "name": "Натрий",
-          "description": "Электролитный баланс"
+          "name": "Sodium",
+          "description": "Electrolyte balance"
         },
         {
-          "name": "Ренин",
-          "description": "Реноваскулярная гипертензия"
+          "name": "Renin",
+          "description": "Renovascular hypertension"
         }
       ],
       "red_flags": [
-        "СКФ <60 — ХБП стадия 3+",
-        "Микроальбумин >300 мг/л — макроальбуминурия",
-        "Мочевая кислота >480 мкмоль/л — риск уратной нефропатии",
-        "Креатинин >120 мкмоль/л — снижение функции почек"
+        "eGFR <60 — CKD stage 3+",
+        "Microalbumin >300 mg/L — macroalbuminuria",
+        "Uric acid >480 µmol/L — risk of urate nephropathy",
+        "Creatinine >120 µmol/L — reduced kidney function"
       ],
       "visit_hint": "Data/doctors/visits/*urolog*"
     },
     "gastroenterologist": {
-      "name_ru": "Гастроэнтеролог",
+      "name": "Gastroenterologist",
       "primary_markers": [
         {
-          "name": "АЛТ",
-          "description": "Печёночный фермент, гепатотоксичность"
+          "name": "ALT",
+          "description": "Liver enzyme; hepatotoxicity"
         },
         {
-          "name": "АСТ",
-          "description": "Печёночный/кардио фермент"
+          "name": "AST",
+          "description": "Liver/cardiac enzyme"
         },
         {
-          "name": "ГГТ",
-          "description": "Холестаз, алкогольное поражение"
+          "name": "GGT",
+          "description": "Cholestasis; alcohol-related injury"
         },
         {
-          "name": "Билирубин",
-          "description": "Общий и прямой — желтухи"
+          "name": "Bilirubin",
+          "description": "Overall and direct — jaundice"
         },
         {
-          "name": "Липаза",
-          "description": "Панкреатит"
+          "name": "Lipase",
+          "description": "Pancreatitis"
         },
         {
-          "name": "Амилаза",
-          "description": "Панкреатит"
+          "name": "Amylase",
+          "description": "Pancreatitis"
         },
         {
-          "name": "H. pylori (антитела, дыхательный тест)",
-          "description": "Хеликобактерная инфекция"
+          "name": "H. pylori (antibodies, breath test)",
+          "description": "Helicobacter infection"
         },
         {
-          "name": "Копрограмма",
-          "description": "Переваривание, мальабсорбция"
+          "name": "Stool analysis",
+          "description": "Digestion; malabsorption"
         },
         {
-          "name": "Кальпротектин фекальный",
-          "description": "Воспаление кишечника"
+          "name": "Fecal calprotectin",
+          "description": "Intestinal inflammation"
         },
         {
-          "name": "FOB (скрытая кровь в кале)",
-          "description": "Кровотечение ЖКТ, колоректальный рак"
+          "name": "FOB (occult blood in stool)",
+          "description": "Gastrointestinal bleeding; colorectal cancer"
         },
         {
-          "name": "Триглицериды",
-          "description": "Липидный обмен, стеатоз печени"
+          "name": "Triglycerides",
+          "description": "Lipid metabolism; hepatic steatosis"
         }
       ],
       "secondary_markers": [
         {
-          "name": "Холестерин общий",
-          "description": "Липидный профиль"
+          "name": "Total cholesterol",
+          "description": "Lipid profile"
         },
         {
-          "name": "Общий белок",
-          "description": "Нутритивный статус, мальабсорбция"
+          "name": "Total protein",
+          "description": "Nutritional status; malabsorption"
         },
         {
-          "name": "Альбумин",
-          "description": "Синтетическая функция печени"
+          "name": "Albumin",
+          "description": "Synthetic liver function"
         },
         {
-          "name": "MCM6 (генетика)",
-          "description": "Лактазная недостаточность"
+          "name": "MCM6 (genetics)",
+          "description": "Lactase deficiency"
         }
       ],
       "red_flags": [
-        "FOB+ + возраст >25 + полицитемия — колоноскопия обязательна",
-        "АЛТ/АСТ >3N — исключить лекарственный гепатит",
-        "Кальпротектин >250 — исключить ВЗК (IBD)",
-        "Триглицериды >5.6 ммоль/л — риск панкреатита"
+        "FOB+ + age >25 + polycythemia — colonoscopy required",
+        "ALT/AST >3N — exclude drug-induced hepatitis",
+        "Calprotectin >250 — exclude inflammatory bowel disease (IBD)",
+        "Triglycerides >5.6 mmol/L — risk of pancreatitis"
       ],
       "visit_hint": "Data/doctors/visits/*gastro*"
     },
     "neurologist": {
-      "name_ru": "Невролог",
+      "name": "Neurologist",
       "primary_markers": [],
       "secondary_markers": [
         {
-          "name": "Витамин B12",
-          "description": "Нейропатия, когнитивные нарушения"
+          "name": "Vitamin B12",
+          "description": "Neuropathy, cognitive impairment"
         },
         {
-          "name": "Витамин D",
-          "description": "Нейропротекция"
+          "name": "Vitamin D",
+          "description": "Neuroprotection"
         },
         {
-          "name": "Магний",
-          "description": "Мигрень, нервно-мышечная проводимость"
+          "name": "Magnesium",
+          "description": "Migraine; neuromuscular conduction"
         },
         {
-          "name": "Кальций",
-          "description": "Тетания, судороги"
+          "name": "Calcium",
+          "description": "Tetany; seizures"
         }
       ],
       "red_flags": [
-        "Новая неврологическая симптоматика (слабость, онемение, нарушение зрения) — МРТ экстренно",
-        "Усиление ГБ + рвота + нечёткое зрение — декомпенсация ВЧД",
-        "Нарастающая слабость в конечностях — компрессия корешков C5-C6"
+        "New neurological symptoms (weakness, numbness, visual disturbance) — MRI urgent",
+        "Worsening headache + vomiting + blurred vision — decompensated intracranial hypertension",
+        "Progressive weakness in limbs — compression of nerve roots C5-C6"
       ],
       "visit_hint": "Data/doctors/visits/*neuro*"
     },
     "cardiologist": {
-      "name_ru": "Кардиолог",
+      "name": "Cardiologist",
       "primary_markers": [
         {
-          "name": "Холестерин общий",
-          "description": "Общий кардиориск"
+          "name": "Total cholesterol",
+          "description": "Overall cardiovascular risk"
         },
         {
-          "name": "Триглицериды",
-          "description": "Атерогенная дислипидемия"
+          "name": "Triglycerides",
+          "description": "Atherogenic dyslipidemia"
         },
         {
-          "name": "ЛПНП",
-          "description": "«Плохой» холестерин"
+          "name": "LDL",
+          "description": "“Bad” cholesterol"
         },
         {
-          "name": "ЛПВП",
-          "description": "«Хороший» холестерин"
+          "name": "HDL",
+          "description": "“Good” cholesterol"
         },
         {
-          "name": "Калий (K)",
-          "description": "Аритмогенный потенциал"
+          "name": "Potassium (K)",
+          "description": "Arrhythmogenic potential"
         },
         {
-          "name": "Натрий (Na)",
-          "description": "Водно-электролитный баланс"
+          "name": "Sodium (Na)",
+          "description": "Fluid and electrolyte balance"
         },
         {
-          "name": "Магний (Mg)",
-          "description": "Антиаритмический"
+          "name": "Magnesium (Mg)",
+          "description": "Antiarrhythmic"
         },
         {
-          "name": "CRP (С-реактивный белок)",
-          "description": "Сосудистое воспаление"
+          "name": "CRP (C-reactive protein)",
+          "description": "Vascular inflammation"
         },
         {
-          "name": "ЧСС",
-          "description": "Частота сердечных сокращений"
+          "name": "Heart rate",
+          "description": "Heart rate"
         },
         {
-          "name": "АД",
-          "description": "Артериальное давление"
+          "name": "Blood pressure",
+          "description": "Arterial pressure"
         }
       ],
       "secondary_markers": [
         {
           "name": "BNP / NT-proBNP",
-          "description": "Сердечная недостаточность"
+          "description": "Heart failure"
         },
         {
-          "name": "Тропонин",
-          "description": "Повреждение миокарда"
+          "name": "Troponin",
+          "description": "Myocardial injury"
         },
         {
-          "name": "Ренин",
-          "description": "Вторичная гипертензия"
+          "name": "Renin",
+          "description": "Secondary hypertension"
         },
         {
-          "name": "Альдостерон",
-          "description": "Минералокортикоидная гипертензия"
+          "name": "Aldosterone",
+          "description": "Mineralocorticoid hypertension"
         }
       ],
       "red_flags": [
-        "ЧСС покоя >100 днём устойчиво — исключить вторичные причины (щитовидка, анемия, феохромоцитома)",
-        "ЛПНП >4.9 + семейный анамнез ИМ — высокий кардиориск",
-        "Ренин↑↑ — исключить реноваскулярную гипертензию",
-        "К <3.5 или >5.5 — аритмогенный риск"
+        "Heart rate at rest >100 during the day persistently — exclude secondary causes (thyroid, anemia, pheochromocytoma)",
+        "LDL >4.9 + family history of MI — high cardiovascular risk",
+        "Renin↑↑ — exclude renovascular hypertension",
+        "K <3.5 or >5.5 — arrhythmogenic risk"
       ],
       "visit_hint": "Data/doctors/visits/*cardio*"
     },
     "dermatologist": {
-      "name_ru": "Дерматолог",
+      "name": "Dermatologist",
       "primary_markers": [],
       "secondary_markers": [
         {
           "name": "CRP",
-          "description": "Системное воспаление"
+          "description": "Systemic inflammation"
         },
         {
-          "name": "Эозинофилы",
-          "description": "Аллергический компонент"
+          "name": "Eosinophils",
+          "description": "Allergic component"
         },
         {
-          "name": "IgE общий",
-          "description": "Атопия"
+          "name": "IgE total",
+          "description": "Atopy"
         },
         {
-          "name": "Витамин D",
-          "description": "Иммуномодуляция кожи"
+          "name": "Vitamin D",
+          "description": "Skin immunomodulation"
         },
         {
-          "name": "Ферритин",
-          "description": "Выпадение волос, дистрофия ногтей"
+          "name": "Ferritin",
+          "description": "Hair loss; nail dystrophy"
         }
       ],
       "red_flags": [
-        "Быстрое распространение высыпаний на тело — системный процесс",
-        "Кожные проявления + артралгии — исключить системную красную волчанку",
-        "Новые элементы при иммуносупрессии — исключить инфекционную этиологию"
+        "Rapid spread of a rash over the body — systemic process",
+        "Skin manifestations + arthralgia — exclude systemic lupus",
+        "New lesions with immunosuppression — exclude infectious etiology"
       ],
       "visit_hint": "Data/doctors/visits/*dermat*"
     },
     "ent": {
-      "name_ru": "ЛОР (отоларинголог)",
+      "name": "ENT specialist",
       "primary_markers": [
         {
-          "name": "АСО (антистрептолизин О)",
-          "description": "Стрептококковая инфекция, ревматизм"
+          "name": "ASO (antistreptolysin O)",
+          "description": "Streptococcal infection, rheumatic disease"
         },
         {
           "name": "CRP",
-          "description": "Воспаление"
+          "description": "Inflammation"
         },
         {
-          "name": "Мазок из зева",
-          "description": "Микрофлора ротоглотки"
+          "name": "Throat swab",
+          "description": "Oropharyngeal flora"
         }
       ],
       "secondary_markers": [
         {
-          "name": "Ревматоидный фактор",
-          "description": "Аутоиммунное воспаление при хр. тонзиллите"
+          "name": "Rheumatoid factor",
+          "description": "Autoimmune inflammation in chronic tonsillitis"
         }
       ],
       "red_flags": [
-        "Лимфаденопатия >2 см + плотная + безболезненная — биопсия",
-        "Затруднённое дыхание + храп + дневная сонливость — полисомнография (СОАС)",
-        "Рецидивирующий тонзиллит >7 раз/год — тонзиллэктомия"
+        "Lymphadenopathy >2 cm + firm + painless — biopsy",
+        "Difficulty breathing + snoring + daytime sleepiness — polysomnography (OSA)",
+        "Recurrent tonsillitis >7 times/year — tonsillectomy"
       ],
       "visit_hint": "Data/doctors/visits/*ent*"
     },
     "orthopedist": {
-      "name_ru": "Ортопед",
+      "name": "Orthopedist",
       "primary_markers": [],
       "secondary_markers": [
         {
-          "name": "Кальций",
-          "description": "Костный обмен"
+          "name": "Calcium",
+          "description": "Bone metabolism"
         },
         {
-          "name": "Витамин D",
-          "description": "Минерализация костей"
+          "name": "Vitamin D",
+          "description": "Bone mineralization"
         },
         {
-          "name": "Щелочная фосфатаза",
-          "description": "Костный метаболизм"
+          "name": "Alkaline phosphatase",
+          "description": "Bone metabolism"
         },
         {
-          "name": "Мочевая кислота",
-          "description": "Подагра, поражение суставов"
+          "name": "Uric acid",
+          "description": "Gout; joint disease"
         }
       ],
       "red_flags": [
-        "Прогрессирование ретролистеза — МРТ шейного отдела",
-        "Неврологический дефицит в руках — компрессия спинного мозга",
-        "Боли в спине + ночные боли + потеря веса — исключить новообразование"
+        "Progressive retrolisthesis — MRI cervical spine",
+        "Neurological deficit in the arms — spinal-cord compression",
+        "Back pain + nighttime pain + weight loss — exclude neoplasm"
       ],
       "visit_hint": "Data/doctors/visits/*ortho*"
     },
     "psychiatrist": {
-      "name_ru": "Психиатр",
+      "name": "Psychiatrist",
       "primary_markers": [],
       "secondary_markers": [
         {
-          "name": "ТТГ",
-          "description": "Субклинический гипотиреоз → депрессия"
+          "name": "TSH",
+          "description": "Subclinical hypothyroidism → depression"
         },
         {
-          "name": "Витамин B12",
-          "description": "Когнитивные нарушения"
+          "name": "Vitamin B12",
+          "description": "Cognitive impairment"
         },
         {
-          "name": "Железо / ферритин",
-          "description": "Астения, когнитивные нарушения"
+          "name": "Iron / ferritin",
+          "description": "Fatigue, cognitive impairment"
         },
         {
-          "name": "Витамин D",
-          "description": "Депрессивные расстройства"
+          "name": "Vitamin D",
+          "description": "Depressive disorders"
         },
         {
-          "name": "Кортизол",
-          "description": "Хронический стресс"
+          "name": "Cortisol",
+          "description": "Chronic stress"
         }
       ],
       "red_flags": [
-        "Суицидальные мысли — немедленная помощь",
-        "Психотическая симптоматика — экстренно",
-        "Нарастающая когнитивная дисфункция у молодого — исключить органику"
+        "Suicidal thoughts — immediate help",
+        "Psychotic symptoms — urgent",
+        "Progressive cognitive dysfunction in a young person — exclude organic disease"
       ],
       "visit_hint": "Data/doctors/visits/*psych*"
     },
     "dentist": {
-      "name_ru": "Стоматолог",
+      "name": "Dentist",
       "primary_markers": [],
       "secondary_markers": [
         {
-          "name": "Глюкоза",
-          "description": "Диабет → пародонтит"
+          "name": "Glucose",
+          "description": "Diabetes → periodontitis"
         },
         {
-          "name": "ОАК",
-          "description": "Перед имплантацией/хирургией"
+          "name": "CBC",
+          "description": "Before implant surgery"
         },
         {
-          "name": "Коагулограмма",
-          "description": "Перед хирургическими вмешательствами"
+          "name": "Coagulation panel",
+          "description": "Before surgery"
         }
       ],
       "red_flags": [
-        "Острая зубная боль + отёк + температура — экстренно",
-        "Подвижность зубов 2–3 степени — пародонтит",
-        "Незаживающая язва слизистой >2 недель — биопсия"
+        "Acute dental pain + swelling + fever — urgent",
+        "Tooth mobility grade 2–3 — periodontitis",
+        "Non-healing mucosal ulcer >2 weeks — biopsy"
       ],
       "visit_hint": "Data/dental/*"
     },
     "ophthalmologist": {
-      "name_ru": "Офтальмолог",
+      "name": "Ophthalmologist",
       "primary_markers": [],
       "secondary_markers": [
         {
-          "name": "Глюкоза / HbA1c",
-          "description": "Диабетическая ретинопатия"
+          "name": "Glucose / HbA1c",
+          "description": "Diabetic retinopathy"
         },
         {
-          "name": "АД",
-          "description": "Гипертоническая ретинопатия"
+          "name": "Blood pressure",
+          "description": "Hypertensive retinopathy"
         }
       ],
       "red_flags": [
-        "Внезапное снижение зрения — экстренно",
-        "ВГД >21 — подозрение на глаукому",
-        "Отёк диска зрительного нерва — ВЧД (невролог)"
+        "Sudden loss of vision — urgent",
+        "Intraocular pressure >21 — suspected glaucoma",
+        "Optic-disc swelling — intracranial pressure (neurologist)"
       ],
       "visit_hint": "Data/doctors/visits/*ophthalmo*"
     }
   },
   "ownership_conflicts": [
     {
-      "marker": "Триглицериды",
+      "marker": "Triglycerides",
       "owner": "cardiologist",
       "co_owners": [
         "gastroenterologist"
       ],
-      "rule": "Ведущий вывод даёт кардиолог в контексте кардиориска. Гастроэнтеролог комментирует только связь с метаболическим синдромом и печенью, основной вывод не дублирует"
+      "rule": "The cardiologist gives the primary conclusion in the context of cardiovascular risk. The gastroenterologist comments only on its association with metabolic syndrome and the liver; the primary conclusion is not duplicated."
     },
     {
-      "marker": "CRP (С-реактивный белок)",
+      "marker": "CRP (C-reactive protein)",
       "owner": "cardiologist",
       "co_owners": [
         "ent",
         "dermatologist"
       ],
-      "rule": "Ведущий вывод даёт кардиолог в контексте сосудистого воспаления. ЛОР трактует в контексте очаговой инфекции, дерматолог — распространённого дерматоза. Основной вывод не дублируется"
+      "rule": "The cardiologist gives the primary conclusion in the context of vascular inflammation. The ENT specialist interprets it in the context of focal infection, and the dermatologist in the context of widespread dermatosis. The primary conclusion is not duplicated"
     }
   ],
   "ownership_rules": [
-    "При наличии записи в ownership_conflicts основной вывод по маркеру даёт специалист из поля owner",
-    "Со-владельцы могут комментировать маркер в своём контексте, но не повторяют вывод владельца — это антипаттерн дублирования из Блока 10 холистической рамки",
-    "Поле visit_glob — подсказка, а не исчерпывающий фильтр. Отбор файлов выполняется по процедуре из Блока 3 контракта специалиста через _index.json",
-    "Канонические имена маркеров и единицы — Data/labs/_marker-aliases.json"
+    "When an ownership_conflicts record exists, the owner field specialist gives the primary conclusion for the marker",
+    "Co-owners may comment on a marker in their context, but must not repeat the owner's conclusion — this is the duplication antipattern from Block 10 of the holistic framework",
+    "The visit_glob field is a hint, not an exhaustive filter. File selection follows the procedure in Block 3 of the specialist contract through _index.json",
+    "Canonical marker names and units — Data/labs/_marker-aliases.json"
   ],
   "updated": "2026-07-31",
-  "_note": "Файл описывает ЗОНЫ ОТВЕТСТВЕННОСТИ специалистов, а не состояние пациента. Утверждений о пациенте здесь нет и быть не должно: поле relevant_conditions удалено, поскольку хранило готовые выводы, часть которых была опровергнута актуальными анализами. Клиническую картину специалист строит сам из Data/profile.json и Data/labs/.",
+  "_note": "The file describes specialist AREAS OF RESPONSIBILITY, not the patient's condition. It contains no patient claims: relevant_conditions was removed because it stored ready-made conclusions, some of which were refuted by current tests. The specialist builds the clinical picture from Data/profile.json and Data/labs/.",
   "_fields": {
-    "primary_markers": "Маркеры, по которым специалист даёт основной вывод",
-    "secondary_markers": "Маркеры, которые специалист трактует в своём контексте, но не владеет ими",
-    "red_flags": "Условные клинические правила эскалации. Формулируются как условия, не как утверждения о пациенте",
-    "visit_hint": "Подсказка для поиска визитов. НЕ исчерпывающий фильтр — отбор идёт через visits/_index.json по Блоку 3 контракта специалиста"
+    "primary_markers": "Markers for which the specialist gives the primary conclusion",
+    "secondary_markers": "Markers the specialist interprets in context but does not own",
+    "red_flags": "Conditional clinical escalation rules. They are formulated as conditions, not claims about a patient",
+    "visit_hint": "Hint for finding visits. This is not an exhaustive filter; selection follows the specialist contract in Block 3 through visits/_index.json"
   }
 }

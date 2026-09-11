@@ -53,12 +53,12 @@ export function MarkerTrendChart() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Тренд маркера</CardTitle>
-            <CardDescription>Динамика значений по датам</CardDescription>
+            <CardTitle>Marker trend</CardTitle>
+            <CardDescription>Values over time</CardDescription>
           </div>
           <Select value={selectedMarker} onValueChange={setSelectedMarker}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Выберите маркер" />
+              <SelectValue placeholder="Select a marker" />
             </SelectTrigger>
             <SelectContent>
               {markerList?.map((m) => (
@@ -75,7 +75,7 @@ export function MarkerTrendChart() {
           <Skeleton className="h-[300px] w-full" />
         ) : points.length === 0 ? (
           <p className="text-sm text-muted-foreground py-12 text-center">
-            Нет данных для этого маркера
+            No data for this marker
           </p>
         ) : (
           <div className="h-[300px]">
@@ -107,7 +107,7 @@ export function MarkerTrendChart() {
                           {d.value} {d.unit}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Норма: {d.reference_min}–{d.reference_max}
+                          Reference: {d.reference_min}–{d.reference_max}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {d.lab}

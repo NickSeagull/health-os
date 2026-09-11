@@ -35,6 +35,9 @@ export const specialtyColors: Record<string, string> = {
   orthopedics: "#6366f1",
   dentistry: "#ec4899",
   general: "#6b7280",
+  "primary care": "#6b7280",
+  "primary care physician": "#6b7280",
+  "restorative dentist": "#ec4899",
 };
 
 export const recoveryColors = {

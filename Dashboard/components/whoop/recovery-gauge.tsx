@@ -39,14 +39,14 @@ export function RecoveryGauge() {
     <Card>
       <CardHeader>
         <CardTitle>Recovery</CardTitle>
-        <CardDescription>Сегодня</CardDescription>
+        <CardDescription>Today</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-40 w-full" />
         ) : recovery == null ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет данных — проверьте WHOOP credentials
+            No data — check your WHOOP credentials
           </p>
         ) : (
           <div className="flex flex-col items-center">

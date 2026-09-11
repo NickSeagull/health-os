@@ -33,8 +33,8 @@ type FormData = z.infer<typeof schema>;
 
 export function MoodInputDialog() {
   const [open, setOpen] = useState(false);
-  // Текст помощи держим в состоянии: он должен остаться на экране после закрытия
-  // диалога, а не мелькнуть тостом (Блок 4 critical-values.md)
+  // Keep the help text in state so it remains visible after the dialog closes
+  // instead of flashing as a toast (Block 4 of critical-values.md).
   const [crisisHelp, setCrisisHelp] = useState<string | null>(null);
   const {
     register,
@@ -65,7 +65,7 @@ export function MoodInputDialog() {
 
     if (!res.ok) {
       const { error } = await res.json().catch(() => ({ error: "" }));
-      toast.error(error || "Не удалось сохранить запись");
+      toast.error(error || "Could not save entry");
       return;
     }
 
@@ -78,10 +78,10 @@ export function MoodInputDialog() {
   }
 
   const fields = [
-    { name: "mood" as const, label: "Настроение", emoji: "😊" },
-    { name: "energy" as const, label: "Энергия", emoji: "⚡" },
-    { name: "stress" as const, label: "Стресс", emoji: "😰" },
-    { name: "sleep_quality" as const, label: "Качество сна", emoji: "😴" },
+    { name: "mood" as const, label: "Mood", emoji: "😊" },
+    { name: "energy" as const, label: "Energy", emoji: "⚡" },
+    { name: "stress" as const, label: "Stress", emoji: "😰" },
+    { name: "sleep_quality" as const, label: "Sleep quality", emoji: "😴" },
   ];
 
   return (
@@ -91,7 +91,7 @@ export function MoodInputDialog() {
           role="alert"
           className="rounded-lg border border-red-600 bg-red-600/10 p-4 text-sm whitespace-pre-line"
         >
-          <p className="mb-2 font-medium">⚠️ Обрати внимание</p>
+          <p className="mb-2 font-medium">⚠️ Please note</p>
           {crisisHelp}
           <Button
             variant="outline"
@@ -99,7 +99,7 @@ export function MoodInputDialog() {
             className="mt-3"
             onClick={() => setCrisisHelp(null)}
           >
-            Скрыть
+            Hide
           </Button>
         </div>
       )}
@@ -107,13 +107,13 @@ export function MoodInputDialog() {
       <DialogTrigger asChild>
         <Button size="sm">
           <SmilePlus className="h-4 w-4 mr-1" />
-          Как дела?
+          Check in
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Mood check-in</DialogTitle>
-          <DialogDescription>Оцените по шкале 1–10</DialogDescription>
+          <DialogDescription>Rate each item on a scale from 1 to 10</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -133,15 +133,15 @@ export function MoodInputDialog() {
             ))}
           </div>
           <div>
-            <Label>Заметки</Label>
-            <Textarea {...register("notes")} placeholder="Как прошёл день..." />
+            <Label>Notes</Label>
+            <Textarea {...register("notes")} placeholder="How was your day..." />
           </div>
           <div>
-            <Label>Теги (через запятую)</Label>
-            <Input {...register("tags")} placeholder="работа, спорт, сон" />
+            <Label>Tags (comma-separated)</Label>
+            <Input {...register("tags")} placeholder="work, exercise, sleep" />
           </div>
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Сохранение..." : "Сохранить"}
+            {isSubmitting ? "Saving..." : "Save"}
           </Button>
         </form>
       </DialogContent>

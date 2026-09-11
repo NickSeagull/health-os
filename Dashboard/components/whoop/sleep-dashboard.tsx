@@ -27,21 +27,21 @@ export function SleepDashboard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Сон</CardTitle>
-        <CardDescription>Последняя ночь</CardDescription>
+        <CardTitle>Sleep</CardTitle>
+        <CardDescription>Last night</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-24 w-full" />
         ) : sleepHours == null ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Нет данных о сне
+            No sleep data
           </p>
         ) : (
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-4xl font-bold">{sleepHours}ч</p>
-              <p className="text-xs text-muted-foreground">Продолжительность</p>
+              <p className="text-4xl font-bold">{sleepHours}h</p>
+              <p className="text-xs text-muted-foreground">Duration</p>
             </div>
             <div className="flex-1">
               <div className="h-3 rounded-full bg-muted overflow-hidden">
@@ -59,7 +59,7 @@ export function SleepDashboard() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Цель: 7–9 часов
+                Target: 7–9 hours
               </p>
             </div>
           </div>

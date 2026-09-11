@@ -23,9 +23,8 @@ function readDir(base: string, type: WikiType, shared: boolean): WikiPage[] {
       (f) =>
         f.endsWith(".md") &&
         !f.startsWith("_") &&
-        // Шаблоны установщика лежат рядом с развёрнутыми страницами.
-        // Без этой отсечки каждая страница попадала бы в граф дважды —
-        // как страница и как собственный шаблон
+        // Installer templates live beside deployed pages. Without this filter,
+        // every page would enter the graph twice: as a page and as its own template.
         !/\.(demo|example|reference)\.md$/.test(f)
     );
   } catch {
@@ -48,18 +47,17 @@ function readDir(base: string, type: WikiType, shared: boolean): WikiPage[] {
       fm = parsed.data as Record<string, unknown>;
       body = parsed.content;
     } catch (e) {
-      // Страница попадает в граф и без разбираемого frontmatter, но молчать
-      // об этом нельзя: без метаданных она теряет заголовок, статус и
-      // источники — и выглядит как страница, у которой их просто нет.
-      // Частая причина — незакавыченное двоеточие в значении YAML
-      broken = e instanceof Error ? e.message.split("\n")[0] : "не разбирается";
+      // Keep the page in the graph even when its frontmatter cannot be parsed,
+      // but report it: without metadata it loses its title, status, and sources,
+      // appearing to have none. A common cause is an unquoted colon in a YAML value.
+      broken = e instanceof Error ? e.message.split("\n")[0] : "cannot be parsed";
     }
 
     const slug = name.replace(/\.md$/, "");
     const links = new Set<string>();
     for (const m of body.matchAll(LINK_RE)) {
       const target = m[1].trim();
-      // Ссылка без типа считается ссылкой внутри своего типа
+      // A link without a type is considered to be within the current type.
       links.add(target.includes("/") ? target : `${type}/${target}`);
     }
 
@@ -82,29 +80,29 @@ function readDir(base: string, type: WikiType, shared: boolean): WikiPage[] {
   return pages;
 }
 
-/** Время последнего изменения файла-источника, к которому привязана страница. */
+/** Last modification time of the source file linked to a page. */
 function newestSourceDate(page: WikiPage, profileRoot: string, sharedRoot: string): string | null {
   let newest: number | null = null;
   for (const rel of page.sources) {
     const base = page.shared ? sharedRoot : profileRoot;
-    // Источник не должен уводить за пределы своего корня
+    // A source must not escape its root.
     const target = path.resolve(base, rel);
     if (target !== base && !target.startsWith(base + path.sep)) continue;
     try {
       const st = fs.statSync(target);
       newest = newest === null ? st.mtimeMs : Math.max(newest, st.mtimeMs);
     } catch {
-      /* источник мог быть переименован — это ловит отдельная проверка */
+      /* The source may have been renamed; a separate check reports that. */
     }
   }
   return newest === null ? null : new Date(newest).toISOString().slice(0, 10);
 }
 
 /**
- * Разбор wiki в граф.
+ * Parse the wiki into a graph.
  *
- * Граф считается при запросе, а не читается из кеша: кеш разошёлся бы со
- * страницами — ровно та проблема, ради которой числа не копируются в wiki.
+ * Compute the graph on request rather than reading it from a cache: a cache could
+ * diverge from the pages, which is exactly why numbers are not copied into the wiki.
  */
 export function readWikiGraph(): WikiGraph {
   const profileRoot = (() => {
@@ -136,7 +134,7 @@ export function readWikiGraph(): WikiGraph {
         issues.push({
           kind: "dead-link",
           page: p.id,
-          detail: `ссылка на [[${target}]] — такой страницы нет`,
+          detail: `link to [[${target}]] points to a missing page`,
         });
       }
     }
@@ -150,25 +148,25 @@ export function readWikiGraph(): WikiGraph {
       issues.push({
         kind: "broken-frontmatter",
         page: p.id,
-        detail: `метаданные не разбираются (${p.broken}) — заголовок, статус и источники потеряны`,
+        detail: `frontmatter cannot be parsed (${p.broken}); title, status, and sources are unavailable`,
       });
     }
     if (!inbound.get(p.id) && p.type !== "synthesis") {
       issues.push({
         kind: "orphan",
         page: p.id,
-        detail: "на страницу никто не ссылается",
+        detail: "no page links to this page",
       });
     }
-    // Страница-источник сама является первоисточником: sources[] ей не нужен,
-    // но нужен проверяемый URL. Ссылка без URL — ровно то, что запрещает
-    // evidence-base.md: правдоподобное утверждение, которое нельзя проверить
+    // A source page is itself a primary source, so it needs no sources[] entry,
+    // but it does need a verifiable URL. A link without a URL is exactly what
+    // evidence-base.md forbids: a plausible claim that cannot be checked.
     if (p.type === "source") {
       if (!p.url) {
         issues.push({
           kind: "no-source",
           page: p.id,
-          detail: "страница-источник без URL — сослаться на неё нельзя",
+          detail: "source page has no URL and cannot be cited",
         });
       }
       continue;
@@ -177,7 +175,7 @@ export function readWikiGraph(): WikiGraph {
       issues.push({
         kind: "no-source",
         page: p.id,
-        detail: "нет ни одного источника в sources[]",
+        detail: "sources[] contains no sources",
       });
       continue;
     }
@@ -186,7 +184,7 @@ export function readWikiGraph(): WikiGraph {
       issues.push({
         kind: "stale",
         page: p.id,
-        detail: `источник обновлён ${newest}, страница — ${p.updated}`,
+        detail: `source updated ${newest}; page updated ${p.updated}`,
       });
     }
   }

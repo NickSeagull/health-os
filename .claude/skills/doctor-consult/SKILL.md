@@ -1,49 +1,49 @@
 ---
 name: doctor-consult
 description: |
-  Одиночная консультация AI-специалиста — запуск конкретного врача-агента для анализа данных.
-  Триггеры: «спроси [специальность]», «что думает [врач]», «консультация [врач]»
+  A single AI specialist consultation — launch a specific doctor agent to analyze data.
+  Triggers: “ask [specialty]”, “what does [doctor] think”, “consultation [doctor]”
 ---
 
-# Doctor Consult — одиночная консультация специалиста
+# Doctor Consult — single specialist consultation
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Запуск одного специализированного врача-агента для анализа медицинских данных пациента. Быстрая консультация без полного консилиума.
+Launch one specialized doctor agent to analyze the patient’s medical data. A quick consultation without a full case conference.
 
 ## Workflow
 
-### 1. Парсинг специальности
+### 1. Parse the specialty
 
-Из аргументов скилла определить специальность. Маппинг алиасов — `.claude/shared/specialty-aliases.md`. Прочитать оттуда, не дублировать здесь.
+Determine the specialty from the skill arguments. Alias mapping is in `.claude/shared/specialty-aliases.md`; read it there rather than duplicating it here.
 
-Если специальность не распознана — показать список доступных и спросить.
+If the specialty is not recognized, show the available list and ask.
 
-Если после алиаса есть текст — это фокусный вопрос для специалиста.
-Пример: `/doctor-consult гемато почему растут лимфоциты?` → агент `hematologist` с вопросом «почему растут лимфоциты?»
+If text follows the alias, it is the specialist’s focus question.
+Example: `/doctor-consult hemato why are the lymphocytes increasing?` → the `hematologist` agent with that focus question.
 
-### 2. Запуск агента
+### 2. Launch the agent
 
 ```
-Agent(subagent_type="[specialty]"): «Проведи анализ данных пациента. [Фокусный вопрос: ...]. Прочитай все нужные файлы и выдай ответ в стандартном формате.
+Agent(subagent_type="[specialty]"): “Analyze the patient’s data. [Focus question: ...]. Read all required files and provide the answer in the standard format.
 
-ОБЯЗАТЕЛЬНО: прочитай `.claude/shared/holistic-framework.md` и `.claude/shared/evidence-base.md` и следуй им. Каждое содержательное утверждение маркируется уровнем доказательности (A/B/C/D/⚠️). Выдумывать ссылки, DOI, авторов и названия статей запрещено. Заключение должно содержать секции «Системная картина», «Гипотеза первопричины», «Вклад образа жизни и среды» и «Хронология». Контекст жизни и среды из `Data/profile.json` → `lifestyle` и `Data/context/environment.json` проверяется до поиска редкой патологии.»
+REQUIRED: read `.claude/shared/holistic-framework.md` and `.claude/shared/evidence-base.md` and follow them. Label every substantive claim with an evidence level (A/B/C/D/⚠️). Do not fabricate references, DOIs, authors, or article titles. The conclusion must contain the sections “Systemic picture”, “Root-cause hypothesis”, “Contribution of lifestyle and environment”, and “Timeline”. Check life and environmental context from `Data/profile.json` → `lifestyle` and `Data/context/environment.json` before looking for rare pathology.”
 ```
 
-### 3. Вывод результата
+### 3. Output the result
 
-Вывести ответ специалиста пользователю **как есть** (без дополнительной обработки). Агент уже следует стандартному формату.
+Show the specialist’s answer to the user **as is** (without additional processing). The agent already follows the standard format.
 
-## Правила
+## Rules
 
-- **Холистическая рамка обязательна** — заключение без секций «Системная картина», «Гипотеза первопричины», «Вклад образа жизни и среды» и «Хронология» считается неполным. Если агент их не выдал — запросить дополнение, а не публиковать как есть
-- **Доказательная база обязательна** — утверждения без уровня доказательности (A/B/C/D/⚠️) считаются неоформленными. Если в ответе агента обнаружены выдуманные ссылки (конкретный DOI, автор, название статьи) — удалить их и понизить уровень утверждения до D
-- НЕ модифицировать ответ агента — выдавать напрямую (исключение — удаление выдуманных ссылок выше)
-- НЕ сохранять отчёт (в отличие от консилиума) — это быстрая консультация
-- Если пользователь хочет полный консилиум — предложить `/consilium`
-- Disclaimer обязателен (агент добавляет его сам)
+- **The holistic framework is mandatory** — a conclusion without the sections “Systemic picture”, “Root-cause hypothesis”, “Contribution of lifestyle and environment”, and “Timeline” is incomplete. If the agent omitted them, request an addition rather than publishing as is
+- **The evidence base is mandatory** — claims without an evidence level (A/B/C/D/⚠️) are considered incomplete. If fabricated references (a specific DOI, author, or article title) appear in the agent’s answer, remove them and downgrade the claim to D
+- Do NOT modify the agent’s answer; output it directly (except for removing fabricated references as above)
+- Do NOT save a report (unlike a case conference); this is a quick consultation
+- If the user wants a full case conference, suggest `/consilium`
+- A disclaimer is mandatory (the agent adds it)

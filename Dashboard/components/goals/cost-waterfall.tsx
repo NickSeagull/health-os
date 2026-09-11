@@ -41,9 +41,9 @@ export function CostWaterfall() {
     };
   });
 
-  // Столбцы считаются по directions[], а подпись бралась из cost_summary —
-  // карточка могла противоречить сама себе: сумма столбцов не сходилась с заголовком.
-  // Правильное поведение — показать расхождение, а не выбрать одно из чисел молча
+  // Bars are calculated from directions[], while the label used cost_summary.
+  // The card could therefore contradict itself when the bar total differed
+  // from the headline. Show the mismatch instead of silently choosing a value.
   const mismatches = estimateMismatch(goals);
   const computedTotal = goals.directions.reduce(
     (s, d) => s + (d.cost_estimate_rub ?? 0),
@@ -53,10 +53,10 @@ export function CostWaterfall() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Бюджет</CardTitle>
+        <CardTitle>Budget</CardTitle>
         <CardDescription>
-          Итого: {formatRub(computedTotal)} оценка /{" "}
-          {formatRub(goals.cost_summary.total_actual_rub)} факт
+          Total: {formatRub(computedTotal)} estimated /{" "}
+          {formatRub(goals.cost_summary.total_actual_rub)} actual
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,9 +76,9 @@ export function CostWaterfall() {
                   return (
                     <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                       <p className="font-medium">{d.name}</p>
-                      <p>Оценка: {formatRub(d.estimate)}</p>
-                      <p>Факт: {formatRub(d.actual)}</p>
-                      <p>Остаток: {formatRub(d.remaining)}</p>
+                      <p>Estimated: {formatRub(d.estimate)}</p>
+                      <p>Actual: {formatRub(d.actual)}</p>
+                      <p>Remaining: {formatRub(d.remaining)}</p>
                     </div>
                   );
                 }}
@@ -87,14 +87,14 @@ export function CostWaterfall() {
               <Bar
                 dataKey="actual"
                 fill="#22c55e"
-                name="Факт"
+                name="Actual"
                 radius={[4, 4, 0, 0]}
               />
               <Bar
                 dataKey="remaining"
                 fill="#3b82f6"
                 fillOpacity={0.3}
-                name="Остаток"
+                name="Remaining"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
@@ -104,20 +104,20 @@ export function CostWaterfall() {
         {mismatches.length > 0 && (
           <div className="mt-4 rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
             <p className="text-xs font-medium mb-2">
-              Смета в данных не сходится: {mismatches.length}{" "}
-              {mismatches.length === 1 ? "расхождение" : "расхождения"}
+              Data budget does not reconcile: {mismatches.length}{" "}
+              {mismatches.length === 1 ? "mismatch" : "mismatches"}
             </p>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {mismatches.map((m) => (
                 <li key={m.scope}>
-                  {m.scope}: в {"«"}cost_summary{"»"} {formatRub(m.declared)}, по
-                  направлениям {formatRub(m.computed)}
+                  {m.scope}: cost_summary reports {formatRub(m.declared)};
+                  directions total {formatRub(m.computed)}
                 </li>
               ))}
             </ul>
             <p className="mt-2 text-xs text-muted-foreground">
-              На графике — суммы по направлениям. Пересчитать{" "}
-              {"«"}cost_summary{"»"} нужно в{" "}
+              The chart uses totals by area. Recalculate{" "}
+              <span className="font-mono">cost_summary</span> in{" "}
               <span className="font-mono">Data/goals/2026.json</span>.
             </p>
           </div>

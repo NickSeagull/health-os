@@ -1,210 +1,178 @@
 ---
 name: wiki
 description: |
-  Wiki-слой медкарты: страницы-сущности со связями, поиск противоречий, сироток и битых ссылок, граф.
-  Триггеры: «wiki», «вики», «граф связей», «собери вики», «проверь вики», «противоречия», «что не связано»
+  Medical record wiki layer: linked entity pages, contradiction detection, orphan pages, broken links, and relationship graph.
+  Triggers: “wiki”, “relationship graph”, “build wiki”, “check wiki”, “contradictions”, “what is unlinked”
 ---
 
-# Wiki — связный слой медкарты
+# Wiki — Linked Medical Records
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Личные страницы живут в
-> `Data/profiles/<активный>/wiki/`, общие — в `Data/wiki/`.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. Personal pages live in
+> `Data/profiles/<active>/wiki/`; shared pages live in `Data/wiki/`.
 
-## Назначение
+## Purpose
 
-JSON-файлы `Data/` хранят **значения**: маркеры, даты, дозировки. Они точны,
-но между собой не связаны. Wiki хранит **связи и суждения**: почему этот
-маркер важен, какая гипотеза его объясняет, кто из врачей что сказал и где
-два утверждения противоречат друг другу.
+JSON files in `Data/` store **values**: markers, dates, and doses. They are precise but disconnected. The wiki stores **relationships and judgments**: why a marker matters, which hypothesis explains it, what each doctor said, and where statements contradict one another.
 
-Метод: LLM Wiki Андрея Карпаты, адаптированный под медкарту. Ключевое
-отличие от исходного метода — **числа не переносятся в markdown**. У Карпаты
-источники неструктурированы, поэтому markdown-страница есть шаг вперёд.
-Здесь значения уже лежат в JSON, на них построены тренды, графики и проверка
-целостности. Страница **ссылается** на запись, а не копирует её.
+Method: Andrej Karpathy's LLM Wiki, adapted to medical records. The key difference is that **numbers are not copied into Markdown**. Karpathy's sources are unstructured, making a Markdown page an improvement. Here, values already live in JSON and support trends, charts, and integrity checks. A page **links to** a record instead of copying it.
 
-Копия неизбежно разъезжается с оригиналом. Это ровно та ошибка, которую
-система уже проходила с промптами специалистов, где хранилась копия медкарты:
-она устаревала и заставляла агента утверждать опровергнутое.
+Copies inevitably drift from their originals. The system has already encountered this problem in specialist prompts containing copies of medical records: they became outdated and caused agents to assert claims that had been refuted.
 
 ---
 
-## Типы страниц
+## Page types
 
-### Личные — `Data/profiles/<id>/wiki/`
+### Personal — `Data/profiles/<id>/wiki/`
 
-| Каталог | Что описывает |
-|---------|---------------|
-| `condition/` | Состояние или диагноз: течение, чем подтверждено, что влияет |
-| `hypothesis/` | Гипотеза о первопричине: за, против, чем проверить |
-| `symptom/` | Жалоба: когда началась, с чем совпадает, что усиливает |
-| `doctor/` | Врач: зона, визиты, назначения, что осталось невыполненным |
-| `synthesis/` | Разбор: отчёт консилиума, сопоставление, вывод по теме |
+| Directory | Describes |
+|-----------|-----------|
+| `condition/` | A condition or diagnosis: course, confirmed facts, influencing factors |
+| `hypothesis/` | A root-cause hypothesis: evidence for and against, how to test it |
+| `symptom/` | A complaint: onset, coinciding events, aggravating factors |
+| `doctor/` | A doctor: specialty, visits, prescriptions, outstanding actions |
+| `synthesis/` | A review: consilium report, comparison, or topic assessment |
 
-### Общие — `Data/wiki/`
+### Shared — `Data/wiki/`
 
-| Каталог | Что описывает |
-|---------|---------------|
-| `source/` | Источник литературы: руководство, исследование, с URL |
-| `marker/` | Справка по маркеру: что означает, чем регулируется, что искажает |
+| Directory | Describes |
+|-----------|-----------|
+| `source/` | A literature source: guideline or study, with a URL |
+| `marker/` | Marker reference: meaning, regulation, and confounders |
 
-Общие не привязаны к человеку: литература и физиология маркера одинаковы для
-всех. Исследование, найденное для одного члена семьи, работает на всех.
+Shared pages are not tied to a person: the literature and marker physiology apply to everyone. Research found for one family member can support all profiles.
 
 ---
 
-## Формат страницы
+## Page format
 
 ```markdown
 ---
 type: condition
-title: Железодефицит без анемии
+title: Iron deficiency without anemia
 slug: iron-deficiency-no-anemia
 status: suspected        # active · suspected · resolved · refuted
 created: 2026-03-20
 updated: 2026-08-06
-sources:                 # пути к записям-первоисточникам, БЕЗ копирования значений
+sources:                # paths to source records, WITHOUT copying values
   - labs/2026-03-15_cbc.json
   - doctors/visits/2026-03-20_hematologist.md
 ---
 
-Ферритин снижается третий замер подряд при нормальном гемоглобине —
-см. [[marker/ferritin]]. Клинически проявляется как [[symptom/fatigue]].
+Ferritin has declined for three consecutive measurements while hemoglobin
+remains normal: see [[marker/ferritin]]. Manifestation: [[symptom/fatigue]].
 
-Конкурирующее объяснение — [[hypothesis/thyroid-subclinical]]; различает их
-трансферрин и растворимые рецепторы.
+A competing explanation is [[hypothesis/thyroid-subclinical]]; transferrin
+and soluble transferrin receptors distinguish them.
 
-Гематолог на приёме склонился к дефициту — [[doctor/hematologist]].
-Основание: [[source/bsg-iron-deficiency]].
+At the appointment, the hematologist favored deficiency: [[doctor/hematologist]].
+Basis: [[source/bsg-iron-deficiency]].
 ```
 
-**Правила формата:**
+**Format rules:**
 
-- Числовые значения на страницу **не переносятся.** Пишется «снижается третий
-  замер подряд», а не «23 → 19 → 16». Значения читаются из `sources[]`
-- `sources[]` — пути относительно корня профиля (для общих страниц —
-  относительно `Data/`)
-- Связи — `[[тип/slug]]` в теле. Обратные ссылки не хранятся: они
-  вычисляются, и хранимая копия разъехалась бы
-- `slug` — латиница, цифры, дефис. Совпадает с именем файла без `.md`
-- **Значение с двоеточием берётся в кавычки.** `title: Разбор: причины усталости`
-  ломает YAML, и страница теряет заголовок, статус и источники — при этом
-  выглядит как страница, у которой их просто нет. Правильно:
-  `title: "Разбор. Причины усталости"`
+- **Do not copy numerical values onto pages.** Write “declined for three consecutive measurements,” not “23 → 19 → 16.” Read values from `sources[]`
+- `sources[]` paths are relative to the profile root; for shared pages, they are relative to `Data/`
+- Use `[[type/slug]]` links in the body. Compute backlinks instead of storing them; stored copies would drift
+- `slug` uses Latin letters, digits, and hyphens, and matches the filename without `.md`
+- **Quote values containing a colon.** Unquoted `title: Analysis: causes of fatigue` breaks YAML, causing the page to lose its title, status, and sources while looking like a page that simply lacks them. A valid example is `title: "Analysis. Causes of fatigue"`
 
 ---
 
-## Режимы
+## Modes
 
-### `build` — первичная сборка
+### `build` — initial assembly
 
-Разовая операция при первом запуске. Читает `Data/` активного профиля и
-создаёт стартовый набор страниц:
+A one-time operation on first use. Read the active profile's `Data/` and create an initial set of pages:
 
-1. Из `hypotheses.json` — страница на каждую гипотезу, со статусом и
-   ссылками на анализы из `evidence_for` / `evidence_against`
-2. Из `profile.json` → `chronic_conditions` — страница на состояние
-3. Из `current_complaints` — страница на симптом
-4. Из `doctors/contacts.json` и индекса визитов — страница на врача
-5. Из `consilium/` — synthesis-страница на отчёт
-6. Из индекса анализов — **не создаёт страниц.** Анализ сам по себе не
-   сущность, он источник. Страница появляется у того, что анализ объясняет
+1. From `hypotheses.json`: one page per hypothesis, with status and lab links from `evidence_for` / `evidence_against`
+2. From `profile.json` → `chronic_conditions`: one page per condition
+3. From `current_complaints`: one page per symptom
+4. From `doctors/contacts.json` and the visit index: one page per doctor
+5. From `consilium/`: a synthesis page for each report
+6. From the lab index: **do not create pages directly.** A lab result is a source, not an entity. Create a page for what the result explains
 
-Затем — проход связывания: найти упоминания между страницами и проставить
-`[[ссылки]]`. И `lint`.
+Then link pages: find cross-page mentions, add `[[links]]`, and run `lint`.
 
-Сказать, сколько создано и что осталось несвязанным.
+Report how many pages were created and what remains unlinked.
 
-### `sync` — после новых данных
+### `sync` — after new data
 
-Вызывается из `/inbox`, `/doctor`, `/labs` и `/consilium` после записи, либо
-вручную. Не создаёт всё заново, а **встраивает новое в существующее**:
+Called after writes by `/inbox`, `/doctor`, `/labs`, and `/consilium`, or manually. **Integrate new data into existing pages** rather than rebuilding everything:
 
-1. Прочитать, что появилось с последней синхронизации
-2. Определить, каких сущностей оно касается
-3. Обновить затронутые страницы: течение, статус, `sources[]`, `updated`
-4. Завести страницы для того, что упомянуто, но своей страницы не имеет
-5. Отметить, если новое **противоречит** написанному ранее — не переписывать
-   молча, а показать оба утверждения
-6. Записать строку в `Data/profiles/<id>/wiki/_log.md`
+1. Read what has appeared since the last synchronization
+2. Identify affected entities
+3. Update affected pages: course, status, `sources[]`, and `updated`
+4. Create pages for mentioned entities that lack a page
+5. Flag new information that **contradicts** earlier content; show both statements rather than silently rewriting
+6. Append an entry to `Data/profiles/<id>/wiki/_log.md`
 
-Формат журнала — разбираемый:
+Use a parseable log format:
 
 ```
-## [2026-08-06] sync | Анализы Гемотест 15.03
-Затронуто страниц: 4 · создано: 1 · противоречий: 1
+## [2026-08-06] sync | Gemotest lab results 03-15
+Pages affected: 4 · created: 1 · contradictions: 1
 ```
 
-### `lint` — здоровье wiki
+### `lint` — wiki health check
 
-Главный режим. То, ради чего слой существует.
+The main mode and the reason this layer exists.
 
-| Проверка | Что ищет | Почему важно |
-|----------|----------|--------------|
-| **Противоречия** | Два утверждения, которые не могут быть верны одновременно | Врач А сказал одно, врач Б другое; гипотеза утверждает «стабилен», анализ показывает падение |
-| **Сиротки** | Страница, на которую никто не ссылается | Анализ загружен и не интерпретирован; гипотеза без next_step; назначение врача, о котором забыли |
-| **Битые ссылки** | `[[x]]`, где страницы `x` нет | Препарат назван в протоколе визита, но отсутствует в `medications/`; диагноз упомянут без своей страницы |
-| **Устаревшее** | `updated` страницы старше самого свежего файла из её `sources[]` | Пришёл новый анализ, а вывод на странице остался от прошлого |
-| **Недостающие связи** | Страницы с общим источником, между которыми нет ссылки | Две гипотезы опираются на один анализ и не знают друг о друге |
+| Check | Finds | Why it matters |
+|-------|-------|----------------|
+| **Contradictions** | Statements that cannot both be true | Doctors disagree; a hypothesis says “stable” while a lab result shows a decline |
+| **Orphans** | Pages with no incoming links | An imported result was never interpreted; a hypothesis lacks `next_step`; a doctor's prescription was forgotten |
+| **Broken links** | `[[x]]` with no page `x` | A medication appears in a visit note but not in `medications/`; a diagnosis is mentioned without its own page |
+| **Outdated pages** | `updated` predates the newest file in `sources[]` | New lab results arrived, but the page's conclusion is unchanged |
+| **Missing links** | Pages sharing a source without linking to one another | Two hypotheses rely on the same result but are disconnected |
 
-Вывод — рабочий список, а не украшение:
+The output is a work list:
 
 ```
-⚠ Противоречия (2)
-  [[condition/iron-deficiency]] «ферритин стабилен»
-    ↔ labs/2026-03-15_cbc.json показывает третье снижение подряд
-    Разрешить: обновить страницу либо объяснить расхождение
+⚠ Contradictions (2)
+  [[condition/iron-deficiency]] “ferritin is stable”
+    ↔ labs/2026-03-15_cbc.json shows a third consecutive decline
+    Resolve: update the page or explain the discrepancy
 
-○ Сиротки (4)
-  [[hypothesis/b12-deficiency]] — нет входящих ссылок и next_step
+○ Orphans (4)
+  [[hypothesis/b12-deficiency]] — no incoming links or next_step
 
-✗ Битые ссылки (1)
-  [[medication/magnesium-citrate]] ← упомянут в doctor/therapist
+✗ Broken links (1)
+  [[medication/magnesium-citrate]] ← mentioned in doctor/therapist
 ```
 
-**Противоречие не разрешается автоматически.** Показать оба утверждения и
-предложить, что их рассудит. Молчаливая правка уничтожает информацию:
-расхождение между источниками — это и есть находка.
+**Do not resolve contradictions automatically.** Show both statements and suggest what could distinguish them. Silent editing destroys information: disagreement between sources is itself a finding.
 
-### `graph` — данные для дашборда
+### `graph` — dashboard data
 
-Граф **не кешируется в файл**: дашборд разбирает страницы при запросе.
-Кеш разъехался бы со страницами, а мы и так боремся с копиями.
+**Do not cache the graph to a file**: the dashboard parses pages on request. A cache would drift from the pages, recreating the problem of duplicate information.
 
-Режим существует, чтобы показать статистику текстом: узлов по типам, рёбер,
-самые связанные и самые одинокие страницы.
+This mode presents text statistics: nodes by type, edges, and the most and least connected pages.
 
 ---
 
-## Когда wiki вредна
+## When the wiki is harmful
 
-Слой, который забыли обновить, **хуже его отсутствия**: он выглядит
-достоверным и читается как актуальный вывод.
+A neglected layer is **worse than no layer**: it looks trustworthy and is read as a current assessment.
 
-Поэтому:
+Therefore:
 
-- `lint` обязателен в `/wrap-up`
-- На каждой странице видна дата `updated` и список `sources[]`
-- Страница, чей источник свежее её самой, помечается устаревшей до того,
-  как её прочитают
-- Утверждение без источника в `sources[]` — дефект страницы, а не стиль
+- Run `lint` during `/wrap-up`
+- Show each page's `updated` date and `sources[]`
+- Mark a page outdated before reading it when a source is newer
+- Treat a claim unsupported by `sources[]` as a page defect, not a style issue
 
 ---
 
-## Правила
+## Rules
 
-- **Числа не копируются на страницы.** Только ссылка на запись
-- Обратные ссылки вычисляются, а не хранятся
-- Противоречия показываются, а не сглаживаются
-- Личные страницы не ссылаются на страницы другого профиля. Общие —
-  источники и справка по маркерам — доступны всем
-- Каждое клиническое утверждение — с уровнем доказательности по
-  `.claude/shared/evidence-base.md`
-- Страница-источник создаётся только с проверяемым URL: выдуманная ссылка
-  в wiki опаснее, чем в ответе, — она остаётся и цитируется потом
-- `slug` в имени файла и во frontmatter совпадают
-- Критерий завершения: `lint` отработал, противоречия показаны,
-  `_log.md` дополнен
+- **Do not copy numbers onto pages.** Link to records
+- Compute backlinks rather than storing them
+- Show contradictions rather than smoothing them over
+- Personal pages must not link to another profile's pages. Shared sources and marker references are available to all profiles
+- Give every clinical claim an evidence level and source according to `.claude/shared/evidence-base.md`
+- Create source pages only with verifiable URLs: a fabricated wiki citation persists and may be cited again
+- Match the filename's slug to the frontmatter `slug`
+- Completion requires running `lint`, presenting contradictions, and appending to `_log.md`
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a physician for treatment decisions.*

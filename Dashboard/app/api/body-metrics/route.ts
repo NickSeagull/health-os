@@ -25,11 +25,11 @@ export async function POST(request: Request) {
     v.optionalNumber(body?.heart_rate, "heart_rate", "heart_rate");
     v.optionalNumber(body?.waist_cm, "waist_cm", "waist_cm");
 
-    // Половина измерения давления бесполезна и ломает график: обе цифры или ни одной
+    // A partial blood-pressure reading is useless and breaks the chart: both values or neither.
     const hasSystolic = body?.systolic !== undefined && body.systolic !== null && body.systolic !== "";
     const hasDiastolic = body?.diastolic !== undefined && body.diastolic !== null && body.diastolic !== "";
     if (hasSystolic !== hasDiastolic) {
-      v.add("systolic/diastolic: давление записывается парой, укажите оба значения");
+      v.add("systolic/diastolic: blood pressure must be recorded as a pair; provide both values");
     }
     if (
       hasSystolic &&
@@ -39,22 +39,22 @@ export async function POST(request: Request) {
       body.systolic <= body.diastolic
     ) {
       v.add(
-        `systolic/diastolic: систолическое (${body.systolic}) должно быть выше диастолического (${body.diastolic})`
+        `systolic/diastolic: systolic (${body.systolic}) must be higher than diastolic (${body.diastolic})`
       );
     }
 
     const invalid = v.response();
     if (invalid) return invalid;
 
-    // Ключ строки — date (Блок 0). Дописать вторую строку за ту же дату значит
-    // получить две точки одного дня в тренде и рассинхрон с InBody
+    // The row key is date (Block 0). Adding a second row for the same date would
+    // create two points for one day in the trend and desynchronize it from InBody.
     const existing = await readBodyMetrics();
     const clash = existing.find((r) => String(r.date) === body.date);
     if (clash) {
-      return conflict(`Измерение за ${body.date} уже записано`, { existing: clash });
+      return conflict(`A measurement for ${body.date} is already recorded`, { existing: clash });
     }
 
-    // Рост берётся из профиля, а не остаётся пустым (Блок 9)
+    // Take height from the profile rather than leaving it empty (Block 9).
     const profile = await readProfile();
     const heightCm =
       typeof body.height_cm === "number" ? body.height_cm : profile?.basic?.height_cm;

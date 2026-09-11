@@ -59,7 +59,7 @@ export function VisitTimeline() {
         setDetailJson(data);
       }
     } catch {
-      setDetail("Ошибка загрузки");
+      setDetail("Load failed");
       setDetailJson(null);
     }
     setDetailLoading(false);
@@ -74,9 +74,9 @@ export function VisitTimeline() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Timeline визитов</CardTitle>
+          <CardTitle>Visit timeline</CardTitle>
           <CardDescription>
-            {sorted?.length ?? 0} записей по годам
+            {sorted?.length ?? 0} records by year
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -158,7 +158,7 @@ export function VisitTimeline() {
                   onClick={() => setEditing(true)}
                 >
                   <Pencil className="h-3 w-3 mr-1" />
-                  Редактировать
+                  Edit
                 </Button>
               )}
             </div>

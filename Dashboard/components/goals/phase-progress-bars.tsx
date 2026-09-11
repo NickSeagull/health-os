@@ -47,8 +47,8 @@ export function PhaseProgressBars() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Прогресс по фазам</CardTitle>
-        <CardDescription>3 фазы лечения</CardDescription>
+        <CardTitle>Progress by phase</CardTitle>
+        <CardDescription>3 treatment phases</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {phaseData.map((phase) => (

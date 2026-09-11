@@ -21,7 +21,7 @@ export function KrProgressOverview() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Прогресс KR</CardTitle>
+          <CardTitle>KR progress</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -39,9 +39,9 @@ export function KrProgressOverview() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Прогресс KR</CardTitle>
+        <CardTitle>KR progress</CardTitle>
         <CardDescription>
-          {goals.directions.length} направлений по {goals.phases.length} фазам
+          {goals.directions.length} areas across {goals.phases.length} phases
         </CardDescription>
       </CardHeader>
       <CardContent>

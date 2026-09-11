@@ -1,75 +1,75 @@
 ---
 name: coach
 description: |
-  AI health coach — полный обзор здоровья, anomaly detection, корреляции, рекомендации.
-  Триггеры: «health coach», «обзор здоровья», «рекомендации по здоровью»
+  AI health coach — comprehensive health overview, anomaly detection, correlations, recommendations.
+  Triggers: “health coach”, “health overview”, “health recommendations”
 ---
 
-# Health Coach — AI коуч по здоровью
+# Health Coach — AI health coach
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand path `Data/X` in this file
+> means `Data/profiles/<active>/X` — never write to the literal shorthand path.
+> Before writing, state whose profile the data will be written to.
 
-## Назначение
+## Purpose
 
-Комплексный обзор здоровья: сбор ВСЕХ данных, anomaly detection, корреляции, конкретные рекомендации.
+Comprehensive health overview: collect ALL data, detect anomalies, identify correlations, and provide specific recommendations.
 
 ## Disclaimer
 
-> Ты НЕ врач. Все рекомендации — информационные. Серьёзные решения о лечении — только с врачом.
+> You are NOT a doctor. All recommendations are informational. Major treatment decisions must be made with a doctor.
 
 ## Workflow
 
-### 1. Параллельный сбор данных
+### 1. Parallel data collection
 
-Запустить через Agent tool параллельно:
+Launch in parallel using the Agent tool:
 
-**Агент 1 — WHOOP (14 дней):**
+**Agent 1 — WHOOP (14 days):**
 - `whoop_get_overview`
-- `whoop_get_recovery` (последние 14 дней)
-- `whoop_get_sleep` (последние 14 дней)
-- `whoop_get_strain` (последние 14 дней)
+- `whoop_get_recovery` (last 14 days)
+- `whoop_get_sleep` (last 14 days)
+- `whoop_get_strain` (last 14 days)
 - `whoop_get_healthspan`
 
-**Агент 2 — Файлы здоровья:**
+**Agent 2 — Health files:**
 - `Data/profile.json`
 - `Data/medications/current.json`
 - `Data/goals/YYYY.json`
-- `Data/body-metrics.csv` (последние 10 записей)
-- `Data/mental/journal.jsonl` (последние 14 записей)
-- `Data/labs/_index.json` (последние анализы)
-- `Data/profile.json` → блок `lifestyle` (питание, вещества, сон, тренировки, работа)
-- `Data/context/environment.json` (география, климат, сезон, работа, стресс)
-- `Data/hypotheses.json` (текущие гипотезы о первопричинах)
+- `Data/body-metrics.csv` (last 10 entries)
+- `Data/mental/journal.jsonl` (last 14 entries)
+- `Data/labs/_index.json` (latest tests)
+- `Data/profile.json` → `lifestyle` block (nutrition, substances, sleep, training, work)
+- `Data/context/environment.json` (geography, climate, season, work, stress)
+- `Data/hypotheses.json` (current root-cause hypotheses)
 
-**Агент 3 — Визиты и задачи:**
-- `Data/doctors/visits/` (последние 3 визита)
-- Todoist: задачи по здоровью (find-tasks searchText: "здоровье|врач|анализ")
+**Agent 3 — Visits and tasks:**
+- `Data/doctors/visits/` (last 3 visits)
+- Todoist: health tasks (find-tasks searchText: "health|doctor|lab")
 
-### 2. Обзор по секциям
+### 2. Overview by section
 
-#### A. Прогресс по Health KR (v2)
+#### A. Health KR progress (v2)
 
-Прочитать `Data/goals/YYYY.json` (v2) и `Data/traction/reviews.jsonl` (последний snapshot).
+Read `Data/goals/YYYY.json` (v2) and `Data/traction/reviews.jsonl` (latest snapshot).
 
 ```
-### По фазам
+### By phase
 
-#### Фаза 1. Срочное
-| KR | Описание | Статус | Milestones | Застой? |
+#### Phase 1. Urgent
+| KR | Description | Status | Milestones | Stalled? |
 |----|----------|--------|------------|---------|
-| KR5.0 | Гематолог | investigating | 0/4 | >14 дней |
-| KR5.1 | Урология | not_started | 0/4 | >14 дней |
-| KR5.5 | Гормоны | not_started | 0/3 | >14 дней |
+| KR5.0 | Hematologist | investigating | 0/4 | >14 days |
+| KR5.1 | Urology | not_started | 0/4 | >14 days |
+| KR5.5 | Hormones | not_started | 0/3 | >14 days |
 
-#### Фаза 2, 3 — аналогично
+#### Phases 2, 3 — same format
 ```
 
-Подсвечивать направления с `last_activity` > 14 дней (застой).
+Highlight directions with `last_activity` > 14 days ago (stalled).
 
-#### B. WHOOP — 14-дневный обзор
+#### B. WHOOP — 14-day overview
 
 ```
 Recovery: avg 58% (yellow) | min 23% | max 89%
@@ -79,68 +79,68 @@ Strain: avg 12.4 | workouts: 8
 Healthspan: WHOOP age XX vs calendar XX (delta)
 ```
 
-#### C. Аномалии
+#### C. Anomalies
 
-Проверить:
-- Recovery < 34% три дня подряд → `recovery_low_streak`
-- HRV снизился > 20% за неделю → `hrv_drop`
-- Нет тренировок 3+ дня → `no_workout_3_days`
-- Mood < 5 за 3 дня → `mood_decline`
-- Вес ±2 кг за неделю → `weight_spike`
-
-```
-⚠️ Алерты:
-- [high] Recovery < 34% три дня (12-14 марта) — рекомендуется лёгкий день
-- [medium] HRV снизился на 22% за неделю — проверь стресс и сон
-```
-
-→ Сохранить алерты в `Cache/alerts/YYYY-MM-DD.json` по схеме из Блока 5 файла `.claude/shared/critical-values.md`. Каталог `Cache/health/alerts/` не используется
-
-#### D. Корреляции
+Check:
+- Recovery < 34% for three consecutive days → `recovery_low_streak`
+- HRV decreased by > 20% in a week → `hrv_drop`
+- No workouts for 3+ days → `no_workout_3_days`
+- Mood < 5 over 3 days → `mood_decline`
+- Weight ±2 kg in a week → `weight_spike`
 
 ```
-📊 Обнаруженные связи:
-- Сон > 7.5ч → Recovery > 66% (7 из 8 случаев)
-- Strain > 15 → Mood на следующий день +1.2
-- Алкоголь (тег) → Recovery −18%
+⚠️ Alerts:
+- [high] Recovery < 34% for three days (March 12-14) — a light day is recommended
+- [medium] HRV decreased by 22% in a week — check stress and sleep
 ```
 
-#### E. Лекарства
+→ Save alerts to `Cache/alerts/YYYY-MM-DD.json` using the schema in Block 5 of `.claude/shared/critical-values.md`. The `Cache/health/alerts/` directory is not used
+
+#### D. Correlations
 
 ```
-💊 Активные курсы:
-- Препарат А: осталось 5 дней (до 26.03)
-- Витамин D: постоянно
+📊 Relationships found:
+- Sleep > 7.5h → Recovery > 66% (7 out of 8 cases)
+- Strain > 15 → Mood the next day +1.2
+- Alcohol (tag) → Recovery −18%
 ```
 
-#### F. Контекст жизни и среды
+#### E. Medications
 
-Прочитать `Data/profile.json` → `lifestyle` и `Data/context/environment.json`. Сопоставить аномалии из блока C с контекстом до того, как искать медицинское объяснение.
+```
+💊 Active courses:
+- Medication A: 5 days left (until 26.03)
+- Vitamin D: ongoing
+```
 
-| Фактор | Что проверить |
+#### F. Life and environmental context
+
+Read `Data/profile.json` → `lifestyle` and `Data/context/environment.json`. Compare anomalies from block C with context before looking for a medical explanation.
+
+| Factor | What to check |
 |--------|---------------|
-| Фаза питания | Дефицит калорий сам по себе снижает recovery, HRV, настроение, тестостерон и Т3. Текущая фаза важнее любого маркера |
-| Вещества | Кальян, кофеин, алкоголь — сопоставить даты употребления с провалами recovery и ростом RHR |
-| Сезон и свет | Широту, длину светового дня и сезонные факты взять из `Data/context/environment.json` → `climate.derived_facts`. На высоких широтах зимой ожидаемы дефицит витамина D и сезонная амплитуда настроения и энергии |
-| Регулярность сна | Нерегулярность режима вреднее короткой длительности. Смотреть разброс времени отхода, а не только сумму часов |
-| Нагрузка и работа | Дедлайны, когнитивная нагрузка, сидячий режим — вход в ось ГГН и фактор биомеханики |
-| Отопительный сезон | Октябрь—апрель, влажность 20–30% — слизистые, кожа, качество сна |
+| Nutrition phase | A calorie deficit itself lowers recovery, HRV, mood, testosterone, and T3. The current phase matters more than any marker |
+| Substances | Hookah, caffeine, alcohol — compare dates of use with recovery dips and rising RHR |
+| Season and light | Take latitude, daylight duration, and seasonal facts from `Data/context/environment.json` → `climate.derived_facts`. At high latitudes in winter, vitamin D deficiency and seasonal variation in mood and energy are expected |
+| Sleep regularity | An irregular schedule is more harmful than short duration. Look at variation in bedtime, not just total hours |
+| Workload and work | Deadlines, cognitive load, sedentary routine — inputs to the HPA axis and biomechanical factors |
+| Heating season | October–April, humidity 20–30% — mucous membranes, skin, sleep quality |
 
-**Правило:** не объяснять аномалию патологией, пока не проверен контекст жизни. Если контекст объясняет находку — назвать его первым.
+**Rule:** do not explain an anomaly as pathology until life context has been checked. If context explains the finding, name it first.
 
-#### G. Рекомендации
+#### G. Recommendations
 
-Конкретные, actionable:
+Specific and actionable:
 ```
-1. 🏋️ Тренировки: 8 из 12 в этом месяце. Нужно 4+ за оставшиеся 10 дней — по 1 через день
-2. 😴 Сон: дефицит 2.1ч. Ложись на 30 мин раньше ближайшие 3 дня
-3. 🏥 Урология: follow-up назначен на 25.03 — подготовь анализы (задача в Todoist)
-4. 💊 Омепразол: курс заканчивается 26.03 — уточни у врача о продлении
+1. 🏋️ Training: 8 out of 12 this month. Need 4+ in the remaining 10 days — one every other day
+2. 😴 Sleep: 2.1h deficit. Go to bed 30 minutes earlier for the next 3 days
+3. 🏥 Urology: follow-up scheduled for 25.03 — prepare test results (task in Todoist)
+4. 💊 Omeprazole: course ends on 26.03 — ask your doctor about extending it
 ```
 
-### 3. Кэширование
+### 3. Caching
 
-Сохранить WHOOP данные в расширенном формате v2:
+Save WHOOP data in the extended v2 format:
 ```json
 {
   "version": 2,
@@ -153,14 +153,14 @@ Healthspan: WHOOP age XX vs calendar XX (delta)
 }
 ```
 
-## Правила
+## Rules
 
-- Никогда не ставить диагнозы
-- **Доказательность обязательна** — рекомендации по нагрузке, сну, питанию и добавкам маркируются уровнем (A/B/C/D/⚠️) согласно `.claude/shared/evidence-base.md`. Профильные источники: ACSM, WHO Physical Activity Guidelines, AASM, NIH Office of Dietary Supplements
-- **Выдумывать ссылки запрещено** — ссылка на орган или руководство допустима, конкретный DOI, автор или название статьи — нет
-- Рекомендации — конкретные и actionable
-- Всегда показывать disclaimer
-- Алерты сохранять в кэш для использования в morning-digest
-- Если критический алерт — предложить обратиться к врачу
+- Never diagnose
+- **Evidence grading is mandatory** — label recommendations on exertion, sleep, nutrition, and supplements with a level (A/B/C/D/⚠️) according to `.claude/shared/evidence-base.md`. Specialty sources: ACSM, WHO Physical Activity Guidelines, AASM, NIH Office of Dietary Supplements
+- **Fabricating references is prohibited** — a reference to an organization or guideline is acceptable; a specific DOI, author, or article title is not
+- Recommendations must be specific and actionable
+- Always show the disclaimer
+- Cache alerts for use in morning-digest
+- If there is a critical alert, suggest seeing a doctor
 
-⚕️ *Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.*
+⚕️ *This information is for reference only. Consult a doctor before making treatment decisions.*

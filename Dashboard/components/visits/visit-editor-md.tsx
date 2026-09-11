@@ -36,11 +36,11 @@ export function VisitEditorMd({
         body: JSON.stringify({ content }),
       });
       if (!res.ok) throw new Error("Save failed");
-      toast.success("Визит сохранён");
+      toast.success("Visit saved");
       mutate("/api/visits");
       onClose();
     } catch {
-      toast.error("Ошибка сохранения");
+      toast.error("Save failed");
     }
     setSaving(false);
   }
@@ -48,15 +48,15 @@ export function VisitEditorMd({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">Редактирование (Markdown)</h3>
+        <h3 className="text-sm font-medium">Edit (Markdown)</h3>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={onClose}>
             <X className="h-3 w-3 mr-1" />
-            Отмена
+            Cancel
           </Button>
           <Button size="sm" onClick={handleSave} disabled={saving}>
             <Save className="h-3 w-3 mr-1" />
-            {saving ? "Сохранение..." : "Сохранить"}
+            {saving ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>

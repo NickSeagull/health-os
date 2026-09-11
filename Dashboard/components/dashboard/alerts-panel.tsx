@@ -13,9 +13,9 @@ import type { HealthAlert, AlertSeverity } from "@/lib/types/alert";
 import { cn } from "@/lib/utils";
 
 /**
- * Оформление по severity из Блока 5 `critical-values.md`. `critical` здесь раньше не было,
- * хотя именно им помечается остановка обработки — суицидальные признаки в mood-журнале
- * и критические значения анализов.
+ * Styling follows the severity definitions in Block 5 of `critical-values.md`.
+ * The `critical` level was previously missing here, even though it marks
+ * processing stops, suicidal signs in the mood journal, and critical lab values.
  */
 const severityConfig: Record<
   AlertSeverity,
@@ -43,25 +43,25 @@ const severityConfig: Record<
   },
 };
 
-/** Фолбэк на случай severity, которой нет в конфиге: молча пропускать алерт нельзя */
+/** Fallback for an unknown severity: alerts must never be silently dropped. */
 const unknownSeverity = severityConfig.high;
 
 export function AlertsPanel() {
   const { data: alerts } = useHealthData<HealthAlert[]>("alerts");
 
-  // Массив может не прийти, если роут вернул объект ошибки
+  // The route may return an error object instead of an array.
   const list = Array.isArray(alerts) ? alerts : [];
   const activeAlerts = list.filter((a) => !a.acknowledged);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Алерты</CardTitle>
-        <CardDescription>Требуют внимания</CardDescription>
+        <CardTitle>Alerts</CardTitle>
+        <CardDescription>Require attention</CardDescription>
       </CardHeader>
       <CardContent>
         {!activeAlerts.length ? (
-          <p className="text-sm text-muted-foreground">Нет активных алертов</p>
+          <p className="text-sm text-muted-foreground">No active alerts</p>
         ) : (
           <div className="space-y-2">
             {activeAlerts.map((alert, i) => {
@@ -87,7 +87,7 @@ export function AlertsPanel() {
                         <p className="text-xs text-muted-foreground">
                           {alert.marker}
                           {alert.value != null && `: ${alert.value}`}
-                          {alert.reference && ` (норма ${alert.reference})`}
+                          {alert.reference && ` (reference ${alert.reference})`}
                         </p>
                       )}
                       {alert.action && (

@@ -1,205 +1,205 @@
-# Архитектура
+# Architecture
 
-> ⚠️ **Не медицинское изделие. Не медицинская рекомендация. Некоммерческий проект.**
-> Предоставляется «как есть», без гарантий. Использование — на собственный риск.
-> Все демо-данные вымышлены. Полные условия — [DISCLAIMER.md](../DISCLAIMER.md) (в корне репозитория).
-> 🚨 При неотложном состоянии — скорая помощь.
+> ⚠️ **Not a medical device. Not medical advice. Non-commercial project.**
+> Provided “as is,” without warranties. Use at your own risk.
+> All demo data is fictional. Full terms are in [DISCLAIMER.md](../DISCLAIMER.md) (in the repository root).
+> 🚨 In an emergency, call emergency services.
 
-Как система устроена внутри и почему именно так. Документ для тех, кто собирается её дорабатывать: добавлять специалистов, менять скиллы, разбираться, почему что-то работает не так, как ожидалось.
-
----
-
-## Блок 1. Общая картина
-
-Health-OS собран из четырёх сущностей, и все они — обычные файлы.
-
-| Сущность | Чем является | Роль |
-|----------|--------------|------|
-| **Данные** | JSON, CSV, JSONL, Markdown в `Data/` | База данных |
-| **Claude Code** | CLI-агент | Движок: читает, пишет, рассуждает |
-| **Скиллы** | Markdown в `.claude/skills/*/SKILL.md` | Операции над данными |
-| **Агенты** | Markdown в `.claude/agents/*.md` | Специалисты с изолированным контекстом |
-
-Ни базы данных, ни сервера, ни ORM. Файловое дерево и текстовые инструкции.
-
-### Почему файлы, а не база
-
-Три причины, и все практические.
-
-**Данные переживают систему.** JSON с результатами анализов читается любым инструментом и через десять лет, когда от этого проекта не останется ничего. База требует своей версии движка, своей схемы, своей миграции. Медицинская история человека живёт дольше любого софта, и формат хранения должен это учитывать.
-
-**Diff и история бесплатны.** Локальный git даёт версионирование, откат и понятную историю правок без единой строки кода. Видно, когда маркер изменился, кто это записал и что было до.
-
-**Движок читает файлы напрямую.** Claude Code работает с файловой системой как с первичным интерфейсом. База данных добавила бы слой, который пришлось бы описывать в промптах, — и этот слой стал бы ещё одним местом рассинхронизации.
-
-Цена решения честная: нет транзакций, нет ограничений целостности на уровне хранилища, нет конкурентного доступа. Вместо них — инварианты, описанные в `.claude/shared/data-schemas.md`, и проверки, которые скиллы выполняют перед записью. Это слабее, чем СУБД, и об этом надо помнить.
-
-### Скиллы и агенты — разные вещи
-
-Их легко перепутать, но роли противоположные.
-
-**Скилл** — это операция. Он знает, где что лежит, в каком порядке спрашивать, что проверить перед записью и что обновить после. Скиллы пишут данные.
-
-**Агент** — это точка зрения. Он ничего не знает о структуре проекта сверх того, что написано в контракте, и никогда ничего не пишет: только читает `Data/` и возвращает рассуждение. Изолированный контекст здесь не техническая деталь, а суть — двенадцать специалистов, рассуждающих в одном контексте, дают одно мнение в двенадцати формулировках.
+How the system is built internally and why it is built this way. This document is for people who plan to extend it: adding specialists, changing skills, and investigating why something does not work as expected.
 
 ---
 
-## Блок 2. Слои
+## Block 1. Overview
 
-```
-Данные Data/
-   ↓ читаются
-Рамки .claude/shared/ — как рассуждать над данными
-   ↓ обязательны для
-Агенты .claude/agents/ — клинические зоны, только чтение
-   ↓ вызываются из
-Скиллы .claude/skills/ — операции, единственные, кто пишет
-   ↓ результат виден в
-Дашборд Dashboard/ — визуализация, только 127.0.0.1
-```
+Health-OS consists of four entities, all of them ordinary files.
 
-Направление зависимостей одностороннее: нижние слои не знают о верхних. Агент не знает, из какого скилла его вызвали. Рамка не знает, какой агент её читает. Данные не знают ни о чём.
+| Entity | What it is | Role |
+|--------|------------|------|
+| **Data** | JSON, CSV, JSONL, Markdown in `Data/` | Database |
+| **Claude Code** | CLI agent | Engine: reads, writes, reasons |
+| **Skills** | Markdown in `.claude/skills/*/SKILL.md` | Operations on data |
+| **Agents** | Markdown in `.claude/agents/*.md` | Specialists with isolated context |
 
-Это даёт главное свойство системы: **добавление специалиста не требует правок нигде, кроме реестров.** Новый агент получает всю методологию из рамок, а данные — из `Data/`.
+There is no database, server, or ORM. There is a file tree and textual instructions.
+
+### Why files instead of a database
+
+Three reasons, all practical.
+
+**Data outlives the system.** JSON with lab results can be read by any tool ten years from now, when nothing may remain of this project. A database requires its own engine version, schema, and migration. A person’s medical history outlives any software, and the storage format must account for that.
+
+**Diff and history are free.** Local git provides versioning, rollback, and a clear edit history without a line of code. You can see when a marker changed, who recorded it, and what came before.
+
+**The engine reads files directly.** Claude Code treats the filesystem as its primary interface. A database would add a layer that would have to be described in prompts — and that layer would become another place for desynchronization.
+
+The tradeoff is real: there are no transactions, storage-level integrity constraints, or concurrent access. In their place are invariants described in `.claude/shared/data-schemas.md`, plus checks that skills perform before writing. This is weaker than a DBMS, and it must be remembered.
+
+### Skills and agents are different
+
+They are easy to confuse, but their roles are opposite.
+
+**A skill** is an operation. It knows where things live, what order to ask questions in, what to check before writing, and what to update afterward. Skills write data.
+
+**An agent** is a point of view. It knows nothing about project structure beyond the contract and never writes anything: it only reads `Data/` and returns reasoning. Isolated context is not a technical detail here; it is the point — twelve specialists reasoning in one context produce one opinion in twelve wordings.
 
 ---
 
-## Блок 3. Слой данных
+## Block 2. Layers
 
 ```
 Data/
-├── profile.json            медкарта: рост, аллергии, хронические, семейный анамнез,
-│                           блок lifestyle — питание, вещества, сон, тренировки
-├── context/                среда: география, климат, жильё, работа, соцокружение
-├── history.json            операции, госпитализации, перенесённые заболевания
-├── hypotheses.json         гипотезы о первопричинах со статусом и доказательной базой
-├── vaccinations.json       прививки и туберкулиновые пробы
-├── body-metrics.csv        вес, давление, ИМТ, состав тела — append-only
-├── labs/                   анализы + _index.json + _marker-aliases.json
-├── doctors/                contacts.json, visits/ с индексом, prep/ — брифы к приёму
-├── dental/                 карта зубов по ISO 3950, процедуры
-├── medications/            current.json: лекарства, БАДы, наружное, протоколы
-├── mental/                 journal.jsonl — настроение, энергия, стресс, сон
-├── costs/                  расходы, append-only JSONL
-├── goals/                  цели с направлениями, milestone и оценкой стоимости
-├── consilium/              отчёты консилиумов + _sessions.json
-├── traction/               история обзоров прогресса
+   ↓ read by
+Frameworks .claude/shared/ — how to reason over data
+   ↓ mandatory for
+Agents .claude/agents/ — clinical areas, read-only
+   ↓ called from
+Skills .claude/skills/ — operations, the only writers
+   ↓ result visible in
+Dashboard Dashboard/ — visualization, 127.0.0.1 only
+```
+
+Dependency direction is one-way: lower layers do not know about upper layers. An agent does not know which skill called it. A framework does not know which agent reads it. Data knows about none of them.
+
+This gives the system its main property: **adding a specialist requires changes only in registries.** The new agent gets all methodology from the frameworks and data from `Data/`.
+
+---
+
+## Block 3. Data layer
+
+```
+Data/
+├── profile.json            medical record: height, allergies, chronic conditions, family history,
+│                           lifestyle block — diet, substances, sleep, training
+├── context/                environment: geography, climate, housing, work, social environment
+├── history.json            procedures, hospitalizations, past illnesses
+├── hypotheses.json         root-cause hypotheses with status and evidence base
+├── vaccinations.json       vaccinations and tuberculin tests
+├── body-metrics.csv        weight, blood pressure, BMI, body composition — append-only
+├── labs/                   lab results + _index.json + _marker-aliases.json
+├── doctors/                contacts.json, indexed visits/, prep/ — visit briefs
+├── dental/                 dental chart according to ISO 3950, procedures
+├── medications/            current.json: medications, supplements, topical products, protocols
+├── mental/                 journal.jsonl — mood, energy, stress, sleep
+├── costs/                  expenses, append-only JSONL
+├── goals/                  goals with directions, milestones, and cost estimate
+├── consilium/              consilium reports + _sessions.json
+├── traction/               progress-review history
 └── specialists/            marker-ownership.json, cross-specialty-map.json
 ```
 
-Полное описание каждого файла — `.claude/shared/data-schemas.md`. Этот документ объявлен единственным источником истины по структуре, и правило жёсткое: **скилл ссылается на него, а не переписывает схему у себя.**
+The complete description of every file is in `.claude/shared/data-schemas.md`. That document is declared the single source of truth for structure, and the rule is strict: **a skill refers to it rather than copying the schema into itself.**
 
-Правило появилось не из любви к порядку. Раньше каждый скилл держал собственную копию схемы, копии разошлись, и скилл, добросовестно следовавший своей документации, не находил данные при чтении и создавал несовместимый файл при записи.
+The rule was not created for the love of order. Previously, every skill kept its own schema copy; the copies diverged, and a skill faithfully following its documentation failed to find data when reading and created an incompatible file when writing.
 
-### Индексы
+### Indexes
 
-`Data/labs/_index.json` и `Data/doctors/visits/_index.json` — точки входа в свои коллекции. Агент не сканирует каталог и не угадывает имена файлов: он читает индекс, отбирает релевантные записи по полям `type`, `flags`, `specialty`, `brief` и читает только отобранное.
+`Data/labs/_index.json` and `Data/doctors/visits/_index.json` are entry points into their collections. An agent does not scan the directory or guess filenames: it reads the index, selects relevant records by `type`, `flags`, `specialty`, and `brief`, and reads only what was selected.
 
-Инвариант: число записей в индексе равно числу файлов в каталоге. Проверяется командами из блока «Инварианты» в `data-schemas.md`.
+Invariant: the number of index records equals the number of files in the directory. The commands in the “Invariants” section of `data-schemas.md` check this.
 
-### Два реестра специалистов
+### Two specialist registries
 
-`Data/specialists/marker-ownership.json` — кто ведущий по каждому маркеру. Нужен, чтобы гематолог и эндокринолог не выдавали два конкурирующих основных вывода по ТТГ: у маркера есть `owner`, остальные комментируют, но не дублируют.
+`Data/specialists/marker-ownership.json` identifies the lead specialist for each marker. This keeps a hematologist and an endocrinologist from producing two competing primary conclusions about TSH: a marker has an `owner`; others comment but do not duplicate the primary conclusion.
 
-`Data/specialists/cross-specialty-map.json` — перекрёстные паттерны, сформулированные **как условия, а не как утверждения о пациенте**. У каждого паттерна есть `trigger_conditions[]` и `min_conditions`: агент проверяет каждое условие по актуальным данным и активирует паттерн только при фактическом совпадении. Прежняя версия файла хранила конкретные значения пациента, устарела и заставляла агентов утверждать уже опровергнутое.
-
----
-
-## Блок 4. Слой рамок
-
-Семь документов в `.claude/shared/`. Это методология, вынесенная из промптов, чтобы существовать в одном экземпляре.
-
-| Документ | Что задаёт | Кто обязан читать |
-|----------|-----------|-------------------|
-| `holistic-framework.md` | Способ рассуждения: каузальная лестница из пяти уровней, 13 сквозных физиологических осей, матрица контекста жизни, хронологический якорь, терапевтический порядок, антипаттерны | Все агенты, аналитические скиллы |
-| `specialist-contract.md` | Общий контракт: обязательное чтение, процедура отбора анализов, разрешение конфликтов источников, обязательные секции заключения | Все агенты |
-| `evidence-base.md` | Иерархия источников, уровни A/B/C/D/⚠️, формат ссылки, запрет на выдуманные ссылки | Все агенты, аналитические скиллы |
-| `critical-values.md` | Пороги неотложных состояний, порядок действий при их обнаружении, красные флаги психического состояния | `/labs`, `/inbox`, `/body`, `/mental`, все агенты |
-| `consilium-protocol.md` | Три раунда, правила критики, правила вердикта, запрет искусственного консенсуса | `/consilium` и участвующие агенты |
-| `data-schemas.md` | Структура всех файлов `Data/`, инварианты, правила записи | Все пишущие скиллы |
-| `specialty-aliases.md` | Разговорные названия → имена агентов, автоподбор специальностей по теме вопроса | `/consilium`, `/doctor-consult` |
-
-Вынос сделан по той же причине, что и единый источник схем: `specialist-contract.md` собран из двенадцати файлов агентов, где одни и те же правила дублировались дословно и успели разойтись между собой.
+`Data/specialists/cross-specialty-map.json` contains cross-specialty patterns expressed **as conditions, not as claims about the patient**. Each pattern has `trigger_conditions[]` and `min_conditions`: the agent checks every condition against current data and activates the pattern only on an actual match. The previous version stored specific patient values, became stale, and made agents assert claims that had already been disproved.
 
 ---
 
-## Блок 5. Почему в промптах агентов нет фактов о пациенте
+## Block 4. Framework layer
 
-Это центральное архитектурное правило системы, и оно стоит подробного объяснения.
+There are seven documents in `.claude/shared/`. This is methodology extracted from prompts so that it exists in one copy.
 
-Соблазн очевиден: записать в промпт кардиолога «у пациента синусовая тахикардия и повышенные триглицериды» — и агент сразу в курсе, не тратит токены на чтение, отвечает быстрее и точнее.
+| Document | Defines | Who must read it |
+|----------|---------|------------------|
+| `holistic-framework.md` | Reasoning method: five-level causal ladder, 13 cross-cutting physiological axes, life-context matrix, chronological anchor, therapeutic order, antipatterns | All agents, analytical skills |
+| `specialist-contract.md` | Common contract: mandatory reading, lab-selection procedure, source-conflict resolution, mandatory conclusion sections | All agents |
+| `evidence-base.md` | Source hierarchy, A/B/C/D/⚠️ levels, citation format, prohibition on invented citations | All agents, analytical skills |
+| `critical-values.md` | Emergency thresholds, procedure when they are found, mental-state red flags | `/labs`, `/inbox`, `/body`, `/mental`, all agents |
+| `consilium-protocol.md` | Three rounds, critique rules, verdict rules, prohibition on artificial consensus | `/consilium` and participating agents |
+| `data-schemas.md` | Structure of all `Data/` files, invariants, writing rules | All writing skills |
+| `specialty-aliases.md` | Conversational names → agent names, automatic specialty selection by question topic | `/consilium`, `/doctor-consult` |
 
-Проблема в том, что **у промпта и у данных разные скорости обновления**.
-
-Данные обновляются сами собой: пришли новые анализы — `/inbox` разобрал их и записал. Файл теперь говорит другое. Это происходит регулярно и не требует ничьего внимания.
-
-Промпт правится вручную. Его надо вспомнить, открыть, найти нужную строку, понять, что она устарела, исправить. Ни одно из этих действий не происходит автоматически, и ни одно не напоминает о себе.
-
-Через несколько итераций возникает расхождение. И здесь принципиальный момент: **при расхождении промпт проигрывает, но агент об этом не знает.** Он не видит противоречия, потому что содержимое промпта воспринимается им не как утверждение, требующее проверки, а как данность. Он строит рассуждение на устаревшем факте с полной уверенностью и выдаёт результат, неотличимый по форме от корректного.
-
-В рабочей версии системы это происходило буквально: промпты агентов утверждали полицитемию, нарастающий лимфоцитоз и повышенные триглицериды, тогда как свежие анализы опровергали все три. Агенты продолжали строить на них выводы — уверенно, структурированно, с уровнями доказательности.
-
-Отсюда правило в трёх частях:
-
-1. **Промпт специалиста — это методология, а не медкарта.** Клиническую зону, маркеры и способ рассуждения он описывает. Состояние пациента — нет.
-2. **Клиническая картина строится агентом самостоятельно, чтением `Data/`.** Каждый раз заново.
-3. **Если агенту кажется, что он «уже знает» что-то о пациенте, не прочитав это в `Data/`, — он это выдумал.** Формулировка вынесена в контракт дословно.
-
-Правило распространяется дальше промптов. `cross-specialty-map.json` хранит условия вместо значений по той же причине. Возраст вычисляется из даты рождения, а не записывается числом. Давность исследования — из его даты и текущей, а не из фразы «полгода назад».
-
-### Следствие: производные документы не источник истины
-
-Отчёты консилиумов, брифы к приёму, записи гипотез — снимки рассуждения на момент написания. Они не обновляются при поступлении новых данных и вполне могут опираться на то, что опровергнуто через неделю.
-
-Правило: прежде чем сослаться на вывод из производного документа, сверьте его основания с актуальными данными. Если основание снято — вывод недействителен, и об этом надо сказать прямо, указав документ и дату.
-
-`/consilium` делает это системно: перед синтезом он перечитывает прошлые отчёты и выносит недействительные выводы в отдельную секцию нового отчёта. Старые отчёты при этом не редактируются — они остаются историческим снимком.
+The extraction was done for the same reason as the single schema source: `specialist-contract.md` was assembled from twelve agent files where the same rules were duplicated verbatim and had already diverged.
 
 ---
 
-## Блок 6. Приоритет источников при конфликте
+## Block 5. Why agent prompts contain no patient facts
 
-Источники противоречат друг другу регулярно. Порядок строгий:
+This is the system’s central architectural rule and deserves a detailed explanation.
+
+The temptation is obvious: put “the patient has sinus tachycardia and elevated triglycerides” in the cardiologist’s prompt, and the agent is immediately informed, spends no tokens reading, and answers faster and more accurately.
+
+The problem is that **prompts and data update at different speeds**.
+
+Data updates by itself: new lab results arrive, `/inbox` parses and records them, and the file now says something else. This happens regularly without anyone’s attention.
+
+A prompt is edited manually. Someone must remember it, open it, find the relevant line, recognize that it is stale, and correct it. None of this happens automatically, and nothing reminds anyone to do it.
+
+After several iterations, the two diverge. The key point is: **when they diverge, the prompt loses, but the agent does not know that.** It cannot see the contradiction because it treats prompt contents not as a claim requiring verification but as a given. It reasons from the stale fact with complete confidence and produces an answer indistinguishable in form from a correct one.
+
+This happened literally in the working version: agent prompts asserted polycythemia, rising lymphocytosis, and elevated triglycerides while fresh tests disproved all three. Agents continued to build conclusions on them — confidently, structurally, and with evidence levels.
+
+That leads to a three-part rule:
+
+1. **A specialist prompt is methodology, not a medical record.** It describes the clinical area, markers, and reasoning method. It does not describe the patient’s state.
+2. **The agent builds the clinical picture independently by reading `Data/`.** Every time, from scratch.
+3. **If an agent thinks it “already knows” something about the patient without reading it in `Data/`, it made it up.** This wording is included verbatim in the contract.
+
+The rule extends beyond prompts. `cross-specialty-map.json` stores conditions instead of values for the same reason. Age is calculated from the date of birth rather than stored as a number. Test recency is calculated from its date and the current date rather than from the phrase “six months ago.”
+
+### Consequence: derived documents are not a source of truth
+
+Consilium reports, visit briefs, and hypothesis records are snapshots of reasoning at the time they were written. They do not update when new data arrives and may rely on something disproved a week later.
+
+Rule: before citing a conclusion from a derived document, check its basis against current data. If the basis has been removed, the conclusion is invalid; say so directly and identify the document and date.
+
+`/consilium` does this systematically: before synthesis, it rereads previous reports and moves invalid conclusions into a separate section of the new report. Old reports are not edited; they remain historical snapshots.
+
+---
+
+## Block 6. Source priority when sources conflict
+
+Sources contradict each other regularly. The order is strict:
 
 ```
-файл анализа  >  hypotheses.json  >  profile.json  >  визиты  >  промпт
+lab-result file  >  hypotheses.json  >  profile.json  >  visits  >  prompt
 ```
 
-Сопутствующие правила, каждое со своей причиной:
+Related rules, each for a reason:
 
-**Референсный интервал берётся из самого файла анализа.** Поля `reference_min` / `reference_max` привязаны к лаборатории и методу. Нормы «по памяти» запрещены: одно и то же значение бывает `normal` в одной лаборатории и `high` в другой. Практическое следствие — узкий референс одной лаборатории создаёт видимость отклонения там, где по референсу другой всё нормально.
+**The reference interval comes from the lab-result file itself.** `reference_min` / `reference_max` are tied to the laboratory and method. “By memory” ranges are forbidden: the same value can be `normal` at one lab and `high` at another. In practice, a narrow range at one lab can create an apparent deviation where another lab’s range says everything is normal.
 
-**Единицы сверяются до любого сравнения.** Один маркер приходит из разных лабораторий в разных единицах. Словарь `Data/labs/_marker-aliases.json` хранит канонические имена, синонимы, коэффициенты пересчёта и — отдельным полем `not_synonyms` — аналиты, которые похожи по названию, но являются разными веществами и в один тренд объединяться не должны.
+**Units are checked before any comparison.** One marker may arrive from different laboratories in different units. `Data/labs/_marker-aliases.json` stores canonical names, synonyms, conversion factors, and — in the separate `not_synonyms` field — analytes that look similar by name but are different substances and must not be combined into one trend.
 
-Пример из словаря: тестостерон записан и в нг/мл, и в нмоль/л. Без пересчёта тренд «17.33 → 6.5» читается как обвал втрое, тогда как на деле это рост.
+Example from the dictionary: testosterone appears in both ng/ml and nmol/l. Without conversion, the trend “17.33 → 6.5” looks like a threefold collapse, when it is actually an increase.
 
-**Значения из разных лабораторий сравниваются по положению в референсе**, а не по абсолютному числу. Исключение — маркеры, для которых руководства задают абсолютный целевой уровень, а не популяционный референс. Применяя исключение, агент обязан назвать его явно.
+**Values from different laboratories are compared by position within the reference range**, not by absolute number. The exception is a marker for which guidelines set an absolute target rather than a population reference range. When applying the exception, the agent must name it explicitly.
 
-**Данные старше 24 месяцев** помечаются как требующие подтверждения. Вывод, целиком опирающийся на них, маркируется соответственно.
+**Data older than 24 months** is marked as requiring confirmation. A conclusion relying entirely on it receives the same label.
 
-**Если `hypotheses.json` противоречит анализу — верны данные.** Опровержение гипотезы так же ценно, как подтверждение, и должно быть названо прямо.
+**If `hypotheses.json` contradicts a test, the data wins.** Disproving a hypothesis is as valuable as confirming one and must be stated directly.
 
-**Расхождение называется явно.** Молча выбрать удобный источник запрещено: нужно показать конфликт и объяснить выбор.
+**A discrepancy is named explicitly.** Quietly choosing the convenient source is forbidden: show the conflict and explain the choice.
 
 ---
 
-## Блок 7. Три поколения схемы анализов
+## Block 7. Three generations of lab-result schema
 
-Файлы в `Data/labs/` существуют в трёх формах одновременно. Это факт данных, а не дефект, и знать о нём обязательно.
+Files in `Data/labs/` exist in three forms at once. This is a data fact, not a defect, and everyone must understand it.
 
-| Поколение | Форма | Откуда взялось |
-|-----------|-------|----------------|
-| **v1** | Плоский массив `markers[]` | Исходная схема, ей записана основная часть исторических анализов |
-| **v2** | `panels[].markers[]` | Появилась, когда лаборатории начали отдавать результаты панелями |
-| **v3** | `studies[].markers[]` | Документы, где результаты сгруппированы по исследованиям с разным материалом и разными исполнителями |
+| Generation | Form | Origin |
+|------------|------|--------|
+| **v1** | Flat `markers[]` array | Original schema; most historical lab results use it |
+| **v2** | `panels[].markers[]` | Appeared when laboratories began returning results as panels |
+| **v3** | `studies[].markers[]` | Documents where results are grouped by study, with different materials and performers |
 
-Отдельно стоит схема InBody (`type: "body_composition"`) — у неё вообще нет маркеров в обычном смысле, только блоки состава тела.
+The InBody schema (`type: "body_composition"`) is separate — it has no ordinary markers, only body-composition blocks.
 
-### Главная ловушка
+### The main trap
 
-**Поле `version` не различает схемы.** У всех трёх поколений оно равно `1`. Отличать их надо по наличию ключа: `markers`, `panels` или `studies`.
+**The `version` field does not distinguish schemas.** It is `1` in all three generations. Distinguish them by the presence of `markers`, `panels`, or `studies`.
 
-Отсюда обязательное правило чтения — маркеры собираются объединением всех трёх источников:
+Therefore the mandatory reading rule is to collect markers by merging all three sources:
 
 ```
 markers[]  +  panels[].markers[]  +  studies[].markers[]
@@ -211,192 +211,192 @@ jq '[(.markers // []),
      ([(.studies // [])[].markers // []] | add // [])] | add' file.json
 ```
 
-Цена ошибки асимметрична и потому опасна. Чтение только `panels[].markers[]` теряет почти всю историю — код при этом работает, ничего не падает, тренды строятся, просто они построены на нескольких последних точках. Чтение только `markers[]` теряет все свежие результаты — и тоже без единой ошибки в логе.
+The error is asymmetric and therefore dangerous. Reading only `panels[].markers[]` loses almost the entire history — the code still runs, nothing crashes, and trends are built, but from a few recent points. Reading only `markers[]` loses all fresh results, again without a single log error.
 
-Именно поэтому правило вынесено в `data-schemas.md` как обязательное, а в дашборде реализовано отдельной функцией `collectMarkers`, а не повторяется в каждом месте чтения.
+That is why the rule is mandatory in `data-schemas.md`, and why the dashboard implements it as a separate `collectMarkers` function rather than repeating it at every read site.
 
-### Почему старые файлы не мигрировали
+### Why old files were not migrated
 
-Миграция выглядит очевидным решением: привести всё к одной схеме и забыть. Против неё два аргумента.
+Migration seems obvious: bring everything to one schema and forget about it. Two arguments oppose it.
 
-Первый: v3 существует не от небрежности. Урологическое обследование с четырьмя разными материалами и тремя исполнителями естественно ложится в `studies[]` и плохо — в плоский список. Приведение к общей схеме потеряло бы структуру документа.
+First, v3 exists for a reason. A urological examination with four different materials and three performers naturally fits `studies[]` and fits a flat list poorly. Flattening it would lose document structure.
 
-Второй, более весомый: миграция — это массовая перезапись медицинских данных скриптом. Ошибка в нём тихо испортит историю анализов, и обнаружится это через год, когда кто-то заметит странный тренд. Риск несопоставим с выигрышем в удобстве чтения.
+Second, and more important: migration is a script rewriting medical data at scale. A bug would silently damage the lab history and be discovered a year later when someone notices a strange trend. The risk is not comparable to the convenience of reading one schema.
 
-Канон для новых записей — v2. Существующие файлы не трогаются.
+The canonical schema for new records is v2. Existing files are left alone.
 
 ---
 
-## Блок 8. Консилиум
+## Block 8. Consilium
 
-Центральный механизм системы и то, ради чего построено всё остальное.
+This is the system’s central mechanism and the reason everything else was built.
 
-Параллельный запуск специалистов сам по себе консилиумом не является. Двенадцать независимых монологов, сшитых оркестратором, дают набор мнений: никто ничего не проверил, никто ни с кем не спорил, и слабая гипотеза выглядит ровно так же убедительно, как сильная.
+Launching specialists in parallel is not itself a consilium. Twelve independent monologues stitched together by an orchestrator produce a set of opinions: nobody checked anyone else, nobody argued, and a weak hypothesis looks exactly as convincing as a strong one.
 
 ```mermaid
 flowchart TB
-    Q["Вопрос пользователя"] --> PICK["Подбор специальностей<br/>specialty-aliases.md, предел — 8"]
+    Q["User question"] --> PICK["Select specialties<br/>specialty-aliases.md, limit — 8"]
 
-    subgraph R1["Раунд 1 — вслепую, параллельно"]
-        A1["Специалист A"]
-        A2["Специалист B"]
-        A3["Специалист C"]
+    subgraph R1["Round 1 — blind, in parallel"]
+        A1["Specialist A"]
+        A2["Specialist B"]
+        A3["Specialist C"]
     end
 
-    subgraph R2["Раунд 2 — только пересёкшиеся"]
-        C1["Критика по существу:<br/>с чем согласен, с чем нет,<br/>что коллеги не рассмотрели"]
-        DEV["Адвокат дьявола<br/>против ведущей гипотезы"]
+    subgraph R2["Round 2 — overlaps only"]
+        C1["Substantive critique:<br/>what is agreed, what is not,<br/>what colleagues did not consider"]
+        DEV["Devil’s advocate<br/>against leading hypothesis"]
     end
 
-    subgraph R3["Раунд 3 — оркестратор"]
-        V["Вердикты по уровню<br/>доказательности"]
-        U["Неразрешённое —<br/>в отчёт как есть"]
-        S["Синтез общей<br/>первопричины"]
+    subgraph R3["Round 3 — orchestrator"]
+        V["Verdicts by<br/>evidence level"]
+        U["Unresolved —<br/>reported as is"]
+        S["Synthesis of common<br/>root cause"]
     end
 
     PICK --> A1
     PICK --> A2
     PICK --> A3
 
-    A1 --> CROSS{"Есть предмет спора?"}
+    A1 --> CROSS{"Subject of dispute?"}
     A2 --> CROSS
     A3 --> CROSS
 
-    CROSS -->|"нет"| SKIP["Раунд 2 пропущен,<br/>отмечено в отчёте"]
-    CROSS -->|"да"| C1
+    CROSS -->|"no"| SKIP["Round 2 skipped,<br/>marked in report"]
+    CROSS -->|"yes"| C1
     C1 --> DEV
 
     DEV --> V
     SKIP --> V
     V --> U --> S
 
-    S --> GATE{"Все обязательные<br/>секции на месте?"}
-    GATE -->|"нет"| FILL["Заполнить,<br/>а не удалить секцию"]
+    S --> GATE{"All mandatory<br/>sections present?"}
+    GATE -->|"no"| FILL["Fill it in,<br/>do not delete the section"]
     FILL --> GATE
-    GATE -->|"да"| OUT["Отчёт в Data/consilium/"]
+    GATE -->|"yes"| OUT["Report in Data/consilium/"]
 ```
 
-### Почему первый раунд слепой
+### Why the first round is blind
 
-Специалисты не видят выводов друг друга. Это не оптимизация, а защита от якорения: увидев чужой вывод до того, как сформировал свой, специалист перестаёт искать собственный и начинает объяснять чужой.
+Specialists do not see one another’s conclusions. This is not an optimization but protection against anchoring: after seeing someone else’s conclusion before forming their own, a specialist stops searching independently and starts explaining the other person’s answer.
 
-Независимость первого раунда — источник разнообразия гипотез. Без неё во втором раунде не о чем будет спорить: все уже согласны с тем, кто высказался первым.
+First-round independence is the source of hypothesis diversity. Without it, there is nothing to argue about in round two: everyone already agrees with whoever spoke first.
 
-Дополнительное требование раунда: минимум две конкурирующие гипотезы от каждого участника с указанием, что их различает. Одна гипотеза — это догадка, а не анализ.
+The round has an additional requirement: each participant must provide at least two competing hypotheses and state what distinguishes them. One hypothesis is a guess, not an analysis.
 
-И секция «Уверенность и уязвимость», где специалист называет самое слабое место своего вывода и то, что его переубедит. Честно названное слабое место экономит консилиуму целый раунд.
+There is also a “Confidence and vulnerability” section, where the specialist names the weakest part of the conclusion and what would change their mind. A weakness named honestly can save the consilium an entire round.
 
-### Почему второй раунд выборочный
+### Why the second round is selective
 
-Запускать всех повторно дорого и бессмысленно. Во второй раунд идут только те, у кого есть предмет спора: пересечение по маркеру, органу или сквозной оси, конкурирующие объяснения одной жалобы, выставленный флаг, расхождение в оценке значимости находки.
+Rerunning everyone is expensive and pointless. Round two includes only participants with a subject of dispute: overlap by marker, organ, or cross-cutting axis; competing explanations for one complaint; a raised flag; or disagreement about the significance of a finding.
 
-Если пересечений нет вообще — раунд пропускается, и это отмечается в отчёте явно. Молчаливый пропуск неотличим от того, что раунд провели формально.
+If there is no overlap at all, the round is skipped and this is stated explicitly in the report. A silent omission is indistinguishable from a round carried out perfunctorily.
 
-Правила критики устроены так, чтобы спор был содержательным: возражение обосновывается данными, а не мнением; авторитет специальности не аргумент; атаковать надо самое сильное прочтение чужого тезиса, а не удобную упрощённую версию; возражать ради возражения запрещено — если после честной проверки возразить нечего, надо сказать, что именно проверено.
+The critique rules make the disagreement substantive: an objection is supported by data, not opinion; specialty authority is not an argument; attack the strongest reading of the other person’s thesis rather than a convenient simplified version; arguing for its own sake is forbidden — if an honest check finds no objection, say exactly what was checked.
 
-Отдельно назначается адвокат дьявола для ведущей гипотезы — участник, чья зона наименее с ней связана, с единственной задачей её опрокинуть. Устоявшая под целенаправленной атакой гипотеза заслуживает большего доверия. Рухнувшая — экономит деньги и время на ненужных обследованиях.
+A devil’s advocate is separately assigned to the leading hypothesis: a participant whose area is least connected to it, with the sole task of overturning it. A hypothesis that survives a targeted attack deserves more trust. One that collapses saves money and time on unnecessary tests.
 
-### Почему запрещён искусственный консенсус
+### Why artificial consensus is forbidden
 
-Самое важное правило протокола.
+This is the protocol’s most important rule.
 
-Соблазн сгладить понятен: отчёт с единой позицией читается лучше отчёта с двумя противоречащими. Но **неразрешённое разногласие несёт информацию, которой нет больше нигде: оно точно указывает, какое обследование нужно сделать следующим.**
+The temptation to smooth things over is understandable: a report with one position is easier to read than a report with two contradictions. But **unresolved disagreement carries information found nowhere else: it identifies exactly what examination should happen next.**
 
-Если гематолог и эндокринолог расходятся в объяснении одной находки и оба правы в пределах своих данных — значит, данных не хватает ровно в том месте, где они спорят. Исследование, которое их рассудит, выбрано не наугад, а самой структурой спора.
+If a hematologist and an endocrinologist disagree about one finding and both are right within their data, the missing data is exactly where they disagree. The study that will arbitrate is selected by the structure of the dispute, not at random.
 
-Сглаженная формулировка эту информацию уничтожает. Читатель получает уверенное утверждение и не узнаёт, что система не знает ответа.
+Smoothing the wording destroys this information. The reader gets a confident claim and does not learn that the system does not know the answer.
 
-Поэтому в отчёте есть отдельная секция «Неразрешённые разногласия», где обе позиции сохраняются с уровнями доказательности и с указанием исследования-арбитра. И отдельная секция «Отклонённые гипотезы» — чтобы при следующем разборе не выдвигать заново то, что уже проверено.
+Therefore the report has a separate “Unresolved disagreements” section that preserves both positions with evidence levels and identifies the arbiter study. It also has a separate “Rejected hypotheses” section so the next review does not propose something already tested.
 
-### Гейт перед сохранением
+### Gate before saving
 
-Отчёт не записывается, пока не подтверждено наличие обязательных секций: ход обсуждения, разрешённые и неразрешённые споры, проверка ведущей гипотезы, общая первопричина, хронология, вклад образа жизни, влияние на существующие гипотезы, пробелы в данных, дисклеймер.
+The report is not written until the following mandatory sections are confirmed: discussion course, resolved and unresolved disputes, leading-hypothesis check, common root cause, chronology, lifestyle contribution, effect on existing hypotheses, data gaps, and disclaimer.
 
-Отсутствующая секция заполняется, а не удаляется из шаблона. Пустая обязательная секция означает незавершённый консилиум, и лучше это видеть, чем не видеть.
+A missing section is filled in rather than deleted from the template. An empty mandatory section means the consilium is incomplete, and it is better to see that than to hide it.
 
-Отдельно проверяется, что у каждой конкретной ссылки — DOI, автора, названия, номера руководства — есть открываемый URL. Специалисты имеют узкий канал в сеть по белому списку доменов ради подтверждения источника; конкретика без URL означает, что проверка не проводилась, и такая ссылка снимается.
+It is also checked that every specific citation — DOI, author, title, guideline number — has an openable URL. Specialists have a narrow network channel to an allowlist of domains for source verification; specifics without a URL mean verification was not performed, so the citation is removed.
 
 ---
 
-## Блок 9. Механика сессий
+## Block 9. Session mechanics
 
-Работа с медданными растянута во времени: анализы приходят партиями, визиты происходят раз в месяцы, оцифровка истории занимает недели. Сессионный слой нужен, чтобы контекст не терялся между заходами.
+Work with medical data stretches over time: lab results arrive in batches, visits happen months apart, and digitizing history takes weeks. The session layer keeps context from being lost between visits.
 
-### Четыре компонента
+### Four components
 
-| Компонент | Файл | Живёт | Отвечает за |
-|-----------|------|-------|-------------|
-| Breadcrumb | `.claude/hooks/pending-sessions/<id>.json` | До обработки | Факт, что сессия была и не закрыта |
-| Active context | `Cache/active-context.md` | Постоянно, перезаписывается | Горячий контекст: задачи, ожидания, следующие шаги |
-| Checkpoint | `Cache/checkpoint.yml` | Пока задача не закрыта | Точка восстановления многошаговой операции |
-| Session log | `Cache/sessions/YYYY-MM-DD_HH-MM.md` | Постоянно | Аудит: что сделано в конкретной сессии |
-| Долгосрочная память | `MEMORY.md` | Постоянно | Устойчивое: активные треды, курсы, открытые вопросы |
+| Component | File | Lifetime | Responsible for |
+|-----------|------|----------|----------------|
+| Breadcrumb | `.claude/hooks/pending-sessions/<id>.json` | Until processed | The fact that a session existed and was not closed |
+| Active context | `Cache/active-context.md` | Permanent, overwritten | Hot context: tasks, expectations, next steps |
+| Checkpoint | `Cache/checkpoint.yml` | Until the task is closed | Recovery point for a multi-step operation |
+| Session log | `Cache/sessions/YYYY-MM-DD_HH-MM.md` | Permanent | Audit: what was done in a particular session |
+| Long-term memory | `MEMORY.md` | Permanent | Durable information: active threads, courses, open questions |
 
-Разделение между `active-context.md` и `MEMORY.md` намеренное. Первый — что происходит сейчас и перезаписывается целиком. Второй — что верно вообще и правится точечно. Смешение приводит к тому, что либо в память попадает сиюминутное, либо горячий контекст тонет в истории.
+The separation between `active-context.md` and `MEMORY.md` is intentional. The first contains what is happening now and is overwritten in full. The second contains what is generally true and is edited selectively. Mixing them means either that transient details enter memory or that hot context drowns in history.
 
-### Хуки
+### Hooks
 
-**Stop → `session-save.sh`.** Срабатывает после каждого ответа. Читает payload из stdin, проверяет, что рабочий каталог относится к Health-OS, и перезаписывает breadcrumb по `session_id`. Идемпотентен: файл один на сессию, обновляется на каждом Stop.
+**Stop → `session-save.sh`.** Runs after every response. Reads the payload from stdin, checks that the working directory belongs to Health-OS, and overwrites the breadcrumb by `session_id`. It is idempotent: there is one file per session, updated on every Stop.
 
-Число сообщений считается по строкам транскрипта, а не берётся из payload: поля `num_turns` в payload Stop-хука нет, и прежняя версия всегда писала ноль, из-за чего `/recover-sessions` считал все сессии пустыми и удалял их без логов.
+The message count is calculated from transcript lines rather than taken from the payload: the Stop-hook payload has no `num_turns` field, and the old version always wrote zero, causing `/recover-sessions` to treat every session as empty and delete it without logs.
 
-**SessionStart → `session-restore.sh`.** Проверяет возраст `Cache/active-context.md` — старше семи дней выводит маркер `<context-stale>`. Проверяет свежесть алертов. Сканирует breadcrumbs, исключая текущую сессию, и при наличии незакрытых выводит `<session-recovery>` с предложением запустить `/recover-sessions`.
+**SessionStart → `session-restore.sh`.** Checks the age of `Cache/active-context.md` — older than seven days emits `<context-stale>`. Checks alert freshness. Scans breadcrumbs, excluding the current session, and if unfinished sessions exist emits `<session-recovery>` with an offer to run `/recover-sessions`.
 
-Путь к проекту вычисляется от расположения самого скрипта. Захардкоженный абсолютный путь ломал хук у любого, кто склонировал репозиторий, и заодно раскрывал имя пользователя в файле под контролем версий.
+The project path is calculated from the script’s location. A hardcoded absolute path broke the hook for anyone who cloned the repository and also exposed the user’s name in a version-controlled file.
 
-### Жизненный цикл
+### Lifecycle
 
 ```
-Старт сессии
-  → session-restore.sh: маркеры о состоянии контекста и pending-сессиях
-  → /day: дельта с прошлого раза, проверка целостности, алерты, рекомендации
-  → работа: скиллы читают и пишут Data/, при каждом Stop обновляется breadcrumb
-  → /wrap-up: session log → active-context → checkpoint → MEMORY.md
-              → удаление своего breadcrumb → коммит без push
+Session start
+  → session-restore.sh: markers for context state and pending sessions
+  → /day: delta since last time, integrity check, alerts, recommendations
+  → work: skills read and write Data/, breadcrumb updated on every Stop
+  → /wrap-up: session log → active context → checkpoint → MEMORY.md
+              → remove own breadcrumb → commit without push
 ```
 
-Отдельное правило `/wrap-up`: удаляется **только свой breadcrumb, по известному `session_id`.** Массовое удаление по дате уничтожает вход для `/recover-sessions` — то есть ровно те сессии, ради которых механизм и существует.
+Separate `/wrap-up` rule: delete **only your own breadcrumb, by known `session_id`.** Mass deletion by date destroys the input for `/recover-sessions` — exactly the sessions for which the mechanism exists.
 
 ### Checkpoint
 
-Отдельный механизм для операций, которые не влезают в одну сессию: обработка пачки документов, импорт истории, многошаговая расшифровка. Хранит текущий шаг, обработанные и оставшиеся файлы, заметки.
+A separate mechanism for operations that do not fit in one session: processing a batch of documents, importing history, or multi-step interpretation. It stores the current step, processed and remaining files, and notes.
 
-При старте `/day` активный checkpoint показывается с предложением продолжить. Активируется при трёх и более файлах в обработке, деактивируется при завершении задачи.
-
----
-
-## Блок 10. Дашборд
-
-Next.js, App Router, читает `Data/` через Node.js `fs`. Строго на `127.0.0.1` — см. [SECURITY.md](SECURITY.md).
-
-```
-Data/ ──fs──▶ lib/data/*.ts ──▶ app/api/*/route.ts ──JSON──▶ клиент (SWR + Recharts)
-```
-
-Изначально дашборд задумывался только на чтение, но часть роутов умеет писать: правка анализа, протокола визита, добавление метрики, записи настроения. Отсюда два слоя защиты в `lib/data/`:
-
-- **`utils.ts` → `resolveWithin`** — резолв пути с проверкой, что он не выходит за пределы каталога данных. Единственный допустимый способ построить путь из пользовательского ввода;
-- **`validation.ts` → `Validator`, `RANGES`, `isPlainFilename`** — проверка типов, enum, календарной корректности дат, физиологических диапазонов и того, что параметр маршрута является именно именем файла.
-
-Мутирующие роуты сливают тело запроса с существующим файлом, а не заменяют его: редактор не знает о полях вроде `pdf_path` или `studies[]` и при полной замене стирал бы их. Поле `version` никогда не сбрасывается.
+At `/day` startup, an active checkpoint is shown with an offer to continue. It activates when three or more files are being processed and deactivates when the task is complete.
 
 ---
 
-## Блок 11. Как добавить своего специалиста
+## Block 10. Dashboard
 
-Пример: пульмонолог. Порядок такой же для любой специальности.
+Next.js with App Router reads `Data/` through Node.js `fs`. It is strictly on `127.0.0.1` — see [SECURITY.md](SECURITY.md).
 
-### Шаг 1. Файл агента
+```
+Data/ ──fs──▶ lib/data/*.ts ──▶ app/api/*/route.ts ──JSON──▶ client (SWR + Recharts)
+```
+
+The dashboard was originally intended to be read-only, but some routes can write: edit a lab result or visit protocol, add a metric, or add a mood record. That creates two protection layers in `lib/data/`:
+
+- **`utils.ts` → `resolveWithin`** — resolves a path while checking that it stays inside the data directory. This is the only permitted way to build a path from user input;
+- **`validation.ts` → `Validator`, `RANGES`, `isPlainFilename`** — checks types, enums, calendar-valid dates, physiological ranges, and that the route parameter is a filename.
+
+Mutating routes merge the request body into the existing file rather than replacing it: the editor does not know about fields such as `pdf_path` or `studies[]`, and a full replacement would erase them. The `version` field is never reset.
+
+---
+
+## Block 11. Adding a specialist
+
+Example: a pulmonologist. The order is the same for any specialty.
+
+### Step 1. Agent file
 
 `.claude/agents/pulmonologist.md`:
 
 ```markdown
 ---
 name: pulmonologist
-description: "AI-пульмонолог: анализирует функцию внешнего дыхания, бронхиальную
-  обструкцию, хронический кашель и респираторные проявления системных процессов.
-  Вызывай при одышке, кашле, разборе спирометрии и рентгена лёгких, а также когда
-  другой специалист флагит респираторную связь."
+description: "AI pulmonologist: analyzes pulmonary function, bronchial obstruction,
+  chronic cough, and respiratory manifestations of systemic processes. Invoke for
+  dyspnea, cough, interpretation of spirometry and lung radiographs, and when
+  another specialist flags a respiratory connection."
 model: inherit
 color: cyan
 tools:
@@ -405,80 +405,80 @@ tools:
   - Grep
 ---
 
-# Пульмонолог — AI-специалист
+# Pulmonologist — AI specialist
 
-Ты — AI-пульмонолог в системе Health-OS.
+You are an AI pulmonologist in the Health-OS system.
 
 ## Disclaimer
-> ⚕️ Ты НЕ врач. Все заключения — справочные.
+> ⚕️ You are NOT a physician. All conclusions are for reference.
 
-## Обязательное чтение перед анализом
+## Required reading before analysis
 
-Прочитай `.claude/shared/specialist-contract.md` — общий контракт специалиста.
-Контракт ссылается на `.claude/shared/holistic-framework.md` и
-`.claude/shared/evidence-base.md` — их тоже прочитай.
+Read `.claude/shared/specialist-contract.md` — the common specialist contract.
+The contract refers to `.claude/shared/holistic-framework.md` and
+`.claude/shared/evidence-base.md` — read those too.
 
-**Профильные руководства:** GOLD, GINA, ATS/ERS
+**Specialty guidelines:** GOLD, GINA, ATS/ERS
 
-## Клинический фокус
+## Clinical focus
 ...
 
-## Твои маркеры
+## Your markers
 ...
 
-## Дифференциальная диагностика
+## Differential diagnosis
 ...
 
-## Перекрёстные связи
+## Cross-specialty links
 ...
 ```
 
-**Обязательно:**
+**Required:**
 
-| Что | Почему |
-|-----|--------|
-| `name` во frontmatter | Совпадает с именем файла, по нему агент вызывается |
-| `description` | По нему движок решает, когда агента звать. Пишется как инструкция: при каких жалобах и данных вызывать |
-| `tools: Read, Glob, Grep` | Только чтение. Специалист, умеющий писать, нарушает разделение ролей и ломает консилиум |
-| Ссылка на `specialist-contract.md` | Через неё агент получает всю общую методологию |
-| Отсутствие фактов о пациенте | Блок 5. Нарушение этого правила делает агента источником устаревших утверждений |
+| What | Why |
+|------|-----|
+| `name` in frontmatter | Matches the filename; this is how the agent is called |
+| `description` | The engine uses it to decide when to call the agent. Write it as instructions describing which complaints and data should trigger it |
+| `tools: Read, Glob, Grep` | Read-only. A specialist that can write violates role separation and breaks the consilium |
+| Link to `specialist-contract.md` | Gives the agent all shared methodology |
+| No patient facts | Block 5. Violating this makes the agent a source of stale claims |
 
-**Не обязательно, но полезно:** `color` для различимости в выводе, подспециальности, таблица вторичных маркеров, список профильных руководств, раздел дифференциальной диагностики. Без них агент работает, но слабее.
+**Optional but useful:** `color` for distinguishability in output, subspecialties, a secondary-marker table, specialty-guideline list, and differential-diagnosis section. The agent works without them but is weaker.
 
-**Запрещено:** дублировать содержимое контракта или холистической рамки (копия разойдётся с оригиналом), задавать закрытые списки шаблонов имён файлов для отбора анализов (гарантированно пропустит новые файлы), давать инструменты записи.
+**Forbidden:** duplicate the contract or holistic framework (the copy will diverge), define closed filename-template lists for selecting lab results (new files will be missed), or provide write tools.
 
-### Шаг 2. Реестр алиасов
+### Step 2. Alias registry
 
-`.claude/shared/specialty-aliases.md` — добавить строку в таблицу соответствия:
+`.claude/shared/specialty-aliases.md` — add a row to the mapping table:
 
 ```markdown
-| `пульмо`, `pulmo`, `пульмонолог`, `лёгкие`, `дыхание` | `pulmonologist` |
+| `pulmo`, `pulmonologist`, `lungs`, `breathing` | `pulmonologist` |
 ```
 
-И, если уместно, в таблицу автоподбора по теме вопроса:
+If appropriate, also add a row to the automatic topic-based selection table:
 
 ```markdown
-| Одышка, кашель, дыхание | `pulmonologist`, `cardiologist`, `ent` |
+| Dyspnea, cough, breathing | `pulmonologist`, `cardiologist`, `ent` |
 ```
 
-Без этого шага агента можно вызвать только по точному имени: `/consilium` его не подберёт.
+Without this step, the agent can be invoked only by its exact name: `/consilium` will not select it.
 
-### Шаг 3. Зоны ответственности
+### Step 3. Responsibility areas
 
-`Data/specialists/marker-ownership.json` — указать, по каким маркерам новый специалист ведущий, а где комментирует. Иначе при пересечении зон в отчёте появятся два конкурирующих основных вывода по одному показателю.
+`Data/specialists/marker-ownership.json` — specify which markers the new specialist leads and where they comment. Otherwise overlapping areas produce two competing primary conclusions about one measurement.
 
-### Шаг 4. Перекрёстные паттерны (опционально)
+### Step 4. Cross-specialty patterns (optional)
 
-`Data/specialists/cross-specialty-map.json` — если специальность участвует в известном паттерне, добавить его. Формулировать **условиями**, а не утверждениями о пациенте:
+`Data/specialists/cross-specialty-map.json` — add a known pattern if the specialty participates in one. Express it **as conditions**, not claims about the patient:
 
 ```json
 {
   "id": "sleep-apnea-cardiometabolic",
   "specialties": ["pulmonologist", "ent", "cardiologist"],
   "trigger_conditions": [
-    "Жалобы на храп или остановки дыхания во сне",
-    "Дневная сонливость при формально достаточной длительности сна",
-    "Ночная тахикардия или недостаточное снижение давления ночью"
+    "Reports of snoring or pauses in breathing during sleep",
+    "Daytime sleepiness despite a formally sufficient sleep duration",
+    "Nocturnal tachycardia or insufficient nighttime blood-pressure dipping"
   ],
   "min_conditions": 2,
   "hypothesis": "...",
@@ -486,139 +486,139 @@ tools:
 }
 ```
 
-### Шаг 5. Список в скилле консилиума
+### Step 5. Consilium skill list
 
-`.claude/skills/consilium/SKILL.md` — добавить строку в таблицу доступных специалистов и в перечень имён агентов.
+`.claude/skills/consilium/SKILL.md` — add a row to the available-specialists table and to the list of agent names.
 
-### Шаг 6. Документация
+### Step 6. Documentation
 
-`CLAUDE.md` и `README.md` — обновить количество специалистов и перечисление, если новая специальность меняет общую картину.
+Update `CLAUDE.md` and `README.md` with the specialist count and list if the new specialty changes the overall picture.
 
-### Проверка
+### Check
 
 ```
-/doctor-consult спроси пульмонолога
+/doctor-consult ask the pulmonologist
 ```
 
-Заключение должно содержать обязательные секции из контракта: системная картина, гипотеза первопричины с уровнями L3 и L4, вклад образа жизни и среды, хронология, доказательная база, пробелы в данных. Их отсутствие означает, что агент не прочитал контракт, — проверьте ссылку в шаге 1.
+The conclusion must contain the contract’s mandatory sections: systems picture, root-cause hypothesis at L3 and L4, lifestyle and environmental contribution, chronology, evidence base, and data gaps. Their absence means the agent did not read the contract; check the link in Step 1.
 
 ---
 
-## Блок 12. Как добавить свой скилл
+## Block 12. Adding a skill
 
-### Шаг 1. Файл
+### Step 1. File
 
-`.claude/skills/<имя>/SKILL.md`. Каталог называется так же, как скилл.
+`.claude/skills/<name>/SKILL.md`. The directory is named after the skill.
 
 ```markdown
 ---
 name: sleep
 description: |
-  Дневник сна: длительность, время отхода, регулярность, корреляции с recovery.
-  Триггеры: «сон», «не выспался», «во сколько лёг», «sleep»
+  Sleep journal: duration, bedtime, regularity, correlations with recovery.
+  Triggers: “sleep”, “didn’t sleep enough”, “what time I went to bed”
 ---
 
-# Sleep — дневник сна
+# Sleep — sleep journal
 
-## Назначение
+## Purpose
 ...
 
 ## Workflow
 ### 1. ...
 ### 2. ...
 
-## Правила
+## Rules
 ...
 
-## Критерий завершения
+## Completion criterion
 ...
 ```
 
-`description` — не украшение: по нему движок решает, вызывать скилл или нет. Формулируйте через триггеры и через границу с соседями: «Расшифровка результатов — в `/labs`», «Поиск нового врача — через `/find-doctor`». Скиллы с размытыми описаниями перехватывают чужие запросы.
+`description` is not decoration: the engine uses it to decide whether to call a skill. Phrase it with triggers and boundaries with neighbors: “Result interpretation is in `/labs`,” “Finding a new doctor goes through `/find-doctor`.” Skills with vague descriptions intercept other requests.
 
-### Шаг 2. Работа с данными
+### Step 2. Working with data
 
-**Читаете** — сошлитесь на `.claude/shared/data-schemas.md`, не переписывайте схему у себя. Копия разойдётся, и скилл перестанет находить данные.
+**Reading** — refer to `.claude/shared/data-schemas.md`; do not copy the schema. The copy will diverge and the skill will stop finding data.
 
-**Пишете** — обязательны четыре вещи:
+**Writing** — four things are mandatory:
 
-1. Проверка порогов из `critical-values.md` **до** сохранения. Критическое значение останавливает обработку.
-2. Проверка дубликата по ключу из `data-schemas.md`. При совпадении — показать существующую запись и спросить, а не записывать молча.
-3. Сохранение поля `version`. Никогда не сбрасывать и не удалять.
-4. Запись **в массив**, а не в корень файла. Объект, положенный в корень вместо `procedures[]`, невидим для всех последующих чтений.
+1. Check thresholds from `critical-values.md` **before** saving. A critical value stops processing.
+2. Check duplicates using the key from `data-schemas.md`. If there is a match, show the existing record and ask rather than writing silently.
+3. Preserve the `version` field. Never reset or delete it.
+4. Write **into an array**, not into the file root. An object placed at the root instead of `procedures[]` is invisible to every subsequent read.
 
-### Шаг 3. Регистрация
+### Step 3. Registration
 
-Добавить строку в таблицу скиллов в `CLAUDE.md`. Это то место, откуда система узнаёт о составе.
+Add a row to the skill table in `CLAUDE.md`. This is where the system learns its composition.
 
-### Шаг 4. Границы
+### Step 4. Boundaries
 
-Проверьте, не пересекается ли новый скилл с существующим. Если пересекается — явно напишите в обоих, кто за что отвечает. В системе это уже сделано: `/dental` делегирует протокол визита `/doctor`, `/labs` отправляет импорт PDF в `/inbox`, `/doctor` отправляет поиск нового врача в `/find-doctor`.
+Check whether the new skill overlaps an existing one. If it does, state clearly in both which skill owns what. The system already does this: `/dental` delegates visit protocol to `/doctor`, `/labs` sends PDF import to `/inbox`, and `/doctor` sends new-doctor searches to `/find-doctor`.
 
-Без явной границы два скилла будут делать одно и то же по-разному, и данные разъедутся.
+Without an explicit boundary, two skills will do the same thing differently and the data will drift.
 
 ---
 
-## Блок 13. Поток данных
+## Block 13. Data flow
 
 ```mermaid
 flowchart TB
-    subgraph INGEST["Ввод"]
-        DOC["PDF, сканы, фото"]
-        TALK["Ответы в диалоге"]
+    subgraph INGEST["Input"]
+        DOC["PDFs, scans, photos"]
+        TALK["Dialogue answers"]
     end
 
     DOC --> INBOX["Inbox/"]
 
     subgraph ENGINE["Claude Code"]
-        SKILL["Скиллы<br/>операции, единственные пишут"]
-        AGENT["Агенты-специалисты<br/>изолированный контекст, только чтение"]
-        FRAME["Рамки .claude/shared/<br/>методология"]
+        SKILL["Skills<br/>operations, the only writers"]
+        AGENT["Specialist agents<br/>isolated context, read-only"]
+        FRAME["Frameworks .claude/shared/<br/>methodology"]
     end
 
     INBOX -->|"/inbox"| SKILL
     TALK -->|"/onboarding, /labs, /body, /mental"| SKILL
 
-    SKILL --> CRIT{"Порог из<br/>critical-values.md?"}
-    CRIT -->|"да"| STOP["Стоп-сценарий:<br/>находка первым сообщением"]
+    SKILL --> CRIT{"Threshold from<br/>critical-values.md?"}
+    CRIT -->|"yes"| STOP["Stop scenario:<br/>finding in first message"]
     STOP --> ALERTS[("Cache/alerts/")]
-    CRIT -->|"нет"| DATA[("Data/")]
-    SKILL -->|"оригиналы"| ARCH[("Archive/")]
+    CRIT -->|"no"| DATA[("Data/")]
+    SKILL -->|"originals"| ARCH[("Archive/")]
 
     DATA --> AGENT
     FRAME --> AGENT
     FRAME --> SKILL
-    AGENT -->|"заключения"| SKILL
+    AGENT -->|"conclusions"| SKILL
 
-    SKILL --> ANSWER["Ответ в диалоге"]
-    SKILL --> REPORT["Отчёты консилиума,<br/>брифы к приёму"]
+    SKILL --> ANSWER["Dialogue answer"]
+    SKILL --> REPORT["Consilium reports,<br/>visit briefs"]
     REPORT --> DATA
 
-    DATA --> DASH["Дашборд<br/>127.0.0.1"]
-    DASH -->|"правки через<br/>resolveWithin + Validator"| DATA
+    DATA --> DASH["Dashboard<br/>127.0.0.1"]
+    DASH -->|"edits through<br/>resolveWithin + Validator"| DATA
 
-    SKILL -.->|"только агрегаты"| MCP["MCP: Todoist,<br/>Google Calendar"]
-    WHOOP["MCP: WHOOP"] -.->|"метрики"| SKILL
+    SKILL -.->|"aggregates only"| MCP["MCP: Todoist,<br/>Google Calendar"]
+    WHOOP["MCP: WHOOP"] -.->|"metrics"| SKILL
 ```
 
-Пунктиром показаны опциональные каналы наружу. Направление стрелок к MCP одностороннее по назначению: WHOOP только отдаёт метрики, Todoist и Calendar только принимают — и принимают агрегаты, а не медицинское содержание.
+Dotted lines show optional external channels. The arrows to MCP are one-way by design: WHOOP only supplies metrics, while Todoist and Calendar only receive — and they receive aggregates, not medical content.
 
 ---
 
-## Блок 14. Куда смотреть дальше
+## Block 14. Where to look next
 
-| Вопрос | Файл |
-|--------|------|
-| Как устроен конкретный файл данных | `.claude/shared/data-schemas.md` |
-| Как агенты обязаны рассуждать | `.claude/shared/holistic-framework.md` |
-| Что обязан делать каждый специалист | `.claude/shared/specialist-contract.md` |
-| Как оцениваются доказательства | `.claude/shared/evidence-base.md` |
-| Правила спора в консилиуме | `.claude/shared/consilium-protocol.md` |
-| Пороги неотложных состояний | `.claude/shared/critical-values.md` |
-| Модель угроз и правила безопасности | [SECURITY.md](SECURITY.md) |
-| Установка и обновление | [../INSTALL.md](../INSTALL.md) |
-| Первые дни работы с системой | [ONBOARDING.md](ONBOARDING.md) |
+| Question | File |
+|----------|------|
+| How a particular data file is structured | `.claude/shared/data-schemas.md` |
+| How agents must reason | `.claude/shared/holistic-framework.md` |
+| What every specialist must do | `.claude/shared/specialist-contract.md` |
+| How evidence is evaluated | `.claude/shared/evidence-base.md` |
+| Consilium disagreement rules | `.claude/shared/consilium-protocol.md` |
+| Emergency thresholds | `.claude/shared/critical-values.md` |
+| Threat model and security rules | [SECURITY.md](SECURITY.md) |
+| Installation and updates | [../INSTALL.md](../INSTALL.md) |
+| The first days with the system | [ONBOARDING.md](ONBOARDING.md) |
 
 ---
 
-⚕️ Документ описывает устройство системы, а не медицинское содержание данных. Для решений о лечении обратитесь к врачу.
+⚕️ This document describes how the system is built, not the medical content of the data. Consult a physician for treatment decisions.

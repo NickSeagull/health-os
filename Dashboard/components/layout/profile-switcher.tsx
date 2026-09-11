@@ -23,14 +23,14 @@ type ProfileInfo = {
 };
 
 const RELATIONSHIP: Record<string, string> = {
-  self: "Владелец",
-  spouse: "Супруг(а)",
-  child: "Ребёнок",
-  parent: "Родитель",
-  other: "Другое",
+  self: "Self",
+  spouse: "Spouse",
+  child: "Child",
+  parent: "Parent",
+  other: "Other",
 };
 
-/** Полных лет на сегодня. Возраст не хранится — он меняется сам по себе. */
+/** Full years as of today. Age is not stored; it changes over time. */
 function ageYears(dob: string | null): number | null {
   if (!dob) return null;
   const d = new Date(dob);
@@ -51,19 +51,14 @@ function describe(p: ProfileInfo): string {
 }
 
 function plural(n: number): string {
-  const a = n % 10;
-  const b = n % 100;
-  if (a === 1 && b !== 11) return "год";
-  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return "года";
-  return "лет";
+  return n === 1 ? "year" : "years";
 }
 
 /**
- * Переключатель профиля.
+ * Profile switcher.
  *
- * Всегда виден в шапке: работа не с тем профилем — самая дорогая ошибка этой
- * подсистемы, и она возникает именно тогда, когда текущий человек нигде
- * не показан.
+ * Always visible in the header: using the wrong profile is the most costly
+ * error in this subsystem, and it happens when the current person is not shown.
  */
 export function ProfileSwitcher() {
   const router = useRouter();
@@ -75,7 +70,7 @@ export function ProfileSwitcher() {
     fetch("/api/profiles")
       .then((r) => r.json())
       .then((d) => (d.error ? setError(d.error) : setProfiles(d.profiles ?? [])))
-      .catch(() => setError("Профили недоступны"));
+      .catch(() => setError("Profiles unavailable"));
   }, []);
 
   async function switchTo(id: string) {
@@ -88,14 +83,14 @@ export function ProfileSwitcher() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Не удалось переключить профиль");
+        toast.error(data.error ?? "Could not switch profile");
         return;
       }
       setProfiles((prev) =>
         prev ? prev.map((p) => ({ ...p, isActive: p.id === id })) : prev
       );
       const name = profiles?.find((p) => p.id === id)?.displayName ?? id;
-      toast.success(`Активный профиль: ${name}`);
+      toast.success(`Active profile: ${name}`);
       router.refresh();
     } finally {
       setSwitching(false);
@@ -126,7 +121,7 @@ export function ProfileSwitcher() {
           </div>
           <div className="grid flex-1 text-left leading-tight">
             <span className="truncate text-sm font-medium">
-              {active?.displayName ?? (profiles ? "Профиль не выбран" : "…")}
+              {active?.displayName ?? (profiles ? "No profile selected" : "…")}
             </span>
             <span className="truncate text-xs text-muted-foreground">
               {active ? describe(active) : ""}
@@ -138,7 +133,7 @@ export function ProfileSwitcher() {
 
       <DropdownMenuContent align="start" className="w-60">
         <DropdownMenuLabel className="text-xs text-muted-foreground">
-          Активный профиль
+          Active profile
         </DropdownMenuLabel>
         {(profiles ?? []).map((p) => {
           const age = ageYears(p.dateOfBirth);
@@ -165,11 +160,11 @@ export function ProfileSwitcher() {
         })}
         {profiles?.length === 0 && (
           <div className="px-2 py-3 text-xs text-muted-foreground">
-            Профилей нет. Запустите <code>./setup.sh</code>
+            No profiles. Run <code>./setup.sh</code>
           </div>
         )}
         <DropdownMenuLabel className="border-t pt-2 text-xs font-normal text-muted-foreground">
-          Добавить члена семьи — команда <code>/profiles</code> в Claude Code
+          Add a family member with the <code>/profiles</code> command in Claude Code
         </DropdownMenuLabel>
       </DropdownMenuContent>
     </DropdownMenu>

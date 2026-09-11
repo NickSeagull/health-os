@@ -4,8 +4,8 @@ import { Validator, conflict } from "@/lib/data/validation";
 import { isFdiToothNumber } from "@/lib/dental-summary";
 
 /**
- * Enum типа процедуры — Блок 7 data-schemas.md. Раньше `type` писался как есть,
- * включая пустую строку, и в файл попадали значения, которых в enum нет.
+ * Procedure type enum — Block 7 of data-schemas.md. Previously `type` was written
+ * as supplied, including an empty string, allowing values outside the enum into the file.
  */
 const PROCEDURE_TYPES = [
   "filling",
@@ -23,8 +23,8 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const v = new Validator();
-    // `date: null` допустим — у всех четырёх существующих записей дата неизвестна,
-    // и подставлять вместо неё сегодняшнюю запрещено (Блок 0)
+    // `date: null` is allowed: all four existing records have an unknown date,
+    // and substituting today's date is forbidden (Block 0).
     v.optionalDate(body?.date, "date");
     v.requireEnum(body?.type, "type", PROCEDURE_TYPES);
     v.requireString(body?.description, "description");
@@ -33,11 +33,11 @@ export async function POST(request: Request) {
     const teeth: string[] = Array.isArray(body?.teeth) ? body.teeth : [];
     for (const tooth of teeth) {
       if (typeof tooth !== "string" || !isFdiToothNumber(tooth)) {
-        v.add(`teeth: «${tooth}» не номер ISO 3950 (11–18, 21–28, 31–38, 41–48)`);
+        v.add(`teeth: "${tooth}" is not an ISO 3950 number (11–18, 21–28, 31–38, 41–48)`);
       }
     }
     if (body?.notes !== undefined && typeof body.notes !== "string") {
-      v.add("notes: строка");
+      v.add("notes: string");
     }
 
     const invalid = v.response();
@@ -50,8 +50,8 @@ export async function POST(request: Request) {
 
     const date = body.date || null;
 
-    // Ключ дубликата — date + type + teeth (Блок 0). Молча дописывать вторую
-    // такую же процедуру нельзя: в истории появятся два удаления одного зуба
+    // Duplicate key: date + type + teeth (Block 0). Do not silently append
+    // the same procedure: the history would contain two extractions of one tooth.
     const sameTeeth = [...teeth].sort().join(",");
     const duplicate = procs.procedures.find(
       (p) =>
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
         [...(p.teeth ?? [])].sort().join(",") === sameTeeth
     );
     if (duplicate) {
-      return conflict("Такая процедура уже записана", { existing: duplicate });
+      return conflict("This procedure is already recorded", { existing: duplicate });
     }
 
     procs.procedures.push({
@@ -68,8 +68,8 @@ export async function POST(request: Request) {
       teeth,
       type: body.type,
       description: body.description,
-      // doctor_id в данных всегда null и не заполняется: врач опознаётся парой
-      // name + specialty (Блок 4), ссылка doc_XX не резолвится нигде
+      // doctor_id is always null in the data and is not populated: a doctor is identified by
+      // the name + specialty pair (Block 4), and the doc_XX reference is not resolved anywhere.
       doctor_id: null,
       notes: body.notes ?? "",
     });

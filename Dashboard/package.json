@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack -H 127.0.0.1",
     "build": "next build",
     "start": "next start -H 127.0.0.1",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "tsx --test tests/*.test.ts",
+    "check:english": "python3 ../.claude/scripts/check-english.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -43,6 +45,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "tsx": "^4.23.13"
   }
 }

@@ -1,18 +1,18 @@
 {
   "version": 3,
   "updated": "2026-08-05",
-  "purpose": "Перекрёстные паттерны, которые не увидит ни один специалист по отдельности. Паттерны сформулированы как УСЛОВИЯ, а не как утверждения о состоянии пациента — агент проверяет каждое условие по актуальным данным из Data/ и активирует паттерн только при фактическом совпадении",
+  "purpose": "Cross-specialty patterns that no single specialist would see alone. Patterns are stated as CONDITIONS, not claims about the patient; the agent checks each condition against current Data/ and activates a pattern only when the facts match.",
   "usage_rules": [
-    "Паттерн — это гипотеза для проверки, а не установленный факт. Активируется только когда условия подтверждены актуальными данными",
-    "Конкретных значений пациента в этом файле нет и быть не должно: прежняя версия хранила их, устарела и заставляла агентов утверждать опровергнутое",
-    "Перед активацией проверь каждое условие по свежим анализам. Если условие не выполняется — паттерн не применяется, и это стоит отметить как аргумент против соответствующей гипотезы",
-    "Отклонение оценивается относительно референса конкретной лаборатории из файла анализа, а не относительно норм по памяти",
-    "При построении трендов сверяйся с Data/labs/_marker-aliases.json — единицы у одного маркера различаются между лабораториями",
-    "Синтез на основе паттерна — всегда уровень доказательности D или ⚠️ по evidence-base.md",
-    "Пол пациента (Data/profile.json → basic.sex) читается до применения паттернов. У паттернов с полем sex_specific порядок проверки гипотез зависит от пола: это не косметика, а разный первый шаг обследования",
-    "Поле specialties перечисляет ВОЗМОЖНЫХ участников паттерна, а не обязательных. Перед постановкой флага проверь применимость специалиста к данному пациенту — в первую очередь по полу. Флаг гинекологу пациенту мужского пола — дефект"
+    "A pattern is a hypothesis to test, not an established fact. Activate it only when current data confirm the conditions.",
+    "The file contains no patient-specific values: an older version stored them, became stale, and led agents to assert refuted conclusions.",
+    "Before activation, check every condition against recent test results. If a condition is not met, do not apply the pattern and record that as evidence against the hypothesis.",
+    "Assess deviations against the specific laboratory reference range, not remembered normal values.",
+    "When building trends, consult Data/labs/_marker-aliases.json because units for one marker may differ between laboratories.",
+    "Any synthesis based on a pattern is evidence level D or ⚠️ under evidence-base.md.",
+    "Read patient biological sex (Data/profile.json → basic.sex) before applying patterns. For sex_specific patterns, the hypothesis-testing order depends on biological sex; this changes the first workup step.",
+    "specialties lists possible participants, not mandatory participants. Check each specialist’s applicability to the patient, especially by biological sex. Flagging a gynecologist for a male patient is a defect."
   ],
-  "activation_note": "min_conditions — сколько условий должно совпасть, чтобы паттерн считался активным. При частичном совпадении паттерн упоминается как ослабленный, с указанием, какое условие не выполнилось",
+  "activation_note": "min_conditions is the number of conditions that must match for a pattern to be active. With a partial match, mention the pattern as weakened and identify the unmet condition.",
   "patterns": [
     {
       "id": "raas-hypertension",
@@ -22,15 +22,15 @@
         "urologist"
       ],
       "trigger_conditions": [
-        "Ренин выше верхней границы референса лаборатории",
-        "Синусовая тахикардия в покое",
-        "Признаки нарушения гемодинамики почечных артерий по дуплексу или УЗИ",
-        "Повышенное или пограничное артериальное давление"
+        "Renin above the laboratory reference upper limit",
+        "Resting sinus tachycardia",
+        "Signs of impaired renal-artery hemodynamics on duplex ultrasound",
+        "Elevated or borderline blood pressure"
       ],
       "min_conditions": 2,
-      "hypothesis": "Вторичная гипертензия через РААС-активацию. Стеноз почечной артерии → ренин↑ → ангиотензин II → вазоконстрикция и альдостерон → задержка натрия → гипертензия с рефлекторной тахикардией",
-      "action": "КТ-ангиография почечных артерий, альдостерон-рениновое соотношение, суточная экскреция натрия, достоверное суточное мониторирование АД",
-      "data_reliability_note": "В архиве есть исследования АД, помеченные как недостоверные. Проверяй поле достоверности в протоколе визита и не строй выводы на помеченных данных"
+      "hypothesis": "Secondary hypertension through RAAS activation. Renal-artery stenosis → renin↑ → angiotensin II → vasoconstriction and aldosterone → sodium retention → hypertension with reflex tachycardia",
+      "action": "CT angiography of the renal arteries, aldosterone-to-renin ratio, 24-hour urinary sodium excretion, and reliable ambulatory BP monitoring",
+      "data_reliability_note": "The archive contains BP studies marked unreliable. Check the reliability field in the visit record and do not base conclusions on flagged data"
     },
     {
       "id": "lymphoproliferation",
@@ -40,16 +40,16 @@
         "psychiatrist"
       ],
       "trigger_conditions": [
-        "Абсолютное число лимфоцитов выше референса лаборатории",
-        "Тренд лимфоцитов нарастающий на трёх и более последовательных точках",
-        "Моноциты выше референса",
-        "Лимфаденопатия по данным осмотра или УЗИ",
-        "Хроническая усталость"
+        "Absolute lymphocyte count above the laboratory reference range",
+        "Rising lymphocyte trend across three or more consecutive points",
+        "Monocytes above the reference range",
+        "Lymphadenopathy on examination or ultrasound",
+        "Chronic fatigue"
       ],
       "min_conditions": 3,
-      "hypothesis": "Реактивный лимфоцитоз на фоне хронической инфекции (EBV, CMV) либо ранняя стадия лимфопролиферативного процесса. Моноцитоз может указывать на хроническую антигенную стимуляцию",
-      "action": "Иммунофенотипирование лимфоцитов (CD3, CD4, CD8, CD19, CD16+56), EBV и CMV IgG и IgM, ЛДГ, бета-2-микроглобулин. Биопсия лимфоузла только при стойком нарастании либо при узле плотной консистенции",
-      "caution": "Оценивай АБСОЛЮТНОЕ число лимфоцитов, а не процент: процент растёт при падении других популяций и сам по себе лимфоцитозом не является. Разворот тренда к норме — сильный аргумент против лимфопролиферации, эскалацию в этом случае не рекомендовать"
+      "hypothesis": "Reactive lymphocytosis in the setting of chronic infection (EBV, CMV), or an early lymphoproliferative process. Monocytosis may indicate chronic antigenic stimulation",
+      "action": "Lymphocyte immunophenotyping (CD3, CD4, CD8, CD19, CD16+56), EBV and CMV IgG and IgM, LDH, and beta-2-microglobulin. Lymph-node biopsy only for persistent increase or a firm node",
+      "caution": "Assess the ABSOLUTE lymphocyte count, not the percentage: the percentage rises when other populations fall and is not lymphocytosis by itself. A trend back to normal strongly argues against lymphoproliferation; do not escalate in that case"
     },
     {
       "id": "subclinical-hypocorticism",
@@ -59,14 +59,14 @@
         "hematologist"
       ],
       "trigger_conditions": [
-        "АКТГ выше референса при кортизоле в пределах референса",
-        "Хроническая усталость",
-        "Склонность к гипотонии",
-        "Эпизоды гипогликемии"
+        "ACTH above the reference range with cortisol within the reference range",
+        "Chronic fatigue",
+        "Tendency toward hypotension",
+        "Episodes of hypoglycemia"
       ],
       "min_conditions": 2,
-      "hypothesis": "Субклинический гипокортицизм — надпочечники на пределе компенсации: АКТГ повышен, чтобы удерживать кортизол в норме. Может объяснять хроническую усталость, гипотонию и склонность к гипогликемии",
-      "action": "Короткая проба с синактеном, кортизол в слюне в четырёх точках для оценки суточного ритма, ДГЭА-сульфат"
+      "hypothesis": "Subclinical adrenal insufficiency — the adrenal glands are near the limit of compensation: ACTH is elevated to maintain normal cortisol. This may explain chronic fatigue, hypotension, and a tendency toward hypoglycemia",
+      "action": "Short Synacthen test; salivary cortisol at four time points to assess the circadian rhythm; DHEA sulfate"
     },
     {
       "id": "vagal-dysfunction",
@@ -76,14 +76,14 @@
         "neurologist"
       ],
       "trigger_conditions": [
-        "ГЭРБ или нарушение моторики ЖКТ",
-        "Синусовая тахикардия либо сниженная вариабельность сердечного ритма",
-        "Нестабильность или дегенеративные изменения шейного отдела",
-        "Хронический стресс"
+        "GERD or gastrointestinal dysmotility",
+        "Sinus tachycardia or reduced heart-rate variability",
+        "Instability or degenerative changes in the cervical spine",
+        "Chronic stress"
       ],
       "min_conditions": 3,
-      "hypothesis": "Вагусная дисфункция — раздражение или компрессия блуждающего нерва на уровне шейного отдела нарушает парасимпатическую регуляцию, что даёт одновременно тахикардию, рефлюкс и расстройство моторики ЖКТ",
-      "action": "Оценка вариабельности ритма по данным носимого устройства, pH-импедансометрия пищевода, МРТ шейного отдела с акцентом на C2–C6"
+      "hypothesis": "Vagal dysfunction — irritation or compression of the vagus nerve in the cervical region disrupts parasympathetic regulation, producing tachycardia, reflux, and gastrointestinal dysmotility",
+      "action": "Assess heart-rate variability from wearable data, perform esophageal pH impedance monitoring, and obtain cervical-spine MRI focused on C2–C6"
     },
     {
       "id": "autoimmune-thyroiditis-fatigue",
@@ -93,15 +93,15 @@
         "dermatologist"
       ],
       "trigger_conditions": [
-        "Анти-ТПО или анти-ТГ выше референса лаборатории",
-        "Хроническая усталость",
-        "Воспалительный дерматоз",
-        "Сниженное настроение или когнитивные жалобы"
+        "Anti-TPO or anti-thyroglobulin above the reference range",
+        "Chronic fatigue",
+        "Inflammatory dermatosis",
+        "Low mood or cognitive complaints"
       ],
       "min_conditions": 2,
-      "hypothesis": "Аутоиммунный тиреоидит как источник системной иммунной активации. Даже при сохранной функции щитовидной железы носительство антител ассоциировано с усталостью и когнитивными жалобами, а аутоиммунные дерматозы часто сочетаются с АИТ",
-      "action": "Контроль ТТГ, свободных Т3 и Т4 каждые 6–12 месяцев, УЗИ щитовидной железы в динамике, скрининг целиакии как часто сопутствующего состояния",
-      "caution": "Титр антител оценивай относительно референса конкретной лаборатории — пороги различаются в разы"
+      "hypothesis": "Autoimmune thyroiditis as a source of systemic immune activation. Even with preserved thyroid function, antibody positivity is associated with fatigue and cognitive complaints, and autoimmune dermatoses often coexist with autoimmune thyroiditis",
+      "action": "Monitor TSH and free T3/T4 every 6–12 months, follow thyroid ultrasound over time, and screen for celiac disease as a common comorbidity",
+      "caution": "Assess antibody titers against the specific laboratory reference range — thresholds vary several-fold"
     },
     {
       "id": "iron-deficiency-blood-loss",
@@ -111,30 +111,30 @@
         "gynecologist"
       ],
       "trigger_conditions": [
-        "Ферритин ниже референса лаборатории",
-        "Железо сывороточное ниже референса",
-        "Трансферрин или ОЖСС выше референса",
-        "MCV ниже референса — микроцитоз",
-        "Положительный анализ кала на скрытую кровь",
-        "Гемоглобин, гематокрит или эритроциты выше референса"
+        "Ferritin below the laboratory reference range",
+        "Serum iron below the laboratory reference range",
+        "Transferrin or TIBC above the reference range",
+        "MCV below the reference range — microcytosis",
+        "Positive fecal occult blood test",
+        "Hemoglobin, hematocrit, or red blood cells above the reference range"
       ],
       "min_conditions": 2,
-      "hypothesis": "Дефицит железа либо хроническая кровопотеря. Направление поиска источника зависит от пола и возраста — см. sex_specific ниже",
-      "action": "Колоноскопия с биопсией, повторный анализ кала на скрытую кровь в трёх образцах, ретикулоциты, эритропоэтин, ферритин. При подтверждённом эритроцитозе — JAK2 V617F",
-      "caution": "Эритроцитоз проверяй по СВЕЖЕМУ анализу: однократное превышение в прошлом, не подтверждённое позже, паттерн не активирует. Положительный анализ кала на скрытую кровь остаётся показанием к эндоскопии независимо от пола и картины крови",
+      "hypothesis": "Iron deficiency or chronic blood loss. The source search depends on biological sex and age; see sex_specific below",
+      "action": "Colonoscopy with biopsy, repeat fecal occult blood testing in three samples, reticulocytes, erythropoietin, and ferritin. If erythrocytosis is confirmed, test JAK2 V617F",
       "sex_specific": {
         "female_reproductive_age": {
-          "first_hypothesis": "Менструальная кровопотеря — самая частая причина дефицита железа в этой группе",
-          "action": "Оценить объём и длительность менструаций, исключить миому и аденомиоз. УЗИ малого таза. Консультация гинеколога",
-          "note": "Вопрос об объёме менструальной кровопотери задаётся ДО направления на эндоскопию. Пропуск этого шага — самая частая ошибка при разборе дефицита железа у женщин"
+          "first_hypothesis": "Menstrual blood loss is the most common cause of iron deficiency in this group",
+          "action": "Assess menstrual volume and duration; exclude fibroids and adenomyosis. Pelvic ultrasound and gynecology consultation.",
+          "note": "Ask about menstrual blood-loss volume BEFORE referring for endoscopy. Missing this step is a common error when evaluating iron deficiency in women"
         },
         "male_or_postmenopausal": {
-          "first_hypothesis": "ЖКТ-кровотечение до доказанного обратного — менструальной причины нет",
-          "action": "Эндоскопия верхних и нижних отделов ЖКТ, анализ кала на скрытую кровь в трёх образцах. Далее — целиакия, атрофический гастрит, приём ИПП и НПВС",
-          "note": "Дефицит железа у мужчины и женщины в постменопаузе считается показанием к эндоскопии независимо от других находок"
+          "first_hypothesis": "Assume gastrointestinal bleeding until proven otherwise; there is no menstrual cause",
+          "action": "Upper and lower gastrointestinal endoscopy and fecal occult blood testing in three samples. Then consider celiac disease, atrophic gastritis, PPIs, and NSAIDs.",
+          "note": "Iron deficiency in a man or postmenopausal woman is an indication for endoscopy regardless of other findings"
         }
       },
-      "specialties_note": "Состав зависит от пола пациента. gynecologist участвует только при female детородного возраста; при male и постменопаузе он не применяется, и флаг ему не ставится. Перечисление в specialties — это список возможных участников, а не предписание задействовать всех"
+      "specialties_note": "Composition depends on biological sex. The gynecologist participates only for a female patient of reproductive age; do not apply this branch to male or postmenopausal patients. specialties lists possible participants, not a requirement to involve everyone.",
+      "caution": "Check erythrocytosis on a CURRENT test: a single past elevation that is not later confirmed does not activate the pattern. A positive fecal occult blood test remains an indication for endoscopy regardless of sex or blood-count pattern"
     },
     {
       "id": "cardiorisk-familial",
@@ -144,15 +144,15 @@
         "endocrinologist"
       ],
       "trigger_conditions": [
-        "Триглицериды выше референса лаборатории",
-        "ЛПНП выше целевого уровня для категории риска",
-        "Семейный анамнез ранних сердечно-сосудистых событий",
-        "Индекс HOMA-IR выше референса"
+        "Triglycerides above the laboratory reference range",
+        "LDL above the target for the risk category",
+        "Family history of early cardiovascular events",
+        "HOMA-IR above the reference range"
       ],
       "min_conditions": 2,
-      "hypothesis": "Повышенный кардиоваскулярный риск на стыке дислипидемии, инсулинорезистентности и наследственной предрасположенности",
-      "action": "Полный липидный профиль с липопротеином(а), индекс HOMA-IR, дуплексное сканирование брахиоцефальных артерий",
-      "caution": "Шкала SCORE2 валидирована для возраста 40–69 лет. При меньшем возрасте оценивай факторы риска качественно и прямо указывай, что количественная шкала неприменима. Семейный анамнез сохраняет значение независимо от текущего липидного профиля — но если липиды нормализовались, это отмечается как положительная динамика, а не игнорируется"
+      "hypothesis": "Increased cardiovascular risk at the intersection of dyslipidemia, insulin resistance, and hereditary predisposition",
+      "action": "Full lipid profile with lipoprotein(a), HOMA-IR, and brachiocephalic-artery duplex ultrasound",
+      "caution": "SCORE2 is validated for ages 40–69. At younger ages, assess risk factors qualitatively and state that the quantitative scale does not apply. Family history remains relevant regardless of the current lipid profile; normalized lipids are recorded as favorable change, not ignored"
     },
     {
       "id": "lymphadenopathy-systemic",
@@ -161,14 +161,14 @@
         "hematologist"
       ],
       "trigger_conditions": [
-        "Шейная лимфаденопатия",
-        "Хронический тонзиллит или иной очаг инфекции ЛОР-органов",
-        "Абсолютный лимфоцитоз с нарастающим трендом"
+        "Cervical lymphadenopathy",
+        "Chronic tonsillitis or another ENT infection focus",
+        "Absolute lymphocytosis with a rising trend"
       ],
       "min_conditions": 2,
-      "hypothesis": "Реактивная лимфаденопатия на фоне хронического очага инфекции наиболее вероятна. Системный лимфопролиферативный процесс требует исключения только при стойком нарастании абсолютных лимфоцитов",
-      "action": "УЗИ всех групп лимфоузлов, а не только шейных. Иммунофенотипирование при нарастающем абсолютном лимфоцитозе. Биопсия при узле более 3 см, плотной консистенции или спаянности с тканями",
-      "caution": "Реактивная природа — наиболее вероятное объяснение. Не рекомендовать биопсию на основании одного лишь процента лимфоцитов"
+      "hypothesis": "Reactive lymphadenopathy from a chronic infection focus is most likely. Exclude a systemic lymphoproliferative process only with persistent increase in absolute lymphocytes",
+      "action": "Ultrasound all lymph-node groups, not only cervical nodes. Lymphocyte immunophenotyping for rising absolute lymphocytosis. Biopsy for a node larger than 3 cm, firm consistency, or tissue adherence",
+      "caution": "Reactive disease is the most likely explanation. Do not recommend biopsy based on the lymphocyte percentage alone"
     },
     {
       "id": "sleep-disordered-breathing-fatigue",
@@ -179,16 +179,16 @@
         "neurologist"
       ],
       "trigger_conditions": [
-        "Анатомическая обструкция верхних дыхательных путей",
-        "Жалобы на неосвежающий сон при достаточной длительности",
-        "Тахикардия в покое или ночная симпатическая активация",
-        "Дневная сонливость либо когнитивные жалобы",
-        "Храп или свидетельства остановок дыхания"
+        "Anatomical upper-airway obstruction",
+        "Unrefreshing sleep despite sufficient duration",
+        "Resting tachycardia or nocturnal sympathetic activation",
+        "Daytime sleepiness or cognitive complaints",
+        "Snoring or witnessed apneas"
       ],
       "min_conditions": 3,
-      "hypothesis": "Расстройство дыхания во сне — обструкция верхних дыхательных путей вызывает микропробуждения, разрушает архитектуру сна и даёт дневную усталость с симпатической активацией. Синдром повышенной резистентности верхних дыхательных путей протекает без десатурации и не исключается нормальной сатурацией",
-      "action": "Полисомнография либо респираторный мониторинг сна, Эпвортская шкала сонливости, оценка данных носимого устройства по эффективности сна. Септопластика рассматривается как потенциальное решение при подтверждённом вкладе обструкции",
-      "caution": "Нормальные показатели красной крови НЕ исключают этот паттерн: при синдроме повышенной резистентности значимой ночной десатурации может не быть"
+      "hypothesis": "Sleep-disordered breathing — upper-airway obstruction causes microarousals, disrupts sleep architecture, and produces daytime fatigue with sympathetic activation. Upper-airway resistance syndrome can occur without desaturation and is not excluded by normal oxygen saturation",
+      "action": "Polysomnography or respiratory sleep monitoring, Epworth Sleepiness Scale, and assessment of wearable data for sleep efficiency. Consider septoplasty if obstruction is confirmed to contribute",
+      "caution": "Normal red-cell indices do NOT exclude this pattern: significant nocturnal desaturation may be absent in upper-airway resistance syndrome"
     },
     {
       "id": "cervical-instability-headache",
@@ -197,14 +197,14 @@
         "orthopedist"
       ],
       "trigger_conditions": [
-        "Нестабильность или смещение шейных позвонков по данным рентгена либо МРТ",
-        "Признаки внутричерепной гипертензии или расширения ликворных пространств",
-        "Хроническая головная боль",
-        "Сколиоз или иная деформация шейного отдела"
+        "Cervical-vertebra instability or displacement on X-ray or MRI",
+        "Signs of intracranial hypertension or enlarged CSF spaces",
+        "Chronic headache",
+        "Scoliosis or another cervical-spine deformity"
       ],
       "min_conditions": 2,
-      "hypothesis": "Вертеброгенное воздействие на позвоночные артерии нарушает венозный отток из полости черепа, что поддерживает внутричерепную гипертензию и хроническую цефалгию",
-      "action": "МРТ шейного отдела с ангиорежимом, транскраниальная допплерография с функциональными пробами при поворотах головы, консультация нейрохирурга при прогрессировании"
+      "hypothesis": "Vertebrogenic effects on the vertebral arteries impair venous drainage from the skull, sustaining intracranial hypertension and chronic headache",
+      "action": "Cervical-spine MRI with angiographic sequences, transcranial Doppler with functional head-turning tests, and neurosurgical consultation if the condition progresses"
     },
     {
       "id": "nutrient-status-fatigue",
@@ -215,15 +215,15 @@
         "gastroenterologist"
       ],
       "trigger_conditions": [
-        "Витамин D, B12, фолаты, ферритин или магний вне референса — в любую сторону",
-        "Приём добавок в дозах выше профилактических",
-        "Хроническая усталость",
-        "Фаза дефицита калорий либо ограничительный рацион"
+        "Vitamin D, B12, folate, ferritin, or magnesium outside the reference range — in either direction",
+        "Supplement use at doses above preventive levels",
+        "Chronic fatigue",
+        "Calorie-deficit phase or restrictive diet"
       ],
       "min_conditions": 2,
-      "hypothesis": "Нутриентный дисбаланс как модифицируемый вклад в усталость. Значим не только дефицит: избыток жирорастворимых витаминов на фоне бесконтрольного приёма добавок несёт собственные риски",
-      "action": "Сверить дозировки из `Data/medications/current.json` с текущими уровнями. При превышении референса по витамину D — оценить кальций и паратгормон, пересмотреть дозу. При дефиците калорий — оценить его вклад до поиска патологии",
-      "caution": "Проверяй направление отклонения. Допущение «раз добавка принимается, значит был дефицит» ошибочно: уровень мог уже превысить верхнюю границу"
+      "hypothesis": "Nutrient imbalance is a modifiable contributor to fatigue. Deficiency is not the only concern: excess fat-soluble vitamins from uncontrolled supplement use carries its own risks",
+      "action": "Compare doses in `Data/medications/current.json` with current levels. If vitamin D is above range, assess calcium and parathyroid hormone and reconsider the dose. With calorie deficit, assess its contribution before searching for pathology",
+      "caution": "Check the direction of the abnormality. The assumption “a supplement is being taken, so there must have been a deficiency” is wrong: the level may already have exceeded the upper limit"
     },
     {
       "id": "pcos-metabolic",
@@ -233,16 +233,16 @@
       ],
       "sex_applicable": "female",
       "trigger_conditions": [
-        "Нерегулярный цикл либо олигоменорея",
-        "Тестостерон или индекс свободных андрогенов выше референса",
-        "Клиническая гиперандрогения: гирсутизм, акне, андрогенная алопеция",
-        "Индекс HOMA-IR выше референса",
-        "Поликистозная морфология яичников по УЗИ"
+        "Irregular cycle or oligomenorrhea",
+        "Testosterone or free androgen index above the reference range",
+        "Clinical hyperandrogenism: hirsutism, acne, or androgenic alopecia",
+        "HOMA-IR above the reference range",
+        "Polycystic ovarian morphology on ultrasound"
       ],
       "min_conditions": 2,
-      "hypothesis": "СПКЯ как системное метаболическое состояние, а не изолированно гинекологическое. Инсулинорезистентность поддерживает гиперандрогению, та нарушает овуляцию",
-      "action": "Роттердамские критерии: нужны два признака из трёх — олиго- или ановуляция, гиперандрогения, поликистозная морфология. Плюс HOMA-IR, липидный профиль, 17-ОН-прогестерон для исключения врождённой гиперплазии коры надпочечников",
-      "caution": "Изолированная поликистозная морфология по УЗИ диагнозом не является. До постановки СПКЯ исключить тиреоидную дисфункцию, гиперпролактинемию и функциональную гипоталамическую аменорею на фоне дефицита калорий"
+      "hypothesis": "PCOS is a systemic metabolic condition, not an isolated gynecological condition. Insulin resistance sustains hyperandrogenism, which disrupts ovulation",
+      "action": "Rotterdam criteria require two of three features: oligo- or anovulation, hyperandrogenism, and polycystic morphology. Add HOMA-IR, lipid profile, and 17-hydroxyprogesterone to exclude congenital adrenal hyperplasia",
+      "caution": "Polycystic morphology alone is not a diagnosis. Before diagnosing PCOS, exclude thyroid dysfunction, hyperprolactinemia, and functional hypothalamic amenorrhea in the setting of calorie deficit"
     },
     {
       "id": "functional-hypothalamic-amenorrhea",
@@ -253,16 +253,16 @@
       ],
       "sex_applicable": "female",
       "trigger_conditions": [
-        "Нарушение цикла либо аменорея",
-        "Фаза дефицита калорий либо ограничительный рацион",
-        "Высокий объём физических нагрузок",
-        "Хронический психосоциальный стресс",
-        "ЛГ и ФСГ в нижней части референса при низком эстрадиоле"
+        "Cycle disturbance or amenorrhea",
+        "Calorie-deficit phase or restrictive diet",
+        "High exercise volume",
+        "Chronic psychosocial stress",
+        "LH and FSH in the lower reference range with low estradiol"
       ],
       "min_conditions": 3,
-      "hypothesis": "Функциональная гипоталамическая аменорея — подавление гонадотропной оси на фоне энергодефицита. Организм отключает репродуктивную функцию как энергозатратную",
-      "action": "Оценить фактический калораж и объём нагрузок, восстановить энергетический баланс. Оценить плотность костной ткани при длительной аменорее",
-      "caution": "Проверяется ДО поиска редких эндокринопатий — это модифицируемая и частая причина. Правило приоритета из Блока 4 холистической рамки"
+      "hypothesis": "Functional hypothalamic amenorrhea — suppression of the gonadotropin axis in the setting of energy deficit. The body turns off reproductive function because it is energy-intensive",
+      "action": "Assess actual calorie intake and exercise volume and restore energy balance. Assess bone density in prolonged amenorrhea",
+      "caution": "Check this BEFORE searching for rare endocrinopathies: it is a common, modifiable cause. This priority rule comes from Block 4 of the holistic framework"
     },
     {
       "id": "menopause-transition",
@@ -274,16 +274,16 @@
       ],
       "sex_applicable": "female",
       "trigger_conditions": [
-        "Возраст 45 лет и старше",
-        "Изменение характера цикла либо аменорея",
-        "ФСГ выше референса при сниженном эстрадиоле",
-        "Вазомоторные симптомы: приливы, ночная потливость",
-        "Нарушения сна и настроения"
+        "Age 45 or older",
+        "Change in cycle pattern or amenorrhea",
+        "FSH above the reference range with low estradiol",
+        "Vasomotor symptoms: hot flashes or night sweats",
+        "Sleep and mood disturbance"
       ],
       "min_conditions": 2,
-      "hypothesis": "Менопаузальный переход как системное событие: падение эстрогенов ускоряет потерю костной массы, сдвигает липидный профиль и повышает сердечно-сосудистый риск",
-      "action": "Липидный профиль, денситометрия, оценка сердечно-сосудистого риска. Обсуждение менопаузальной гормональной терапии с врачом при значимых симптомах",
-      "caution": "Нарушения сна и настроения в этом периоде часто трактуются как самостоятельная депрессия. Связь с гормональным переходом проверяется до назначения психофармакотерапии"
+      "hypothesis": "The menopausal transition is a systemic event: falling estrogen accelerates bone loss, shifts the lipid profile, and raises cardiovascular risk",
+      "action": "Lipid profile, bone densitometry, and cardiovascular-risk assessment. Discuss menopausal hormone therapy with a doctor for significant symptoms",
+      "caution": "Sleep and mood disturbance during this period is often misclassified as primary depression. Check the hormonal transition before prescribing psychotropic medication"
     }
   ]
 }

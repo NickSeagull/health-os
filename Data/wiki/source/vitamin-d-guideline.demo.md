@@ -1,6 +1,6 @@
 ---
 type: source
-title: Руководство по витамину D (демонстрационная запись)
+title: Vitamin D guideline (demo entry)
 slug: vitamin-d-guideline
 status: reference
 created: 2026-01-15
@@ -9,9 +9,9 @@ url: https://example.org/demo-guideline
 sources: []
 ---
 
-**Демонстрационная страница-источник.** Реальная запись создаётся скиллом
-`/research` и содержит открываемый URL проверяемого руководства.
+**Demonstration source page.** A real entry is created by the `/research`
+skill and contains an accessible URL for a verifiable guideline.
 
-Так выглядит слой литературы: он общий для всех профилей, потому что
-исследование не привязано к человеку. Найденное для одного члена семьи
-работает на всех.
+This illustrates the literature layer: it is shared by all profiles because
+research is not tied to one person. Findings for one family member can
+support all profiles.

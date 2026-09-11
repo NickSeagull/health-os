@@ -31,22 +31,21 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "./theme-toggle";
 import { ProfileSwitcher } from "./profile-switcher";
-import { AuthorBadge } from "./author-badge";
 
 const navItems = [
-  { title: "Обзор", href: "/", icon: LayoutDashboard },
-  { title: "Анализы", href: "/labs", icon: TestTubes },
-  { title: "Тело", href: "/body", icon: Activity },
-  { title: "Визиты", href: "/visits", icon: Calendar },
-  { title: "Лекарства", href: "/meds", icon: Pill },
-  { title: "Зубы", href: "/dental", icon: Smile },
-  { title: "Ментальное", href: "/mental", icon: Brain },
-  { title: "Цели", href: "/goals", icon: Target },
-  { title: "Задачи", href: "/tasks", icon: CheckSquare },
+  { title: "Overview", href: "/", icon: LayoutDashboard },
+  { title: "Labs", href: "/labs", icon: TestTubes },
+  { title: "Body", href: "/body", icon: Activity },
+  { title: "Visits", href: "/visits", icon: Calendar },
+  { title: "Medications", href: "/meds", icon: Pill },
+  { title: "Dental", href: "/dental", icon: Smile },
+  { title: "Mental health", href: "/mental", icon: Brain },
+  { title: "Goals", href: "/goals", icon: Target },
+  { title: "Tasks", href: "/tasks", icon: CheckSquare },
   { title: "Traction", href: "/traction", icon: TrendingUp },
-  { title: "Граф связей", href: "/wiki", icon: Network },
+  { title: "Relationship graph", href: "/wiki", icon: Network },
   { title: "WHOOP", href: "/whoop", icon: Heart },
-  { title: "Профиль", href: "/profile", icon: User },
+  { title: "Profile", href: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
@@ -65,7 +64,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Навигация</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
@@ -90,7 +89,6 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="gap-3 px-4 py-3">
         <ThemeToggle />
-        <AuthorBadge />
       </SidebarFooter>
     </Sidebar>
   );

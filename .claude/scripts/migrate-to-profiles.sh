@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# Перенос плоской структуры Data/ в Data/profiles/<id>/
+# Move the flat Data/ structure into Data/profiles/<id>/
 #
-# До появления профилей все данные лежали прямо в Data/. Скрипт переносит их
-# в профиль владельца, оставляя на месте общесистемные справочники и шаблоны.
+# Before profiles, all data lived directly under Data/. This script moves it
+# into the owner profile, leaving shared registries and templates in place.
 #
-#   ./.claude/scripts/migrate-to-profiles.sh            показать план, ничего не делать
-#   ./.claude/scripts/migrate-to-profiles.sh --apply    выполнить перенос
+#   ./.claude/scripts/migrate-to-profiles.sh            show the plan without making changes
+#   ./.claude/scripts/migrate-to-profiles.sh --apply    perform the move
 #
-# Обратного хода нет. Единственный способ вернуться — резервная копия.
+# There is no undo. Restoring a backup is the only way back.
 
 set -euo pipefail
 
@@ -27,30 +27,30 @@ for a in "$@"; do
     --apply) APPLY="yes" ;;
     --profile=*) PROFILE="${a#--profile=}" ;;
     -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) err "неизвестный аргумент: $a"; exit 1 ;;
+    *) err "unknown argument: $a"; exit 1 ;;
   esac
 done
 
 if ! [[ "$PROFILE" =~ ^[a-z0-9][a-z0-9-]{1,31}$ ]]; then
-  err "недопустимый идентификатор профиля: «${PROFILE}»"
-  echo "     Разрешены строчная латиница, цифры и дефис, 2–32 символа."
+  err "invalid profile identifier: ${PROFILE}"
+  echo "     Use lowercase Latin letters, digits, and hyphens; 2–32 characters."
   exit 1
 fi
 
 echo
-echo "Health-OS — перенос данных в профиль «${PROFILE}»"
+echo "Health-OS — moving data into profile ${PROFILE}"
 echo "═══════════════════════════════════════════════"
 echo
 
-if [ ! -d Data ]; then err "каталога Data/ нет — переносить нечего"; exit 1; fi
+if [ ! -d Data ]; then err "Data/ does not exist: nothing to move"; exit 1; fi
 
 DEST="Data/profiles/$PROFILE"
 
-# ── Что переносим ──────────────────────────────────────────────────
-# Всё содержимое Data/, кроме: самого каталога профилей, общей wiki,
-# общесистемных справочников и файлов-шаблонов.
-# `mapfile` недоступен: macOS поставляется с bash 3.2, где его нет.
-# Собираем список во временный файл — работает в любой версии.
+# ── What to move ──────────────────────────────────────────────────
+# All Data/ contents except the profiles directory, shared wiki,
+# shared registries, and templates.
+# `mapfile` is unavailable in bash 3.2, which ships with macOS.
+# Collect the list in a temporary file to support every version.
 LIST="$(mktemp)"
 trap 'rm -f "$LIST"' EXIT
 
@@ -64,49 +64,49 @@ find Data -mindepth 1 -type f \
 COUNT=$(wc -l < "$LIST" | tr -d ' ')
 
 if [ "$COUNT" -eq 0 ]; then
-  ok "Данных в плоской структуре нет — переносить нечего."
-  if [ -d "$DEST" ]; then ok "Профиль «${PROFILE}» уже существует."; fi
+  ok "No data in the flat structure: nothing to move."
+  if [ -d "$DEST" ]; then ok "Profile ${PROFILE} already exists."; fi
   echo
   exit 0
 fi
 
-echo "Будет перенесено файлов: $COUNT"
+echo "Files to move: $COUNT"
 echo
 while IFS= read -r f; do
   echo "  ${DIM}$f${NC}  →  $DEST/${f#Data/}"
 done < <(head -40 "$LIST")
-[ "$COUNT" -gt 40 ] && echo "  ${DIM}… и ещё $(( COUNT - 40 ))${NC}"
+[ "$COUNT" -gt 40 ] && echo "  ${DIM}… and another $(( COUNT - 40 ))${NC}"
 echo
-echo "Останутся на месте (общесистемные):"
-echo "  Data/labs/_marker-aliases.json   справочник маркеров"
-echo "  Data/specialists/                зоны ответственности специальностей"
-echo "  Data/wiki/                       общее знание: источники, справка"
-echo "  Data/*.example.*, *.demo.*       шаблоны установщика"
+echo "These shared files remain in place:"
+echo "  Data/labs/_marker-aliases.json   marker registry"
+echo "  Data/specialists/                specialty responsibilities"
+echo "  Data/wiki/                       shared knowledge: sources and references"
+echo "  Data/*.example.*, *.demo.*       installer templates"
 echo
 
 if [ "$APPLY" != "yes" ]; then
-  warn "Это предварительный просмотр. Ничего не изменено."
+  warn "This is a preview. Nothing has changed."
   echo
-  echo "  Сделайте резервную копию каталога Data/ — обратного хода у переноса нет:"
+  echo "  Back up Data/ first: this move has no undo:"
   echo "      cp -R Data Data.backup-\$(date +%Y%m%d)"
   echo
-  echo "  Затем выполните перенос:"
+  echo "  Then perform the move:"
   echo "      $0 --apply"
   echo
   exit 0
 fi
 
-# ── Выполнение ─────────────────────────────────────────────────────
+# ── Execution ─────────────────────────────────────────────────────
 if [ -d "$DEST" ] && [ -n "$(find "$DEST" -type f 2>/dev/null | head -1)" ]; then
-  err "Профиль «${PROFILE}» уже содержит файлы."
-  err "Перенос поверх существующего профиля смешал бы два набора данных."
+  err "Profile ${PROFILE} already contains files."
+  err "Moving into an existing profile would mix two datasets."
   echo
-  echo "  Укажите другой профиль:  $0 --apply --profile=<id>"
+  echo "  Specify a different profile:  $0 --apply --profile=<id>"
   echo
   exit 1
 fi
 
-echo "Переношу"
+echo "Moving files"
 MOVED=0
 while IFS= read -r f; do
   [ -f "$f" ] || continue
@@ -116,13 +116,13 @@ while IFS= read -r f; do
   mv "$f" "$target"
   MOVED=$((MOVED+1))
 done < "$LIST"
-ok "перенесено файлов: $MOVED"
+ok "files moved: $MOVED"
 
-# Пустые каталоги, оставшиеся после переноса, кроме тех, где лежат шаблоны
+# Empty directories left after the move, excluding directories with templates
 find Data -mindepth 1 -maxdepth 2 -type d -empty \
   ! -path "Data/profiles*" ! -path "Data/wiki*" -delete 2>/dev/null || true
 
-# ── Указатель активного профиля ────────────────────────────────────
+# ── Active-profile pointer ────────────────────────────────────
 PTR="Data/profiles/_active.json"
 if [ ! -f "$PTR" ]; then
   NOW="$(date +%Y-%m-%dT%H:%M:%S)"
@@ -136,22 +136,22 @@ if [ ! -f "$PTR" ]; then
   ]
 }
 JSON
-  ok "_active.json создан, активный профиль — «${PROFILE}»"
+  ok "_active.json created; active profile: ${PROFILE}"
 else
-  ok "_active.json уже есть, не трогаю"
+  ok "_active.json already exists; leaving unchanged"
 fi
 
 chmod -R go-rwx Data 2>/dev/null || true
 
 echo
 echo "═══════════════════════════════════════════════"
-echo "Готово. Проверяю целостность:"
+echo "Done. Checking integrity:"
 echo
 python3 .claude/scripts/check-integrity.py || {
   echo
-  warn "Проверка целостности нашла проблемы — разберитесь до внесения новых данных."
+  warn "Integrity checks found problems: resolve them before entering new data."
   exit 1
 }
 echo
-echo "Добавить члена семьи:  /profiles создать"
+echo "Add a family member:  /profiles create"
 echo

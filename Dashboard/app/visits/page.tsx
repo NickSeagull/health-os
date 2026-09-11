@@ -10,8 +10,8 @@ export default function VisitsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Визиты"
-        description="История визитов к врачам"
+        title="Visits"
+        description="History of doctor visits"
         actions={<NewVisitDialog />}
       />
       <div className="grid gap-6 lg:grid-cols-2">

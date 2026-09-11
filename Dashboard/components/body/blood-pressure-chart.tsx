@@ -35,8 +35,8 @@ export function BloodPressureChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Артериальное давление</CardTitle>
-        <CardDescription>Систолическое / диастолическое</CardDescription>
+        <CardTitle>Blood pressure</CardTitle>
+        <CardDescription>Systolic / diastolic</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -60,9 +60,9 @@ export function BloodPressureChart() {
                       <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                         <p className="font-medium">{formatDateShort(d.date)}</p>
                         <p>
-                          {d.systolic}/{d.diastolic} мм рт.ст.
+                          {d.systolic}/{d.diastolic} mmHg
                         </p>
-                        {d.heart_rate && <p>ЧСС: {d.heart_rate} уд/мин</p>}
+                        {d.heart_rate && <p>Heart rate: {d.heart_rate} bpm</p>}
                       </div>
                     );
                   }}
@@ -73,14 +73,14 @@ export function BloodPressureChart() {
                   y2={80}
                   fill="#22c55e"
                   fillOpacity={0.05}
-                  label={{ value: "Диаст. норма", fontSize: 9 }}
+                  label={{ value: "Diastolic range", fontSize: 9 }}
                 />
                 <ReferenceArea
                   y1={90}
                   y2={120}
                   fill="#22c55e"
                   fillOpacity={0.05}
-                  label={{ value: "Сист. норма", fontSize: 9 }}
+                  label={{ value: "Systolic range", fontSize: 9 }}
                 />
                 <Line
                   type="monotone"
@@ -88,7 +88,7 @@ export function BloodPressureChart() {
                   stroke="#ef4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  name="Систолическое"
+                  name="Systolic"
                 />
                 <Line
                   type="monotone"
@@ -96,7 +96,7 @@ export function BloodPressureChart() {
                   stroke="#3b82f6"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  name="Диастолическое"
+                  name="Diastolic"
                 />
               </LineChart>
             </ResponsiveContainer>

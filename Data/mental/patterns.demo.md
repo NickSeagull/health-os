@@ -1,42 +1,42 @@
-# Паттерны состояния
+# Well-being Patterns
 
-**Обновлено:** 2026-07-26
-**Записей в журнале:** 4
+**Updated:** 2026-07-26
+**Journal entries:** 4
 
-> ⚠️ Записей меньше 14 — порог для вывода паттернов не пройден. Ниже показано, как выглядит заполненный файл; содержательных выводов на четырёх точках делать нельзя.
-
----
-
-## Тренды
-
-| Показатель | Диапазон | Среднее |
-|------------|----------|---------|
-| Настроение | 6–8 | 6.8 |
-| Энергия | 5–7 | 5.8 |
-| Стресс | 3–6 | 4.5 |
-| Качество сна | 6–8 | 6.8 |
-
-## Дни недели
-
-Записи в выходные дают более высокие оценки настроения и энергии, чем будни. Наблюдение на двух точках — как гипотезу использовать можно, как вывод нет.
-
-## Теги, связанные со стрессом
-
-- `deadline` — единственная запись со стрессом 6
-- `work` — стресс 4–6
-- `weekend`, `daylight` — стресс 3
-
-## Влияние сна на энергию
-
-Записи с качеством сна 7–8 сопровождаются энергией 6–7, с качеством 6 — энергией 5. Направление ожидаемое, но выборка не позволяет отделить сон от дня недели.
-
-## Конкурирующие объяснения
-
-- Фаза питания — поддержание, дефицита калорий нет, как объяснение спада энергии не проходит
-- Сезон — записи сделаны летом, сезонный фактор в этом окне не проверяется
-- Витамин D 24 нг/мл (2026-06-18) — конкурирующее соматическое объяснение, приём начат 2026-06-26
-- Утренний дневной свет около 15 минут в будни против нескольких часов в выходные — совпадает с разницей в оценках
+> ⚠️ Fewer than 14 entries: the threshold for inferring patterns has not been reached. This illustrates a populated file; four points cannot support meaningful conclusions.
 
 ---
 
-⚕️ Корреляция на выборке из одного человека — уровень доказательности D. Это наблюдение, а не причинно-следственная связь. Для решений о лечении обратитесь к врачу.
+## Trends
+
+| Measure | Range | Average |
+|---------|-------|---------|
+| Mood | 6–8 | 6.8 |
+| Energy | 5–7 | 5.8 |
+| Stress | 3–6 | 4.5 |
+| Sleep quality | 6–8 | 6.8 |
+
+## Days of the week
+
+Weekend entries have higher mood and energy scores than weekday entries. An observation based on two points may suggest a hypothesis, but cannot support a conclusion.
+
+## Tags associated with stress
+
+- `deadline` — the only entry with stress at 6
+- `work` — stress 4–6
+- `weekend`, `daylight` — stress 3
+
+## Effect of sleep on energy
+
+Entries with sleep quality of 7–8 accompany energy scores of 6–7; sleep quality of 6 accompanies energy of 5. The direction is expected, but the sample cannot separate sleep from day-of-week effects.
+
+## Competing explanations
+
+- Nutrition phase: maintenance, with no calorie deficit; this does not explain the energy dip
+- Season: entries were recorded in summer, so this window cannot test seasonal effects
+- Vitamin D at 24 ng/mL (2026-06-18): a competing somatic explanation; supplementation started on 2026-06-26
+- Approximately 15 minutes of morning daylight on weekdays versus several hours on weekends: this coincides with the difference in scores
+
+---
+
+⚕️ Correlation in a sample of one person is evidence level D. It is an observation, not a causal relationship. Consult a doctor for treatment decisions.

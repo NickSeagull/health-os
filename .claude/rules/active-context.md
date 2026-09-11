@@ -1,77 +1,77 @@
-# Active Context и Checkpoint
+# Active Context and Checkpoint
 
 ## Active Context (`Cache/active-context.md`)
 
-Горячий контекст между сессиями. Перезаписывается при каждом `/wrap-up`.
+Working context carried between sessions. Rewritten at every `/wrap-up`.
 
-### Обязательные секции
+### Required Sections
 
-1. **Последняя сессия** — дата, что сделано, файлы + 2–3 предыдущие одной строкой
-2. **Текущие задачи** — топ-5 активных health-задач со статусами:
-   - `in_progress` — в работе прямо сейчас
-   - `waiting` — ждёт внешнего события (результаты, запись)
-   - `next` — следующее к выполнению
-3. **Текущий фокус** — на чём сосредоточена работа (фаза, направления)
-4. **Ожидания к следующей сессии** — что должно произойти до следующего входа
-5. **Следующие шаги** — конкретные действия
-6. **Блокеры** — что мешает прогрессу
+1. **Latest Session** — date, work completed, files, plus one line each for the 2–3 preceding sessions
+2. **Current Tasks** — the top 5 active health tasks with statuses:
+   - `in_progress` — being worked on right now
+   - `waiting` — awaiting an external event (results, an appointment)
+   - `next` — next to be done
+3. **Current Focus** — what the work is focused on (phase, health areas)
+4. **Expectations for the Next Session** — what should happen before the next session
+5. **Next Steps** — specific actions
+6. **Blockers** — what is preventing progress
 
-### Формат «Текущие задачи»
+### «Current Tasks» Format
 
 ```markdown
-## Текущие задачи
+## Current Tasks
 
-| # | Задача | Статус | Контекст |
-|---|--------|--------|----------|
-| 1 | Загрузить результаты анализов | waiting | Гемотест, ожидание 16–17.03 |
-| 2 | Запись к гематологу | next | После получения результатов |
-| 3 | Запись к урологу | next | Дедлайн 01.04 |
+| # | Task | Status | Context |
+|---|------|--------|---------|
+| 1 | Upload lab results | waiting | Gemotest, expected March 16–17 |
+| 2 | Book a hematologist appointment | next | After receiving the results |
+| 3 | Book a urologist appointment | next | Deadline April 1 |
 ```
 
-### Когда обновлять
+### When to Update
 
-- `/wrap-up` — полная перезапись
-- Внутри сессии — если статус задачи изменился (waiting → in_progress, задача завершена)
+- `/wrap-up` — rewrite in full
+- During a session — if a task’s status changes (waiting → in_progress, task completed)
 
 ## Checkpoint (`Cache/checkpoint.yml`)
 
-Точка восстановления для многошаговых операций. Позволяет продолжить прерванную задачу.
+A recovery point for multistep operations. Allows an interrupted task to resume.
 
-### Когда активировать (active: true)
+### When to Activate (active: true)
 
-- Обработка нескольких файлов из Inbox (3+ файлов)
-- Загрузка нескольких анализов
-- Многошаговая расшифровка/импорт данных
-- Любая операция, которая может быть прервана на полпути
+- Processing multiple files from Inbox (3+ files)
+- Uploading multiple lab reports
+- Multistep interpretation or data import
+- Any operation that could be interrupted halfway through
 
-### Когда деактивировать (active: false)
+### When to Deactivate (active: false)
 
-- Задача завершена
-- `/wrap-up` — если задача не завершена, оставить active: true с актуальным контекстом
+- The task is complete
+- `/wrap-up` — if the task is incomplete, leave active: true with up-to-date context
 
-### Поля
+### Fields
 
 ```yaml
 active: true
-task_id: "inbox-2026-03-15"        # уникальный ID
-task_title: "Обработка 5 PDF из Inbox"
-skill: "inbox"                      # какой скилл запустил
-current_step: "processing_file_3"   # текущий шаг
-total_steps: 5                      # всего шагов (если известно)
+task_id: "inbox-2026-03-15"        # unique ID
+task_title: "Processing 5 PDFs from Inbox"
+skill: "inbox"                      # skill that started the task
+current_step: "processing_file_3"   # current step
+total_steps: 5                      # total steps (if known)
 started_at: "2026-03-15T14:30:00"
 last_updated: "2026-03-15T15:10:00"
 context:
   files_processed: ["scan1.pdf", "scan2.pdf"]
   files_remaining: ["scan3.pdf", "scan4.pdf", "scan5.pdf"]
-  notes: "Первые два — анализы крови, третий похож на УЗИ"
+  notes: "The first two are blood tests; the third appears to be an ultrasound"
 ```
 
-### При старте сессии (`/day`)
+### At Session Start (`/day`)
 
-Если `active: true` → показать:
+If `active: true` → display:
 ```
-⚡ Прерванная задача: {task_title}
-   Прогресс: {current_step}/{total_steps}
-   Скилл: /{skill}
-   Продолжить? (да / начать заново / отменить)
+⚡ Interrupted task: {task_title}
+   Progress: {current_step}/{total_steps}
+   Skill: /{skill}
+   Continue? (yes / start over / cancel)
 ```

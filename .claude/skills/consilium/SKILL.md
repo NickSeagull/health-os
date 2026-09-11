@@ -1,360 +1,370 @@
 ---
 name: consilium
 description: |
-  AI-консилиум: трёхраундовый разбор несколькими врачами-агентами. Раунд 1 — независимые заключения вслепую, раунд 2 — перекрёстная критика, где специалисты обязаны оспаривать друг друга, раунд 3 — разрешение споров и синтез общей первопричины. Неразрешённые разногласия фиксируются в отчёте, а не сглаживаются.
-  Мнение одного специалиста — через /doctor-consult. Обзор режима и метрик — через /coach.
-  Триггеры: «консилиум», «consilium», «собери врачей», «что думают врачи», «разбери всесторонне», «второе мнение»
+  AI consilium: a three-round review by multiple physician agents. Round 1 produces independent blinded assessments; round 2 requires specialists to challenge each other's conclusions; round 3 resolves disputes and synthesizes a common root cause. Unresolved disagreements are recorded in the report rather than smoothed over.
+  For one specialist's opinion, use /doctor-consult. For a review of daily routine and metrics, use /coach.
+  Triggers: “consilium”, “assemble the doctors”, “what do the doctors think”, “review thoroughly”, “second opinion”
 ---
 
-# Консилиум — оркестратор AI-специалистов
+# Consilium — AI Specialist Orchestrator
 
-> **Профиль.** До чтения и записи определи активный профиль по
-> `.claude/shared/profile-resolution.md`. Короткий путь `Data/X` в этом файле
-> означает `Data/profiles/<активный>/X` — буквально по нему писать нельзя.
-> Перед записью назови, в чей профиль она идёт.
+> **Profile.** Before reading or writing, resolve the active profile using
+> `.claude/shared/profile-resolution.md`. The shorthand `Data/X` in this file
+> means `Data/profiles/<active>/X`; never write to the literal shorthand path.
+> Before writing, announce whose profile will receive the record.
 
-## Назначение
+## Purpose
 
-Параллельный запуск специализированных врачей-агентов для комплексного анализа медицинских данных пациента. Каждый специалист анализирует данные со своей стороны, а оркестратор синтезирует перекрёстные находки.
+Launch specialist medical agents in parallel for a comprehensive review of the patient's medical data. Each specialist examines the data from their own perspective, and the orchestrator synthesizes cross-specialty findings.
 
-## Принципы
+## Principles
 
-1. **Агенты, не промты** — каждый специалист запускается как Agent (отдельный контекст)
-2. **Read-only** — специалисты только читают данные и возвращают анализ. Никогда не пишут файлы
-3. **Независимость первого раунда** — специалисты формируют выводы вслепую, не видя чужих заключений. Это защита от якорения: увидев чужой вывод первым, специалист перестаёт искать свой
-4. **Спор обязателен** — во втором раунде специалисты получают заключения коллег и обязаны их оспорить по существу. Двенадцать монологов консилиумом не являются
-5. **Неразрешённое разногласие ценнее ложного согласия** — искусственный консенсус запрещён. Спор, который не удалось решить, точно указывает, какое исследование нужно следующим
-6. **Холистичность обязательна** — каждый специалист работает по `.claude/shared/holistic-framework.md`: ищет первопричину, а не описывает маркеры, и обязан учитывать образ жизни, среду и хронологию
-7. **Доказательность обязательна** — каждый специалист работает по `.claude/shared/evidence-base.md`: маркирует уровень доказательности (A/B/C/D/⚠️) и не выдумывает ссылки
+1. **Use Agents, not prompts**: launch each specialist as an Agent with separate context
+2. **Read-only**: specialists only read data and return analysis. They never write files
+3. **Independent first round**: specialists form blinded assessments without seeing one another's conclusions. This protects against anchoring: seeing another assessment first can stop a specialist from developing their own
+4. **Debate is required**: in round two, specialists receive their colleagues' opinions and must challenge them on substance. Twelve monologues do not constitute a consilium
+5. **Unresolved disagreement is more valuable than false agreement**: artificial consensus is prohibited. An unresolved dispute identifies exactly which investigation is needed next
+6. **The holistic framework is required**: each specialist follows `.claude/shared/holistic-framework.md`, seeks root causes, and considers lifestyle, environment, and chronology
+7. **Evidence is required**: each specialist follows `.claude/shared/evidence-base.md`, labels evidence levels (A/B/C/D/⚠️), and does not fabricate references
 
-Полные правила дискуссии — `.claude/shared/consilium-protocol.md`. Прочитать перед запуском.
+Read the full discussion rules in `.claude/shared/consilium-protocol.md` before starting.
 
-## Доступные специалисты
+## Available specialists
 
-| Агент | Специальность | Ключевой фокус |
-|-------|---------------|----------------|
-| `hematologist` | Гематолог | ОАК, лимфоцитоз, полицитемия, анемии |
-| `endocrinologist` | Эндокринолог | Щитовидка, РААС, надпочечники, половые гормоны |
-| `urologist` | Уролог и нефролог | Почки, мочевые пути, СКФ — универсально. Простата — у мужчин |
-| `gynecologist` | Гинеколог | Цикл, репродуктивное здоровье, менопауза, скрининг. **Только при `sex` = `female`** |
-| `gastroenterologist` | Гастроэнтеролог | ЖКТ, печень, FOB, нутрициология |
-| `neurologist` | Невролог | Мигрень, ВЧД, шейный отдел, вегетатика |
-| `cardiologist` | Кардиолог | Аритмии, гипертензия, липиды, кардиориск |
-| `dermatologist` | Дерматолог | Дерматозы, аутоиммунные кожные |
-| `ent` | ЛОР | Нос, миндалины, лимфоузлы, СОАС |
-| `orthopedist` | Ортопед | Позвоночник, стопы, биомеханика |
-| `psychiatrist` | Психиатр | Депрессия, СДВГ, усталость, сон |
-| `dentist` | Стоматолог | Кариес, имплантация, пародонт |
-| `ophthalmologist` | Офтальмолог | Рефракция, ВГД, глазное дно |
+| Agent | Specialty | Key focus |
+|-------|-----------|-----------|
+| `hematologist` | Hematologist | CBC, lymphocytosis, polycythemia, anemia |
+| `endocrinologist` | Endocrinologist | Thyroid, RAAS, adrenal glands, sex hormones |
+| `urologist` | Urologist and nephrologist | Kidneys, urinary tract, and GFR for everyone; prostate in men |
+| `gynecologist` | Gynecologist | Menstrual cycle, reproductive health, menopause, screening. **Only with `sex` = `female`** |
+| `gastroenterologist` | Gastroenterologist | Gastrointestinal tract, liver, fecal occult blood, nutrition |
+| `neurologist` | Neurologist | Migraine, intracranial pressure, cervical spine, autonomic function |
+| `cardiologist` | Cardiologist | Arrhythmias, hypertension, lipids, cardiovascular risk |
+| `dermatologist` | Dermatologist | Dermatoses, autoimmune skin conditions |
+| `ent` | ENT specialist | Nose, tonsils, lymph nodes, OSA |
+| `orthopedist` | Orthopedist | Spine, feet, biomechanics |
+| `psychiatrist` | Psychiatrist | Depression, ADHD, fatigue, sleep |
+| `dentist` | Dentist | Caries, implants, periodontium |
+| `ophthalmologist` | Ophthalmologist | Refraction, intraocular pressure, fundus |
 
 ## Workflow
 
-### 1. Парсинг запроса
+### 1. Parse the request
 
-Определить scope консилиума:
+Determine the consilium's scope:
 
-- **Без аргументов** (`/consilium`) → полный консилиум — все специальности, у которых есть данные
-- **С указанием специальностей** (`/consilium гемато эндо`) → целевой — только указанные
-- **С вопросом** (`/consilium почему я устаю?`) → автоматический подбор релевантных специальностей по вопросу
+- **No arguments** (`/consilium`) → full review: all specialists with relevant data
+- **Named specialties** (`/consilium hemato endo`) → targeted review: only the specified specialists
+- **A question** (`/consilium why am I tired?`) → automatic selection of specialists relevant to the question
 
-Маппинг алиасов и таблица автоподбора по теме вопроса — `.claude/shared/specialty-aliases.md`. Прочитать оттуда, не дублировать здесь.
+Read alias mappings and the topic-based selection table from `.claude/shared/specialty-aliases.md`; do not duplicate them here.
 
-### 2. Загрузка данных
+### 2. Load data
 
-Прочитать в основном контексте (для формирования промта агентам):
-- `Data/profile.json` — профиль пациента
-- `Data/labs/_index.json` — индекс анализов
-- `Data/medications/current.json` — текущие лекарства
-- `Data/specialists/cross-specialty-map.json` — перекрёстные паттерны
-- `Data/hypotheses.json` — текущие гипотезы о первопричинах и их доказательная база
-- `Data/context/environment.json` — география, климат, жильё, работа, стресс, соцсреда
-- `Data/profile.json` → блок `lifestyle` — питание, вещества, сон, тренировки, работа
-- `MEMORY.md` — актуальный контекст
+Read in the main context to prepare the agents' prompts:
 
-### 3. Раунд 1 — независимые заключения
+- `Data/profile.json` — patient profile
+- `Data/labs/_index.json` — lab index
+- `Data/medications/current.json` — current medications
+- `Data/specialists/cross-specialty-map.json` — cross-specialty patterns
+- `Data/hypotheses.json` — current root-cause hypotheses and supporting evidence
+- `Data/context/environment.json` — geography, climate, housing, work, stress, and social environment
+- `Data/profile.json` → `lifestyle` — nutrition, substances, sleep, training, and work
+- `MEMORY.md` — current context
 
-Специалисты вызываются **напрямую по имени агента**. Читать файл `.claude/agents/[name].md` и вставлять его в промт НЕ нужно: агенты зарегистрированы как типы субагентов, их системный промпт подгружается автоматически.
+### 3. Round 1 — independent assessments
 
-Заключения коллег в промт первого раунда **не передаются** — раунд слепой.
+Call specialists **directly by agent name**. Do not read `.claude/agents/[name].md` and paste it into the prompt: agents are registered as subagent types and their system prompts load automatically.
+
+**Do not share colleagues' assessments** in the first round; it is blinded.
 
 ```
 Agent(
   subagent_type="neurologist",
   name="neurologist-r1",
-  prompt="Проведи анализ данных пациента. Фокусный вопрос: [вопрос]. [Дополнительный контекст, если есть]
+  prompt="Analyze the patient's data. Focus question: [question]. [Additional context, if available]
 
-Дополнительно к стандартному формату добавь секцию:
-### Уверенность и уязвимость
-- Насколько уверен: высокая / средняя / низкая
-- Самое слабое место моего вывода: [что легче всего оспорить]
-- Что меня переубедит: [конкретный результат или наблюдение]
+In addition to the standard format, add:
+### Confidence and vulnerability
+- Confidence: high / medium / low
+- Weakest point of my assessment: [what is easiest to challenge]
+- What would change my mind: [specific result or observation]
 
-Обязательно выдвини минимум две конкурирующие гипотезы по своему направлению и укажи, что их различает.",
+Propose at least two competing hypotheses in your specialty and state what distinguishes them.",
   run_in_background=true
 )
 ```
 
-**ВАЖНО:**
-- Все агенты запускаются в **одном сообщении** (параллельно), `run_in_background=true`
-- `name` — для идентификации в отчёте
-- Инструкции, холистическая рамка, доказательная база и контракт специалиста читаются агентом самостоятельно — дублировать их в промте не нужно
+**Important:**
 
-### Ограничение состава
+- Launch all agents in **one message**, in parallel, with `run_in_background=true`
+- Use `name` to identify the specialist in the report
+- Each agent reads its instructions, holistic framework, evidence base, and specialist contract independently; do not duplicate them in the prompt
 
-- **Верхний предел — 8 специалистов за один запуск.** Если автоподбор дал больше, показать список, объяснить выбор и спросить подтверждение
-- Полный консилиум из всех 12 запускается только по явному запросу пользователя
-- **Состав фильтруется по полу.** Прочитай `Data/profile.json` → `basic.sex` до формирования списка. `gynecologist` включается только при `female` либо `intersex` с соответствующими органами. При жалобе на усталость у женщины детородного возраста он включается обязательно: менструальная кровопотеря — самая частая причина дефицита железа, и без него гипотеза не будет рассмотрена. Если `sex` не указан — спросить у пользователя, а не угадывать
-- **`health-coach` в консилиуме не участвует.** Он не диагностический специалист и имеет право записи, что нарушает принцип read-only. Для обзора режима и метрик — отдельный вызов `/coach`
+### Panel limits
 
-### Ожидание и обработка сбоев
+- **Maximum 8 specialists per run.** If automatic selection yields more, show the list, explain the choice, and ask for confirmation
+- A full consilium of all 12 runs only at the user's explicit request
+- **Filter the panel by biological sex.** Read `Data/profile.json` → `basic.sex` before assembling it. Include `gynecologist` only for `female`, or for `intersex` when the relevant organs are present. Include this specialist when a woman of reproductive age reports fatigue: menstrual blood loss is the most common cause of iron deficiency, and otherwise that hypothesis may be missed. If `sex` is unspecified, ask rather than guessing
+- **`health-coach` does not participate in the consilium.** It is not a diagnostic specialist and has write access, which violates the read-only principle. Use `/coach` separately to review daily routine and metrics
 
-- Дождаться завершения всех запущенных агентов перед переходом к синтезу
-- **Частичный успех допустим:** если ответили не все, синтез выполняется по полученным заключениям, а в отчёте явно перечисляется, кто не ответил и что из-за этого не покрыто
-- **Пустой или мусорный ответ** агента не включается в синтез и отмечается как сбой
-- Если не ответил ни один специалист — сообщить об этом и не создавать отчёт
+### Waiting and handling failures
 
-**Доступные агенты** (`.claude/agents/`):
+- Wait for all launched agents before synthesis
+- **Partial success is acceptable:** synthesize the assessments received, explicitly listing nonresponding specialists and the resulting gaps
+- Exclude **empty or unusable responses** from synthesis and mark them as failures
+- If no specialist responds, tell the user and do not create a report
+
+**Available agents** (`.claude/agents/`):
 `hematologist`, `endocrinologist`, `urologist`, `gynecologist`, `gastroenterologist`, `neurologist`, `cardiologist`, `dermatologist`, `ent`, `orthopedist`, `psychiatrist`, `dentist`, `ophthalmologist`
 
-### 4. Раунд 2 — перекрёстная критика
+### 4. Round 2 — cross-critique
 
-Полные правила — Блок 3 файла `.claude/shared/consilium-protocol.md`.
+Full rules: Block 3 of `.claude/shared/consilium-protocol.md`.
 
-**Кого запускать.** Не всех повторно, а только тех, у кого есть предмет спора:
+**Who to launch:** only specialists with a substantive disagreement:
 
-- двое и более высказались об одном маркере, органе или сквозной оси
-- гипотезы противоречат друг другу либо по-разному объясняют одну жалобу
-- один выставил флаг другому
-- один назвал находку значимой, другой — незначимой
-- сработал паттерн из `cross-specialty-map.json`, затрагивающий нескольких
+- Two or more addressed the same marker, organ, or cross-specialty axis
+- Hypotheses contradict one another or explain the same symptom differently
+- One specialist flagged an issue for another
+- One called a finding significant and another did not
+- A pattern in `cross-specialty-map.json` was triggered and involves several specialists
 
-Если пересечений нет вообще — раунд пропускается, и это отмечается в отчёте.
+If there are no overlaps, skip the round and state this in the report.
 
 ```
 Agent(
   subagent_type="cardiologist",
   name="cardiologist-r2",
-  prompt="Ты уже дал заключение в первом раунде консилиума. Теперь прочитай заключения коллег по спорной теме и оспорь их по существу.
+  prompt="You provided an assessment in round one. Read your colleagues' conclusions on the disputed topic and challenge them on substance.
 
-ЗАКЛЮЧЕНИЯ КОЛЛЕГ:
-[тексты заключений специалистов, чьи зоны пересеклись с твоей]
+COLLEAGUES' ASSESSMENTS:
+[assessments from specialists whose areas overlap with yours]
 
-ТВОЁ ЗАКЛЮЧЕНИЕ ПЕРВОГО РАУНДА:
-[текст]
+YOUR FIRST-ROUND ASSESSMENT:
+[text]
 
-Прочитай .claude/shared/consilium-protocol.md, Блок 3, и верни ответ строго в формате оттуда: с чем согласен, с чем не согласен, что коллеги не рассмотрели.
+Read .claude/shared/consilium-protocol.md, Block 3, and use its exact response format: what you agree with, what you disagree with, and what your colleagues overlooked.
 
-Возражение обосновывается данными, а не мнением. Авторитет специальности не аргумент. Атакуй самое сильное прочтение чужого тезиса, а не упрощённое. Если после честной проверки возразить нечего — так и напиши, указав, что именно проверил.
+Base objections on data, not opinion. A specialist's authority is not an argument. Challenge the strongest version of the claim, not a simplified version. If an honest check reveals no objection, say so and specify what you checked.
 
-Оспорить собственный вывод первого раунда, если чужие данные его опровергли, — нормально и приветствуется.",
+Revising your own first-round conclusion when a colleague's data refutes it is normal and encouraged.",
   run_in_background=true
 )
 ```
 
-**Адвокат дьявола.** Для ведущей гипотезы — той, что объясняет больше всего находок, — назначить оппонентом участника, чья зона наименее с ней связана, с единственной задачей: попытаться её опрокинуть.
+**Devil's advocate:** for the leading hypothesis—the one explaining the most findings—assign the participant whose area is least associated with it to try to refute it.
 
-### 5. Раунд 3 — разрешение споров
+### 5. Round 3 — dispute resolution
 
-Выполняет оркестратор в основном контексте, без запуска агентов. Правила вердикта — Блок 4 `consilium-protocol.md`.
+The orchestrator resolves disputes in the main context without launching agents. Verdict rules: Block 4 of `consilium-protocol.md`.
 
-По каждому спору определить:
+For each dispute:
 
-| Ситуация | Вердикт |
-|----------|---------|
-| Разные уровни доказательности | Побеждает более высокий, расхождение фиксируется |
-| Уровни равны, но одна позиция опровержима, а другая нет | Побеждает опровержимая — она проверяема |
-| Уровни равны, данных для различения нет | **Неразрешённое разногласие**, назначается исследование-арбитр |
-| Спор из-за разных единиц или разных лабораторий | Не спор, а артефакт: нормализовать по `_marker-aliases.json` и пересобрать |
-| Одна позиция на данных старше 24 месяцев, другая на свежих | Побеждают свежие |
-| Позиция опирается на утверждение из промпта, а не из `Data/` | Отклоняется: фактов о пациенте в промптах нет |
+| Situation | Verdict |
+|-----------|---------|
+| Evidence levels differ | The higher level prevails; record the disagreement |
+| Equal evidence levels, but only one position is falsifiable | The falsifiable position prevails because it can be tested |
+| Equal evidence levels with no distinguishing data | **Unresolved disagreement**; identify an investigation that could settle it |
+| Dispute stems from different units or laboratories | An artifact: normalize using `_marker-aliases.json` and reassess |
+| One position uses data older than 24 months and another uses recent data | Recent data prevails |
+| A position relies on a prompt assertion rather than `Data/` | Reject it: prompts contain no patient facts |
 
-**Запрет на искусственный консенсус.** Неразрешённое разногласие идёт в отчёт как есть, обе позиции сохраняются. Сглаживать формулировку, замалчивать проигравшую сторону или объявлять согласие там, где его нет, запрещено — это уничтожает информацию о том, какое обследование нужно следующим.
+**Artificial consensus is prohibited.** Preserve both positions in unresolved disagreements. Do not smooth the wording, conceal a losing position, or declare agreement where none exists; doing so destroys information about the next investigation needed.
 
-### 6. Синтез результатов
+### 6. Synthesize results
 
-После разрешения споров:
+After resolving disputes:
 
-**A. Сортировка по severity:**
-- Собрать все находки, отсортировать: critical → high → medium → low → stable
+**A. Sort by severity:**
 
-**B. Разрешение cross-specialty флагов:**
-- Если гематолог написал «→ Кардиология: тахикардия может быть следствием анемии» — проверить, что кардиолог сказал о тахикардии
-- Сопоставить флаги одного специалиста с находками другого
-- Выявить совпадения и противоречия
+- Gather all findings and sort: critical → high → medium → low → stable
 
-**C. Применение перекрёстных паттернов:**
-- Загрузить `Data/specialists/cross-specialty-map.json`
-- Проверить, активируются ли известные паттерны (renin↑ + тахикардия + почки, и т.д.)
-- Отметить новые паттерны, которые не были предусмотрены
+**B. Resolve cross-specialty flags:**
 
-**D. Выявление конфликтов:**
-- Разные специалисты рекомендуют противоположное?
-- Лекарства, назначенные одним, мешают лечению другого?
+- If the hematologist wrote “→ Cardiology: tachycardia may result from anemia,” check what the cardiologist said about tachycardia
+- Compare each specialist's flags with the others' findings
+- Identify agreement and contradictions
 
-**E. Синтез перекрёстных гипотез:**
-- Сформулировать гипотезы, которые ни один специалист по отдельности не сформулировал бы
-- Это главная ценность консилиума
+**C. Apply cross-specialty patterns:**
 
-**F. Сведение к общей первопричине:**
-- Собрать гипотезы уровня L4 от всех специалистов (Блок 2 рамки)
-- Проверить, сводятся ли разрозненные находки к одному системному процессу или это несколько независимых
-- Определить, какие сквозные оси назвали несколько специалистов (Блок 3 рамки) — совпадение осей указывает на общий корень
-- Построить хронологию: совпадают ли по времени старты разных состояний
-- Свести вклад образа жизни и среды в единую таблицу — что модифицируемо и даёт наибольший эффект при наименьшем вмешательстве
+- Load `Data/specialists/cross-specialty-map.json`
+- Check for activated patterns (renin↑ + tachycardia + kidney findings, etc.)
+- Note new patterns not already covered
 
-**G. Ревалидация прошлых консилиумов:**
-- Прочитать `Data/consilium/_sessions.json` и отчёты, созданные до последней партии анализов
-- Проверить, не опираются ли их ключевые выводы на данные, которые с тех пор опровергнуты
-- Найденные недействительные выводы перечислить в отчёте отдельно, с указанием файла, даты и того, какой анализ их снял
-- Отчёты прошлых консилиумов **не редактировать** — они остаются историческим снимком. Опровержение фиксируется в новом отчёте
+**D. Detect conflicts:**
 
-**H. Обновление гипотез:**
-- Сопоставить выводы консилиума с `Data/hypotheses.json`
-- Отметить, какие гипотезы усилились, ослабли или опровергнуты и на каком основании
-- Предложить пользователю обновление файла — не записывать без подтверждения
+- Do specialists give opposing recommendations?
+- Do medications prescribed for one condition interfere with treatment of another?
 
-### 7. Формирование отчёта
+**E. Synthesize cross-specialty hypotheses:**
+
+- Formulate hypotheses that no individual specialist would propose alone
+- This is the consilium's main value
+
+**F. Assess a common root cause:**
+
+- Collect every specialist's L4 hypotheses (framework Block 2)
+- Check whether separate findings reduce to one systemic process or several independent processes
+- Identify cross-specialty axes named by multiple specialists (framework Block 3); overlapping axes suggest a common root
+- Build a timeline: do different conditions begin at the same time?
+- Summarize lifestyle and environmental contributions in one table, identifying modifiable factors with the greatest effect for the least intervention
+
+**G. Revalidate earlier consilia:**
+
+- Read `Data/consilium/_sessions.json` and reports predating the latest lab batch
+- Check whether their key conclusions relied on data subsequently refuted
+- List outdated conclusions separately, with the file, date, and lab result that invalidated them
+- **Do not edit earlier reports**: they remain historical snapshots. Record refutations in the new report
+
+**H. Update hypotheses:**
+
+- Compare the consilium's conclusions with `Data/hypotheses.json`
+- Identify strengthened, weakened, or refuted hypotheses and the reasons
+- Offer to update the file; do not write without confirmation
+
+### 7. Generate the report
 
 ```markdown
-## Консилиум — [YYYY-MM-DD] — [scope: полный / целевой / по вопросу]
+## Consilium — [YYYY-MM-DD] — [scope: full / targeted / question]
 
-### Участники
-- [Специальность]: [severity их заключения]
+### Participants
+- [Specialty]: [severity of findings]
 - ...
 
-### Ход обсуждения
-- **Раунд 1:** [сколько специалистов, сколько гипотез выдвинуто]
-- **Раунд 2:** [кто с кем спорил и по какому предмету; либо «пересечений не было, раунд пропущен»]
-- **Не ответили:** [кто, и что из-за этого осталось непокрытым]
+### Discussion progress
+- **Round 1:** [specialists and hypotheses proposed]
+- **Round 2:** [who challenged whom and on what; or “no overlaps, round skipped”]
+- **No response:** [who, and the resulting gaps]
 
-### CRITICAL / HIGH находки
-1. **[Перекрёстная находка]** ([специальности])
-   - Что: [описание]
-   - Почему важно: [обоснование]
-   - Действие: [что делать]
+### CRITICAL / HIGH findings
+1. **[Cross-specialty finding]** ([specialties])
+   - What: [description]
+   - Why it matters: [rationale]
+   - Action: [what to do]
 
-### MEDIUM находки
+### MEDIUM findings
 1. ...
 
-### Перекрёстный синтез
-> Уникальная ценность этого консилиума — находки, которые один специалист не увидел бы
+### Cross-specialty synthesis
+> Findings an individual specialist would not have identified alone
 
-1. **[Гипотеза]**
-   - Основание: [маркер A от специалиста X] + [маркер B от специалиста Y]
-   - Механизм: [объяснение]
-   - Верификация: [какие исследования нужны]
+1. **[Hypothesis]**
+   - Basis: [marker A from specialist X] + [marker B from specialist Y]
+   - Mechanism: [explanation]
+   - Verification: [investigations needed]
 
-### Разрешённые споры
+### Resolved disputes
 
-| Предмет спора | Позиция A (кто) | Позиция B (кто) | Вердикт | Основание |
-|---------------|-----------------|-----------------|---------|-----------|
+| Disputed issue | Position A (who) | Position B (who) | Verdict | Basis |
+|----------------|------------------|------------------|---------|-------|
 
-### Неразрешённые разногласия
-> Здесь не сглаживать. Это самая полезная часть отчёта — она показывает, чего мы не знаем
+### Unresolved disagreements
+> Preserve disagreement. This section shows what we do not know.
 
-1. **[Предмет]**
-   - Позиция A: [...] — [специальность], уровень [X]
-   - Позиция B: [...] — [специальность], уровень [X]
-   - Почему не разрешено: [нет данных / равные уровни / нужен арбитр]
-   - **Что рассудит:** [конкретное исследование]
+1. **[Issue]**
+   - Position A: [...] — [specialty], evidence level [X]
+   - Position B: [...] — [specialty], evidence level [X]
+   - Why unresolved: [missing data / equal evidence levels / adjudicating test needed]
+   - **What could settle it:** [specific investigation]
 
-### Проверка ведущей гипотезы
-- **Гипотеза:** [...]
-- **Оппонент:** [специальность]
-- **Аргументы против:** [...]
-- **Устояла:** да / нет / частично
-- **Итоговая уверенность:** выросла / не изменилась / снизилась
+### Testing the leading hypothesis
+- **Hypothesis:** [...]
+- **Opponent:** [specialty]
+- **Arguments against:** [...]
+- **Withstood challenge:** yes / no / partially
+- **Final confidence:** increased / unchanged / decreased
 
-### Отклонённые гипотезы
+### Rejected hypotheses
 
-| Гипотеза | Кто выдвинул | Почему отклонена |
-|----------|--------------|------------------|
+| Hypothesis | Proposed by | Reason for rejection |
+|------------|-------------|----------------------|
 
-### Общая первопричина
-> Сводится ли картина к одному процессу или это несколько независимых
+### Common root cause
+> Does the picture reduce to one process or several independent processes?
 
-- **Вердикт:** [один процесс / несколько независимых / частично связаны]
-- **Общие затронутые оси:** [оси, названные несколькими специалистами]
-- **Наиболее вероятная корневая причина (L4):** [...]
-- **Конкурирующее объяснение:** [...]
-- **Что различит гипотезы:** [конкретное исследование или наблюдение]
+- **Verdict:** [single process / multiple independent processes / partly related]
+- **Shared axes:** [axes named by multiple specialists]
+- **Most likely root cause (L4):** [...]
+- **Competing explanation:** [...]
+- **What distinguishes the hypotheses:** [specific investigation or observation]
 
-### Хронология
+### Timeline
 
-| Год | Событие или старт симптома | Что совпало по времени |
-|-----|---------------------------|------------------------|
+| Year | Event or symptom onset | Coinciding events |
+|------|------------------------|-------------------|
 
-### Вклад образа жизни и среды
+### Lifestyle and environmental contributions
 
-| Фактор | Текущее значение | На что влияет | Модифицируем | Приоритет |
-|--------|------------------|---------------|--------------|-----------|
+| Factor | Current value | What it affects | Modifiable | Priority |
+|--------|---------------|-----------------|------------|----------|
 
-### Влияние на существующие гипотезы
+### Impact on existing hypotheses
 
-| Гипотеза | Было | Стало | Основание |
-|----------|------|-------|-----------|
+| Hypothesis | Previous status | New status | Basis |
+|------------|-----------------|------------|-------|
 
-### Недействительные выводы прошлых консилиумов
-> Производные документы не обновляются сами. Если прошлый отчёт опирался на данные, снятые новыми анализами, — сказать об этом здесь
+### Invalidated conclusions from earlier consilia
+> Derived documents do not update themselves. State when new lab results refute the data underlying an earlier report.
 
-| Отчёт | Дата | Недействительный вывод | Что его сняло |
-|-------|------|------------------------|---------------|
+| Report | Date | Invalidated conclusion | Refuting evidence |
+|--------|------|------------------------|-------------------|
 
-### Конфликты и взаимодействия
-- [Конфликт 1]: специалист A рекомендует X, специалист B рекомендует Y
-  - Решение: [предложение]
+### Conflicts and interactions
+- [Conflict 1]: specialist A recommends X, specialist B recommends Y
+  - Resolution: [proposal]
 
-### Лекарственные взаимодействия
-- [Если есть]
+### Drug interactions
+- [If any]
 
-### План действий (приоритизированный)
-1. **[СРОЧНО]** [Действие] — [Почему] — [Какой специалист]
-2. **[В ТЕЧЕНИЕ МЕСЯЦА]** ...
-3. **[ПЛАНОВО]** ...
+### Action plan (prioritized)
+1. **[URGENT]** [Action] — [Why] — [Which specialist]
+2. **[WITHIN A MONTH]** ...
+3. **[ROUTINE]** ...
 
-### Вопросы для реальных врачей
-**Гематолог:**
-- [Вопрос]
+### Questions for real doctors
+**Hematologist:**
+- [Question]
 
-**Эндокринолог:**
-- [Вопрос]
+**Endocrinologist:**
+- [Question]
 
-### Пробелы в данных
-- [Что не хватает для полной картины]
+### Data gaps
+- [What is missing from the overall picture]
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+⚕️ This information is for reference only. Consult a doctor for treatment decisions.
 ```
 
-### 8. Проверка перед сохранением
+### 8. Check before saving
 
-Гейт: не записывать отчёт, пока не подтверждено наличие обязательных секций.
+Do not save until every required section is present:
 
-- [ ] Ход обсуждения
-- [ ] Разрешённые споры — либо явная отметка «споров не возникло» с объяснением почему
-- [ ] Неразрешённые разногласия — либо явная отметка «все споры разрешены»
-- [ ] Проверка ведущей гипотезы
-- [ ] Общая первопричина
-- [ ] Хронология
-- [ ] Вклад образа жизни и среды
-- [ ] Влияние на существующие гипотезы
-- [ ] Пробелы в данных
+- [ ] Discussion progress
+- [ ] Resolved disputes, or an explicit “no disputes arose” with an explanation
+- [ ] Unresolved disagreements, or an explicit “all disputes resolved”
+- [ ] Testing the leading hypothesis
+- [ ] Common root cause
+- [ ] Timeline
+- [ ] Lifestyle and environmental contributions
+- [ ] Impact on existing hypotheses
+- [ ] Data gaps
 - [ ] Disclaimer
 
-Отдельно проверить: нет ли в тексте выдуманных ссылок — конкретных DOI, авторов, названий статей. При обнаружении удалить и понизить уровень утверждения до D.
+Separately check for fabricated references: specific DOIs, authors, or article titles. Remove any found and downgrade the claim's evidence level to D.
 
-Если секция отсутствует — заполнить её, а не удалять из шаблона. Пустая обязательная секция означает незавершённый консилиум.
+Fill in missing sections rather than removing them from the template. An empty mandatory section means an incomplete consilium.
 
-### 9. Сохранение
+### 9. Save
 
-1. Сохранить отчёт в `Data/consilium/YYYY-MM-DD_[scope].md`
-   - scope: `full`, `targeted-hemato-endo`, `question-fatigue` и т. д.
-2. Добавить запись в массив `sessions[]` файла `Data/consilium/_sessions.json`. Реальная структура файла — обёртка `{version, sessions[]}`, поле `version` не трогать:
+1. Save the report to `Data/consilium/YYYY-MM-DD_[scope].md`
+   - Scope examples: `full`, `targeted-hemato-endo`, `question-fatigue`
+2. Append to `sessions[]` in `Data/consilium/_sessions.json`. Preserve the `{version, sessions[]}` wrapper and leave `version` unchanged:
    ```json
    {
      "date": "YYYY-MM-DD",
      "scope": "full|targeted|question",
      "specialists": ["hematologist", "endocrinologist"],
-     "question": "текст вопроса или null",
+     "question": "question text or null",
      "file": "YYYY-MM-DD_full.md",
      "rounds": 3,
      "disputes_total": 0,
@@ -365,36 +375,32 @@ Agent(
    }
    ```
 
-## Детский профиль
+## Child profile
 
-Если активный профиль младше 18 лет, агент `pediatrician` — **обязательный
-участник консилиума** независимо от темы вопроса, и одновременно рецензент.
+For an active profile under 18, `pediatrician` is a **required participant and reviewer**, regardless of the question's topic.
 
-Во втором раунде он проверяет заключения остальных на применение взрослых
-норм: референсов, порогов давления, скрининговых рекомендаций, расчёта доз.
+In round two, the pediatrician checks the others' assessments for inappropriate use of adult reference intervals, blood pressure thresholds, screening recommendations, and dose calculations.
 
-Возражение педиатра по этому основанию **содержательное, а не формальное**.
-Гематолог, назвавший возрастной лимфоцитоз четырёхлетнего отклонением,
-ошибся по существу — такой вывод отклоняется, а не смягчается формулировкой.
+Such objections are **substantive, not procedural**. A hematologist labeling physiological lymphocytosis in a four-year-old as abnormal has made a substantive error; reject that conclusion rather than softening its wording.
 
 ---
 
-## Правила
+## Rules
 
-- **Disclaimer обязателен** в каждом отчёте
-- **Никогда не ставить диагнозы** — только гипотезы и рекомендации обследований
-- **Приоритизация действий** — от срочных к плановым
-- **Не дублировать** — если 3 специалиста рекомендуют одно и то же, объединить
-- **Конфликты — явно** — не замалчивать противоречия между специалистами
-- Если у специалиста нет данных по его направлению — он всё равно может найти перекрёстные связи
-- **Холистическая рамка обязательна** — заключение специалиста без секций «Системная картина», «Гипотеза первопричины», «Вклад образа жизни и среды» и «Хронология» считается неполным
-- **Контекст жизни проверяется до поиска редкой патологии** — вещества, режим, питание и среда объясняют находку дешевле и чаще
-- **Отчёт обязан содержать гипотезу общей первопричины** — набор изолированных заключений специалистов консилиумом не является
-- **Доказательная база обязательна** — каждое содержательное утверждение в отчёте маркируется уровнем (A/B/C/D/⚠️) согласно `.claude/shared/evidence-base.md`
-- **Выдуманные ссылки недопустимы.** В первом раунде поиск запрещён: слепые заключения должны быть независимыми и воспроизводимыми. Подтверждать источники — во втором раунде и при синтезе. Ссылка на орган или руководство допустима, конкретный DOI, автор или название статьи — нет. При обнаружении такой ссылки в ответе агента — удалить её и понизить уровень утверждения до D
-- **Перекрёстный синтез консилиума — всегда уровень D или ⚠️** — он строится из сопоставления, а не из прямого исследования
-- **Спор обязателен** — если раунд 2 не дал ни одного возражения, это подозрительно. Проверить, действительно ли предмета спора не было, или специалисты формально согласились. Формальное согласие обесценивает консилиум
-- **Искусственный консенсус запрещён** — неразрешённое разногласие идёт в отчёт с обеими позициями и указанием исследования-арбитра. Сглаживать нельзя
-- **Возражение обосновывается данными**, а не мнением и не авторитетом специальности
-- **Отклонённая гипотеза попадает в отчёт** с объяснением, почему отклонена. Это экономит время при следующем разборе — гипотезу не будут выдвигать заново
-- **Критерий завершения:** отчёт содержит все обязательные секции из чек-листа шага 8, запись добавлена в `sessions[]`, выдуманных ссылок нет
+- **Include a disclaimer** in every report
+- **Never diagnose**: provide hypotheses and investigation recommendations only
+- **Prioritize actions** from urgent to routine
+- **Avoid duplication**: combine identical recommendations from multiple specialists
+- **State conflicts explicitly**; do not conceal contradictions
+- Even without specialty-specific data, a specialist may identify cross-specialty connections
+- **Require the holistic framework**: assessments missing “Systemic picture,” “Root-cause hypothesis,” “Lifestyle and environmental contributions,” or “Timeline” are incomplete
+- **Check life context before rare disease**: substances, routine, nutrition, and environment often explain findings more simply
+- **Include a common root-cause hypothesis**; isolated specialist opinions do not constitute a consilium
+- **Label evidence levels** (A/B/C/D/⚠️) for every substantive claim according to `.claude/shared/evidence-base.md`
+- **Fabricated references are prohibited.** No searching in round one: blinded assessments must be independent and reproducible. Verify sources in round two and synthesis. References to an organization or guideline are acceptable; unverified specific DOIs, authors, or article titles are not. Remove fabricated references from agent responses and downgrade the claim to D
+- **Cross-specialty synthesis is always evidence level D or ⚠️** because it derives from comparison rather than direct research
+- **Debate is required**: no objections in round two warrants checking whether there was truly no disagreement or merely superficial agreement
+- **Artificial consensus is prohibited**: preserve both positions and identify the investigation that could settle an unresolved dispute
+- **Base objections on data**, not a specialist's opinion or authority
+- **Include rejected hypotheses** and reasons so the next review does not needlessly propose them again
+- **Completion requires** every section in step 8, an entry in `sessions[]`, and no fabricated references

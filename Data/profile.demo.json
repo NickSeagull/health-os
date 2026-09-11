@@ -1,8 +1,8 @@
 {
   "version": 1,
   "basic": {
-    "full_name": "Демо Пользователь",
-    "display_name": "Демо-пациент",
+    "full_name": "Demo User",
+    "display_name": "Demo Patient",
     "relationship": "self",
     "date_of_birth": "1992-04-12",
     "sex": "male",
@@ -13,95 +13,95 @@
     "birth_weight_g": 3400,
     "birth_height_cm": 52,
     "birth_head_cm": 35,
-    "birth_place": "Ваш город",
-    "birth_type": "естественные роды",
+    "birth_place": "Your city",
+    "birth_type": "vaginal delivery",
     "emergency_contact": {
-      "name": "Имя Фамилия",
+      "name": "First Last",
       "phone": "+7 (900) 000-00-00",
-      "relation": "близкий человек"
+      "relation": "close relative"
     }
   },
   "consent": {
     "basis": "self",
     "recorded_at": "2026-01-15",
-    "note": "профиль владельца установки"
+    "note": "installation owner profile"
   },
   "allergies": [
     {
-      "allergen": "Пыльца берёзы",
-      "type": "сезонная",
+      "allergen": "Birch pollen",
+      "type": "seasonal",
       "severity": "mild",
-      "reaction": "Заложенность носа, слезотечение в апреле — мае",
-      "notes": "Антигистаминные по потребности"
+      "reaction": "Nasal congestion and watery eyes in April–May",
+      "notes": "Antihistamines as needed"
     }
   ],
   "chronic_conditions": [],
   "family_history": [
     {
-      "relative": "отец",
+      "relative": "father",
       "name": "—",
       "age_at_birth": 29,
-      "condition": "Артериальная гипертензия после 60 лет",
-      "notes": "Контролируется препаратами"
+      "condition": "Hypertension after age 60",
+      "notes": "Controlled with medication"
     }
   ],
   "current_complaints": [
     {
-      "area": "Общее самочувствие",
-      "description": "Снижение энергии во второй половине дня",
+      "area": "General well-being",
+      "description": "Reduced energy in the afternoon",
       "since": "2026-03",
       "status": "investigating",
       "priority": "medium",
-      "notes": "Началось зимой, к лету стало заметно меньше"
+      "notes": "Started in winter and became noticeably milder by summer"
     }
   ],
   "lifestyle": {
     "exercise": {
-      "type": "зал + бег",
-      "frequency": "2–3 раза в неделю",
-      "notes": "Силовые в зале, лёгкий бег на выходных"
+      "type": "Gym + running",
+      "frequency": "2–3 times per week",
+      "notes": "Strength training at the gym; light running on weekends"
     },
     "smoking": {
       "cigarettes": false,
       "hookah": false,
-      "notes": "Не курит"
+      "notes": "Does not smoke"
     },
-    "alcohol": "редко, 1–2 раза в месяц",
+    "alcohol": "Rarely, 1–2 times per month",
     "sleep": {
       "target_bedtime": "23:30",
       "target_wakeup": "07:30",
       "duration_hours": 7.5,
-      "notes": "Просыпается до будильника примерно через день"
+      "notes": "Wakes before the alarm about every other day"
     },
     "nutrition": {
       "tracking": false,
-      "current_phase": "поддержание",
-      "history": "Осенью 2025 был период набора массы, с весны — поддержание",
-      "standard_meal": "Три приёма пищи, перекус после тренировки",
-      "notes": "Овощи и белок почти каждый день, фастфуд редко"
+      "current_phase": "maintenance",
+      "history": "A bulking phase in autumn 2025; maintenance since spring",
+      "standard_meal": "Three meals and a post-workout snack",
+      "notes": "Vegetables and protein almost every day; fast food rarely"
     },
-    "work": "офисная работа за компьютером, полный день",
+    "work": "Full-time office work at a computer",
     "caffeine": {
       "coffee_cups_per_day": 2,
-      "energy_drinks": "нет",
-      "tea": "1 чашка чёрного чая вечером",
+      "energy_drinks": "none",
+      "tea": "One cup of black tea in the evening",
       "last_intake_time": "16:00",
-      "notes": "Второй кофе обычно около полудня"
+      "notes": "The second coffee is usually around noon"
     },
     "hydration": {
       "water_liters_per_day": 1.8,
-      "notes": "В тренировочные дни больше"
+      "notes": "More on training days"
     },
     "screen_and_light": {
       "screen_hours_per_day": 9,
       "evening_screen_cutoff": "23:00",
       "morning_daylight_minutes": 15,
-      "notes": "Утренний свет — только дорога до работы"
+      "notes": "Morning light consists only of the commute to work"
     },
     "sleep_regularity": {
       "actual_bedtime_weekday": "23:45",
       "actual_bedtime_weekend": "01:00",
-      "variability_notes": "Разброс отбоя между буднями и выходными около 1 ч 15 мин"
+      "variability_notes": "Bedtime varies by about 1 hour 15 minutes between weekdays and weekends"
     },
     "_needs_input": []
   }

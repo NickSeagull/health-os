@@ -8,29 +8,29 @@ export async function GET() {
     return NextResponse.json({ profiles: listProfiles() });
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Не удалось прочитать профили" },
+      { error: e instanceof Error ? e.message : "Could not read profiles" },
       { status: 500 }
     );
   }
 }
 
 /**
- * Переключение активного профиля.
+ * Switch the active profile.
  *
- * Указатель один на всю систему — тот же файл читает Claude Code. Так дашборд
- * и ассистент не могут разойтись и показывать данные разных людей.
+ * There is one pointer for the whole system; Claude Code reads the same file.
+ * This keeps the dashboard and assistant from diverging and showing different people's data.
  */
 export async function POST(request: Request) {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Ожидается JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Expected JSON" }, { status: 400 });
   }
 
   const id = (body as { id?: unknown } | null)?.id;
   if (typeof id !== "string") {
-    return NextResponse.json({ error: "Не передан id профиля" }, { status: 400 });
+    return NextResponse.json({ error: "Profile id is required" }, { status: 400 });
   }
 
   try {
@@ -40,6 +40,6 @@ export async function POST(request: Request) {
     if (e instanceof ProfileError) {
       return NextResponse.json({ error: e.message }, { status: 400 });
     }
-    return NextResponse.json({ error: "Не удалось переключить профиль" }, { status: 500 });
+    return NextResponse.json({ error: "Could not switch profile" }, { status: 500 });
   }
 }

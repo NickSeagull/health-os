@@ -1,11 +1,11 @@
-{"ts":"2026-05-06T21:30:00+03:00","mood":5,"energy":4,"stress":6,"sleep_quality":5,"notes":"Тяжело вставать, днём вялость","tags":["work"]}
-{"ts":"2026-05-14T22:00:00+03:00","mood":6,"energy":4,"stress":5,"sleep_quality":6,"notes":"Энергии мало, тренировку перенёс","tags":["training"]}
-{"ts":"2026-05-23T21:15:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Ровный день","tags":["work"]}
-{"ts":"2026-06-04T22:20:00+03:00","mood":5,"energy":4,"stress":7,"sleep_quality":5,"notes":"Сдача проекта, спал шесть часов","tags":["work","deadline"]}
-{"ts":"2026-06-12T21:00:00+03:00","mood":7,"energy":6,"stress":4,"sleep_quality":7,"notes":"Выспался, был в парке","tags":["weekend","daylight"]}
-{"ts":"2026-06-20T21:45:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Обычная неделя","tags":["work"]}
-{"ts":"2026-06-28T20:50:00+03:00","mood":7,"energy":6,"stress":3,"sleep_quality":7,"notes":"Долгая прогулка, лёг вовремя","tags":["weekend","daylight"]}
-{"ts":"2026-07-03T21:40:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Спад энергии после обеда, к вечеру выровнялось","tags":["work"]}
-{"ts":"2026-07-10T22:10:00+03:00","mood":7,"energy":6,"stress":4,"sleep_quality":7,"notes":"Обычный рабочий день, тренировка вечером","tags":["work","training"]}
-{"ts":"2026-07-17T21:55:00+03:00","mood":6,"energy":5,"stress":6,"sleep_quality":6,"notes":"Дедлайн по проекту, лёг позже обычного","tags":["work","deadline"]}
-{"ts":"2026-07-25T20:30:00+03:00","mood":8,"energy":7,"stress":3,"sleep_quality":8,"notes":"Выходные, много времени на улице","tags":["weekend","daylight"]}
+{"ts":"2026-05-06T21:30:00+03:00","mood":5,"energy":4,"stress":6,"sleep_quality":5,"notes":"Hard to get up; sluggish during the day","tags":["work"]}
+{"ts":"2026-05-14T22:00:00+03:00","mood":6,"energy":4,"stress":5,"sleep_quality":6,"notes":"Low energy; postponed the workout","tags":["training"]}
+{"ts":"2026-05-23T21:15:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Uneventful day","tags":["work"]}
+{"ts":"2026-06-04T22:20:00+03:00","mood":5,"energy":4,"stress":7,"sleep_quality":5,"notes":"Project delivery; slept six hours","tags":["work","deadline"]}
+{"ts":"2026-06-12T21:00:00+03:00","mood":7,"energy":6,"stress":4,"sleep_quality":7,"notes":"Well rested; spent time in the park","tags":["weekend","daylight"]}
+{"ts":"2026-06-20T21:45:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Typical week","tags":["work"]}
+{"ts":"2026-06-28T20:50:00+03:00","mood":7,"energy":6,"stress":3,"sleep_quality":7,"notes":"Long walk; went to bed on time","tags":["weekend","daylight"]}
+{"ts":"2026-07-03T21:40:00+03:00","mood":6,"energy":5,"stress":5,"sleep_quality":6,"notes":"Energy dip after lunch; recovered by evening","tags":["work"]}
+{"ts":"2026-07-10T22:10:00+03:00","mood":7,"energy":6,"stress":4,"sleep_quality":7,"notes":"Typical workday; evening workout","tags":["work","training"]}
+{"ts":"2026-07-17T21:55:00+03:00","mood":6,"energy":5,"stress":6,"sleep_quality":6,"notes":"Project deadline; went to bed later than usual","tags":["work","deadline"]}
+{"ts":"2026-07-25T20:30:00+03:00","mood":8,"energy":7,"stress":3,"sleep_quality":8,"notes":"Weekend; lots of time outdoors","tags":["weekend","daylight"]}

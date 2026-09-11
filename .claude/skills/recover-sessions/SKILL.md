@@ -1,145 +1,145 @@
 ---
 name: recover-sessions
 description: |
-  Обработка незафиксированных сессий — создание минимальных логов, очистка breadcrumbs.
-  Триггеры: «recover-sessions», «обработай сессии», «незафиксированные сессии»
+  Processing uncommitted sessions - creating minimal logs, clearing breadcrumbs.
+  Triggers: “recover-sessions”, “process sessions”, “uncommitted sessions”
 ---
 
-# Recover Sessions — обработка pending breadcrumbs
+# Recover Sessions - processing pending breadcrumbs
 
-## Назначение
+## Purpose
 
-Обработать незавершённые сессии (прерванные без `/wrap-up`). Создать минимальные session logs, очистить breadcrumbs.
+Process unfinished sessions (aborted without `/wrap-up`). Create minimal session logs, clear breadcrumbs.
 
-## Запрос пользователя
+## User request
 
 $ARGUMENTS
 
 ## Workflow
 
-### 1. Сканирование pending
+### 1. Scanning pending
 
-Через Glob прочитать все `.claude/hooks/pending-sessions/*.json`.
+Via Glob read all `.claude/hooks/pending-sessions/*.json`.
 
-Для каждого файла извлечь:
-- `session_id` — ID сессии
-- `date` — дата (YYYY-MM-DD)
-- `timestamp` — момент последней записи breadcrumb, UTC. **Источник HH-MM для имени лога**: у breadcrumb, созданных до починки хука, `start_time` пуст
-- `transcript_path` — путь к транскрипту сессии. Главный признак непустоты
-- `message_count` — число строк транскрипта. Справочно: у старых breadcrumb всегда `0`, опираться на это поле нельзя
-- `elapsed_seconds` — длительность. Ноль, если tmp-файла начала сессии не было
-- `start_time` — время начала. Может быть пустым
+For each file extract:
+- `session_id` — session ID
+- `date` - date (YYYY-MM-DD)
+- `timestamp` — the moment of the last breadcrumb record, UTC. **Source HH-MM for log name**: breadcrumb created before the hook was fixed has `start_time` empty
+- `transcript_path` — path to the session transcript. The main sign of non-emptiness
+- `message_count` — number of transcript lines. For reference: old breadcrumb is always `0`, you cannot rely on this field
+- `elapsed_seconds` — duration in seconds. Zero if there was no session start tmp file
+- `start_time` — start time. May be empty
 
-### 2. Классификация
+### 2. Classification
 
-Непустота сессии определяется наличием транскрипта, а НЕ значением `message_count`.
+Whether a session is not empty is determined by the presence of a transcript, NOT by the `message_count` value.
 
-| Категория | Условие | Действие |
+| Category | Condition | Action |
 |-----------|---------|----------|
-| `current` | `session_id` совпадает с текущей сессией | Пропустить, не трогать |
-| `recoverable` | Файл по `transcript_path` существует и непуст | Создать лог, затем удалить breadcrumb |
-| `empty` | Файл по `transcript_path` существует, но пуст (0 байт) | Создать лог с пометкой «сессия без содержимого», затем удалить breadcrumb |
-| `orphan` | `transcript_path` пуст или файл по нему не найден | **Ничего не удалять.** Вынести в список «требуют ручного решения» и показать пользователю |
+| `current` | `session_id` matches the current session | Skip, don't touch |
+| `recoverable` | The file by `transcript_path` exists and is not empty | Create a log, then delete breadcrumb |
+| `empty` | The file by `transcript_path` exists, but is empty (0 bytes) | Create a log marked “session without content”, then delete breadcrumb |
+| `orphan` | `transcript_path` is empty or the file for it was not found | **Do not delete anything.** Add to the “require manual solution” list and show to the user |
 
-Запрещено определять пустую сессию по `message_count`: до починки `.claude/hooks/session-save.sh` это поле всегда равнялось нулю, и фильтр по нему удалил бы 100% сессий, не создав ни одного лога.
+It is forbidden to define an empty session by `message_count`: before fixing `.claude/hooks/session-save.sh` this field was always equal to zero, and a filter based on it would have deleted 100% of sessions without creating a single log.
 
-`message_count` использовать только как справочную величину в теле лога и только если он больше нуля.
+Use `message_count` only as a reference value in the log body and only if it is greater than zero.
 
-### 3. Извлечение контекста
+### 3. Context extraction
 
-Для каждой сессии категории `recoverable` определить тему по её `transcript_path`.
+For each session of the `recoverable` category, determine the topic by its `transcript_path`.
 
-Ограничения на чтение:
-- Читать **не более первых 50 строк** транскрипта — этого достаточно для темы
-- Транскрипт может весить десятки мегабайт. Никогда не загружать его целиком: `head -n 50 "$transcript_path"`
-- Если после 50 строк тема неясна — записать «не определена» и идти дальше
+Reading restrictions:
+- Read **no more than the first 50 lines** of the transcript - this is enough for the topic
+- The transcript can weigh tens of megabytes. Never download it in its entirety: `head -n 50 "$transcript_path"`
+- If after 50 lines the topic is unclear, write down “not defined” and move on
 
-Невозможность определить тему **не отменяет создание лога**.
+Being unable to determine the topic **does not cancel log creation**.
 
-### 4. Создание session logs
+### 4. Creating session logs
 
-Для каждой сессии категорий `recoverable` и `empty` создать `Cache/sessions/YYYY-MM-DD_HH-MM.md`:
-- `YYYY-MM-DD` — из поля `date`
-- `HH-MM` — из `start_time`, если оно непусто; иначе из `timestamp` (записан в UTC — отметить это в логе)
-- Если файл с таким именем уже существует — добавить суффикс `_2`, `_3` и т.д. **Существующий лог не перезаписывать**
+For each session of categories `recoverable` and `empty` create `Cache/sessions/YYYY-MM-DD_HH-MM.md`:
+- `YYYY-MM-DD` — from the `date` field
+- `HH-MM` — from `start_time`, if it is non-empty; otherwise from `timestamp` (recorded in UTC - note this in the log)
+- If a file with the same name already exists, add the suffix `_2`, `_3`, etc. **Do not overwrite existing log**
 
 ```markdown
-# Сессия YYYY-MM-DD HH:MM (recovered)
+# Session YYYY-MM-DD HH:MM (recovered)
 
 - **ID:** {session_id}
-- **Длительность:** ~{elapsed} мин (если `elapsed_seconds` > 0, иначе «неизвестна»)
-- **Сообщений:** ~{message_count} (если > 0, иначе строку не выводить)
-- **Транскрипт:** {transcript_path}
-- **Статус:** recovered (прервана без wrap-up)
+- **Duration:** ~{elapsed} min (if `elapsed_seconds` > 0, otherwise “unknown”)
+- **Messages:** ~{message_count} (if > 0, otherwise do not display the line)
+- **Transcript:** {transcript_path}
+- **Status:** recovered (interrupted without wrap-up)
 
-## Тема
+## Topic
 
-{тема или «не определена»}
+{topic or "unspecified"}
 
-## Примечание
+## Note
 
-Сессия восстановлена автоматически через `/recover-sessions`.
-Контекст ограничен — полные данные в транскрипте по пути выше.
+The session was restored automatically via `/recover-sessions`.
+Context is limited - full details are in the transcript along the path above.
 ```
 
-### 5. Очистка breadcrumb
+### 5. Cleaning the breadcrumb
 
-**Жёсткое правило: breadcrumb удаляется только после того, как лог сессии создан и записан на диск.** Порядок строго такой:
+**Strict rule: breadcrumb is deleted only after the session log has been created and written to disk.** The order is strictly as follows:
 
-1. Создать лог
-2. Убедиться, что файл `Cache/sessions/…md` существует и непуст
-3. Только после этого удалить `.claude/hooks/pending-sessions/{session_id}.json`
+1. Create a log
+2. Make sure that the file `Cache/sessions/…md` exists and is not empty
+3. Only after this delete `.claude/hooks/pending-sessions/{session_id}.json`
 
-Обратный порядок и удаление «заодно» запрещены. Если создание лога не удалось — breadcrumb остаётся на месте, сессия попадает в отчёт как необработанная.
+Reverse order and deletion “at the same time” are prohibited. If log creation fails, the breadcrumb remains in place and the session is included in the report as unprocessed.
 
-Для сессий категории `orphan` breadcrumb **не удалять ни при каких условиях** — без транскрипта содержимое сессии восстановить неоткуда, и удаление breadcrumb уничтожит последний след о ней.
+For sessions of the category `orphan` breadcrumb **do not delete under any circumstances** - without a transcript, the session contents cannot be restored from anywhere, and deleting breadcrumb will destroy the last trace of it.
 
-Сопутствующий `.claude/hooks/session-start-{session_id}.tmp` удалить, если он есть. Его отсутствие — нормальная ситуация, а не ошибка: хук создаёт его не всегда. Не выводить это как проблему.
+Delete the accompanying `.claude/hooks/session-start-{session_id}.tmp` if it exists. Its absence is a normal situation, not an error: the hook does not always create it. Don't present this as a problem.
 
-### 6. Коммит
+### 6. Commit
 
-Только если что-то изменилось — новых логов может не быть вовсе (все breadcrumb оказались `orphan` или относились к текущей сессии).
+Only if something has changed - there may be no new logs at all (all breadcrumbs may have turned out to be `orphan` or belong to the current session).
 
 ```bash
 git status --porcelain Cache/sessions/ .claude/hooks/pending-sessions/
 ```
 
-Если вывод пуст — коммит не делать. Иначе:
+If the output is empty, do not commit. Otherwise:
 
 ```bash
 git add Cache/sessions/ .claude/hooks/pending-sessions/
 git commit -m "fix: recover N sessions"
 ```
 
-### 7. Отчёт
+### 7. Report
 
 ```
-✅ Обработано сессий: N
-- [дата] — [тема] (recovered, лог создан, breadcrumb очищен)
-- [дата] — сессия без содержимого (лог создан, breadcrumb очищен)
+✅ Sessions processed: N
+- [date] - [topic] (recovered, log created, breadcrumb cleared)
+- [date] - session without content (log created, breadcrumb cleared)
 
-⚠️ Требуют ручного решения: M
-- [дата] — {session_id}: транскрипт не найден ({transcript_path или «поле пусто»})
-  Breadcrumb оставлен: .claude/hooks/pending-sessions/{session_id}.json
+⚠️ Requires manual solution: M
+- [date] - {session_id}: transcript not found ({transcript_path or "field empty"})
+  Breadcrumb left: .claude/hooks/pending-sessions/{session_id}.json
 
-Что можно сделать с ними:
-  1. Вспомнить содержание сессии и создать лог вручную
-  2. Удалить breadcrumb, если сессия точно не важна — только по твоему решению
+What can you do with them:
+  1. Remember the contents of the session and create a log manually
+  2. Delete breadcrumb if the session is definitely not important - only by your decision
 
-Логи: Cache/sessions/
+Logs: Cache/sessions/
 ```
 
-Секцию «Требуют ручного решения» показывать всегда, когда M > 0. Не скрывать и не решать за пользователя.
+The section “Requires manual decision” is always shown when M > 0. Do not hide and do not decide for the user.
 
-## Правила
+## Rules
 
-- Не трогать текущую сессию
-- **Никогда не удалять breadcrumb, если лог сессии не создан.** Порядок: лог → проверка существования файла → удаление
-- Непустоту определять по транскрипту, а не по `message_count`
-- Сессии без транскрипта (`orphan`) не удалять — выносить пользователю на ручное решение
-- Не блокировать работу — если тему определить не удалось, создать лог без темы
-- Транскрипты читать частично (первые 50 строк), никогда не загружать целиком
-- Отсутствие `session-start-*.tmp` — не ошибка, не сообщать о нём
-- Коммит только если были изменения
+- Do not touch the current session
+- **Never delete breadcrumb if the session log has not been created.** Order: log → check for file existence → delete
+- Non-emptiness is determined by the transcript, and not by `message_count`
+- Do not delete sessions without a transcript (`orphan`) - leave to the user for a manual solution
+- Do not block work - if the topic could not be determined, create a log without a topic
+- Transcripts should be read partially (first 50 lines), never downloaded in full
+- The absence of `session-start-*.tmp` is not an error, do not report it
+- Commit only if there have been changes
 
-**Критерий завершения:** каждый breadcrumb отнесён к одной из четырёх категорий; для всех `recoverable` и `empty` созданы файлы логов и их существование проверено; удалены только те breadcrumbs, для которых лог подтверждён на диске; все `orphan` остались на месте и перечислены в отчёте.
+**Completion Criteria:** Each breadcrumb is assigned to one of four categories; log files were created for all `recoverable` and `empty` and their existence was checked; only those breadcrumbs were deleted for which the log was confirmed on disk; all `orphan` remained in place and are listed in the report.

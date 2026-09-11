@@ -1,142 +1,107 @@
-# Подтверждение источников
+# Source Verification
 
-Обязательная рамка для любого обращения в интернет. Читается **до первого
-поискового запроса**.
+Required framework for any internet access. Read it **before the first search query**.
 
-Раньше агенты работали полностью офлайн, и правило звучало так: ссылаться на
-орган или руководство можно, изобретать DOI и названия статей — нельзя.
-Правило было верным, но платило за это дорого: система, чей главный тезис —
-доказательность с уровнями A–D, не могла проверить, что цитируемое
-руководство всё ещё действует.
+Previously, agents worked entirely offline. The rule allowed references to an organization or guideline but prohibited invented DOIs and article titles. The rule was sound, but costly: a system centered on evidence levels A–D could not verify whether a cited guideline was still in effect.
 
-Теперь у специалистов есть узкий канал в сеть. Он существует ради одной
-задачи — **подтвердить источник**, а не «поискать про болезнь».
+Specialists now have a narrow network channel. It exists for one purpose: **verifying a source**, not broadly searching for information about a disease.
 
 ---
 
-## Блок 1. Данные пациента в запрос не попадают
+## Block 1. Patient data must not enter queries
 
-Это главное ограничение, и оно не имеет исключений.
+This is the primary restriction, with no exceptions.
 
-Поисковый запрос — **вопрос о литературе**, а не о человеке. Он формулируется
-в обезличенных клинических терминах и уходит третьей стороне: поисковой
-системе и сайту, который откроется. На этот канал не распространяются никакие
-настройки приватности проекта.
+A search query is **a question about the literature**, not about a person. It uses anonymized clinical terms and goes to third parties: the search engine and the website opened. No project privacy setting covers this channel.
 
-### Запрещено в запросе
+### Prohibited query content
 
-- Имя, фамилия, инициалы, дата рождения, возраст с точностью до дня
-- Номер медкарты, полиса, заказа, телефон, адрес электронной почты
-- Название клиники, лаборатории, отделения, фамилия врача
-- Город и адрес проживания
-- **Конкретные значения показателей пациента** — они в сочетании с
-  остальным делают запрос узнаваемым
-- Редкое сочетание состояний, по которому человека можно опознать
+- First name, last name, initials, date of birth, or age precise to the day
+- Medical record, insurance policy, or order number; phone number or email address
+- Clinic, laboratory, or department name; the doctor's last name
+- City and residential address
+- **The patient's exact marker values**: combined with other details, they can make a query identifiable
+- A rare combination of conditions that could identify the person
 
-### Как переформулировать
+### How to rephrase
 
-| Нельзя | Можно |
-|--------|-------|
-| `ферритин 23 мужчина 34 усталость Гемотест` | `ferritin deficiency without anemia adult male fatigue` |
-| `у пациента с ВПЧ и родинками дерматоскопия` | `dermoscopy indications atypical nevi guideline` |
-| `ТТГ 5.4 субклинический гипотиреоз лечить?` | `subclinical hypothyroidism treatment threshold guideline` |
+| Not allowed | Allowed |
+|-------------|---------|
+| `ferritin 23 male 34 fatigue Gemotest` | `ferritin deficiency without anemia adult male fatigue` |
+| `dermoscopy for a patient with HPV and moles` | `dermoscopy indications atypical nevi guideline` |
+| `TSH 5.4 subclinical hypothyroidism treat?` | `subclinical hypothyroidism treatment threshold guideline` |
 
-Диапазон вместо точного значения допустим, если он взят из руководства,
-а не из анализа пациента: `ferritin 15-30 ng/mL threshold` — это вопрос
-о пороге, а не о человеке.
+A range instead of an exact value is acceptable if it comes from a guideline rather than the patient's lab result: `ferritin 15-30 ng/mL threshold` asks about a threshold, not a person.
 
-### Показать до отправки
+### Show the query before sending
 
-Перед первым запросом в сессии показать пользователю, что именно уйдёт
-наружу, и продолжить только после подтверждения. Дальнейшие запросы той же
-сессии по той же теме — без повторного вопроса, но с записью в журнал.
+Before the first query in a session, show the user exactly what will leave the device and proceed only after confirmation. Subsequent queries on the same topic in that session need no repeated question, but must be logged.
 
 ---
 
-## Блок 2. Белый список доменов
+## Block 2. Domain allowlist
 
-Поиск ограничивается доменами ниже. **Механизм ограничения различается
-для двух инструментов, и разница существенна.**
+Search is restricted to the domains below. **The restriction mechanism differs between the two tools, and the difference matters.**
 
-| Инструмент | Как ограничен | Что это значит |
-|------------|---------------|----------------|
-| `WebFetch` | Правилами `WebFetch(domain:…)` в `.claude/settings.json` | **Механически.** Домена нет в списке — страница не откроется, независимо от того, что решит модель |
-| `WebSearch` | Параметром `allowed_domains` в самом вызове | **Инструкционно.** Доменных правил для поиска в настройках разрешений не существует; список передаёт модель, следуя этому документу |
+| Tool | Restriction | Meaning |
+|------|-------------|---------|
+| `WebFetch` | `WebFetch(domain:…)` rules in `.claude/settings.json` | **Mechanically enforced.** If the domain is absent from the list, the page cannot be opened, regardless of the model's decision |
+| `WebSearch` | The `allowed_domains` parameter in the call itself | **Instruction-based.** Search has no domain rules in permission settings; the model supplies the list by following this document |
 
-Раньше здесь было написано, что ограничение «механическое, а не
-пожелание». Для чтения страниц это верно, для поиска — нет, и разницу
-важно понимать: если модель не передаст `allowed_domains`, поиск уйдёт
-по всему вебу. Именно поэтому обязателен журнал запросов из Блока 5 —
-без него это утверждение непроверяемо.
+This document previously called the restriction “mechanical, not a preference.” That is true for fetching pages, but not for search. If the model omits `allowed_domains`, the search covers the whole web. This is why the query log in Block 5 is mandatory: without it, the claim cannot be checked.
 
-Тот, кому такой уровень гарантии недостаточен, может закрыть поиск
-полностью: добавить `WebSearch` в `deny` настроек разрешений. Специалисты
-сохранят возможность открывать страницы из белого списка по прямым
-ссылкам, но перестанут искать.
+If that level of assurance is insufficient, disable search entirely by adding `WebSearch` to the permissions `deny` list. Specialists will still be able to open allowlisted pages through direct links, but will no longer search.
 
-**Систематические обзоры и базы:**
+**Systematic reviews and databases:**
 `cochranelibrary.com`, `pubmed.ncbi.nlm.nih.gov`, `ncbi.nlm.nih.gov`
 
-**Руководства и рекомендации:**
+**Guidelines and recommendations:**
 `nice.org.uk`, `uspreventiveservicestaskforce.org`, `who.int`, `cdc.gov`,
 `nih.gov`, `ema.europa.eu`, `fda.gov`
 
-**Профильные общества:** сайты обществ по специальности из
-`evidence-base.md` — кардиологических, эндокринологических,
-гематологических и прочих.
+**Specialty societies:** society websites listed by specialty in `evidence-base.md`, including cardiology, endocrinology, hematology, and others.
 
-Причина ограничения не в снобизме. Наивный поиск по симптому выносит наверх
-SEO-статьи клиник и агрегаторов: они выглядят авторитетно, не содержат
-уровня доказательности и часто написаны ради продажи услуги. Плохой
-источник вреднее отсутствия источника — он создаёт ложную уверенность.
+The restriction has a practical reason. A naive symptom search often prioritizes clinic and aggregator SEO articles: they look authoritative, omit evidence levels, and are often written to sell a service. A poor source is worse than no source because it creates false confidence.
 
-**Российские источники** допустимы только для нормативных вопросов: ОМС,
-маршрутизация, национальный календарь прививок. С явной пометкой, что это
-локальная норма, а не международная доказательная база.
+**Russian sources** are allowed only for regulatory matters: compulsory medical insurance (OMS), care pathways, and the national vaccination schedule. Explicitly label them as local rules rather than international clinical evidence.
 
 ---
 
-## Блок 3. Что считается подтверждением
+## Block 3. What counts as verification
 
-Найденное подтверждает утверждение, только если выполнено всё:
+A finding supports a claim only if all of the following hold:
 
-1. Страница действительно открылась и прочитана — не «первая ссылка в выдаче»
-2. Домен из белого списка
-3. Утверждение на странице **соответствует** тому, что собирается написать
-   агент, а не просто содержит те же слова
-4. Есть **открываемый URL**, который пользователь может проверить сам
+1. The page was actually opened and read, rather than merely appearing first in search results
+2. Its domain is on the allowlist
+3. The page's statement **matches** the agent's intended claim, rather than merely containing the same words
+4. There is an **accessible URL** the user can check independently
 
-Не найдено подтверждения — так и сказать. «Проверить не удалось» —
-нормальный результат, а не повод оставить утверждение без пометки.
+If no supporting source is found, say so. “Could not verify” is a valid outcome, not a reason to leave a claim unmarked.
 
-### Формат ссылки после проверки
+### Citation format after verification
 
 ```
-[NICE, железодефицитная анемия, руководство NG8, уровень A]
+[NICE, iron-deficiency anemia, guideline NG8, evidence level A]
 https://www.nice.org.uk/guidance/ng8
 ```
 
-Без URL ссылка остаётся в прежнем режиме — орган и тема, без конкретики.
+Without a URL, keep the previous citation format: organization and topic, without specifics.
 
 ---
 
-## Блок 4. Запрет на выдумывание не отменён, а усилен
+## Block 4. The ban on fabrication is strengthened, not removed
 
-Прежнее правило действует полностью: **DOI, автор, название статьи, номер
-страницы не изобретаются никогда.**
+The original rule remains fully in force: **never invent a DOI, author, article title, or page number.**
 
-Теперь к нему добавляется: если приводится конкретика, у неё есть URL,
-который открывали. Конкретика без URL — то же самое выдумывание, только
-теперь у агента нет оправдания отсутствием доступа.
+There is now an additional requirement: specific details must have a URL that was opened. Specifics without a URL are still fabrication; lack of access is no longer an excuse.
 
-Выдуманная ссылка в медицинской системе хуже отсутствия ссылки: читатель
-её не проверяет, а доверие она создаёт.
+A fabricated reference in a medical system is worse than no reference: it creates trust even when the reader does not check it.
 
 ---
 
-## Блок 5. Журнал запросов
+## Block 5. Query log
 
-Каждый запрос записывается в `Cache/research-queries.jsonl`:
+Log every query in `Cache/research-queries.jsonl`:
 
 ```json
 {"ts":"2026-08-06T12:00:00","skill":"consilium","agent":"hematologist",
@@ -144,40 +109,31 @@ https://www.nice.org.uk/guidance/ng8
  "found":true,"url":"https://www.nice.org.uk/guidance/ng8"}
 ```
 
-Журнал нужен, чтобы можно было проверить постфактум, что именно уходило
-наружу. Без него утверждение «данные пациента в поиск не попадают»
-непроверяемо, а значит, ничего не стоит.
+The log allows a later check of exactly what left the device. Without it, the statement “patient data does not enter searches” is unverifiable and therefore meaningless.
 
-Журнал лежит в `Cache/`, закрытом `.gitignore`.
+The log lives in `Cache/`, protected by `.gitignore`.
 
 ---
 
-## Блок 6. Когда в интернет не ходить
+## Block 6. When not to access the internet
 
-- **Первый раунд консилиума.** Слепые заключения должны быть независимыми и
-  воспроизводимыми. Поиск вносит расхождение между запусками и даёт всем
-  специалистам общий источник якорения. Проверять источники — во втором
-  раунде и при синтезе
-- **Неотложная находка.** Критическое значение выводится немедленно.
-  Искать литературу, пока пользователь ждёт сообщения о panic value, — вред
-- **Вопрос не о литературе.** «Какой у меня ферритин» — это чтение файла,
-  а не поиск
-- **Сеть недоступна.** Сказать об этом и продолжить офлайн, пометив
-  утверждения прежним способом. Отсутствие сети не повод остановить разбор
+- **First consilium round.** Blinded opinions must be independent and reproducible. Search introduces differences between runs and gives all specialists a common source of anchoring. Verify sources in round two and during synthesis
+- **Emergency finding.** Display a critical value immediately. Searching the literature while the user waits to learn about a panic value is harmful
+- **The question is not about literature.** “What is my ferritin?” requires reading a file, not searching
+- **Network unavailable.** Say so and continue offline, labeling claims in the previous manner. Lack of network access is not a reason to stop the review
 
 ---
 
-## Блок 7. Антипаттерны
+## Block 7. Antipatterns
 
-Каждый пункт — прямой запрет:
+Every item is explicitly prohibited:
 
-1. Включить в запрос значение показателя пациента, имя, возраст,
-   город, клинику или лабораторию
-2. Искать вне белого списка доменов
-3. Сослаться на страницу, которую не открывали
-4. Привести конкретику — DOI, автора, название — без открываемого URL
-5. Выдать совпадение ключевых слов за подтверждение утверждения
-6. Искать в первом раунде консилиума
-7. Отложить вывод критического значения ради поиска
-8. Не записать запрос в журнал
-9. Промолчать о том, что подтверждение найти не удалось
+1. Including a patient's marker value, name, age, city, clinic, or laboratory in a query
+2. Searching outside the domain allowlist
+3. Citing a page that was not opened
+4. Providing specifics—a DOI, author, or title—without an accessible URL
+5. Treating keyword overlap as verification of a claim
+6. Searching during the first consilium round
+7. Delaying a critical-value alert to search
+8. Failing to log a query
+9. Failing to disclose that verification was unsuccessful

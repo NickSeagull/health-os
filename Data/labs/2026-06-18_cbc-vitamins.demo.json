@@ -2,8 +2,8 @@
   "version": 1,
   "date": "2026-06-18",
   "analysis_date": "2026-06-19",
-  "type": "ОАК + витамины + базовая биохимия",
-  "laboratory": "Демо-лаборатория",
+  "type": "CBC + vitamins + basic chemistry",
+  "laboratory": "Demo Laboratory",
   "order_number": "0000000",
   "pdf_path": null,
   "summary": {
@@ -13,31 +13,31 @@
     "high": 0,
     "critical": 0
   },
-  "notes": "Демо-данные. Синтетический набор для первого запуска дашборда.",
+  "notes": "Demo data. Synthetic dataset for the initial dashboard launch.",
   "panels": [
     {
-      "panel": "Общий анализ крови",
+      "panel": "Complete blood count",
       "markers": [
         {
-          "name": "Гемоглобин",
+          "name": "Hemoglobin",
           "value": 149,
-          "unit": "г/л",
+          "unit": "g/L",
           "reference_min": 132,
           "reference_max": 172,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Эритроциты",
+          "name": "Red blood cells",
           "value": 4.85,
-          "unit": "×10¹²/л",
+          "unit": "×10¹²/L",
           "reference_min": 4.3,
           "reference_max": 5.7,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Гематокрит",
+          "name": "Hematocrit",
           "value": 44.1,
           "unit": "%",
           "reference_min": 39,
@@ -46,102 +46,102 @@
           "flag": null
         },
         {
-          "name": "Лейкоциты",
+          "name": "White blood cells",
           "value": 6.2,
-          "unit": "×10⁹/л",
+          "unit": "×10⁹/L",
           "reference_min": 4.0,
           "reference_max": 9.0,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Тромбоциты",
+          "name": "Platelets",
           "value": 245,
-          "unit": "×10⁹/л",
+          "unit": "×10⁹/L",
           "reference_min": 150,
           "reference_max": 400,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "СОЭ",
+          "name": "ESR",
           "value": 5,
-          "unit": "мм/ч",
+          "unit": "mm/hr",
           "reference_min": 2,
           "reference_max": 15,
           "status": "normal",
           "flag": null
         }
       ],
-      "name": "Общий анализ крови"
+      "name": "Complete blood count"
     },
     {
-      "panel": "Витамины, железо и базовая биохимия",
+      "panel": "Vitamins, iron, and basic chemistry",
       "markers": [
         {
-          "name": "Витамин D (25-OH)",
+          "name": "Vitamin D",
           "value": 24,
-          "unit": "нг/мл",
+          "unit": "ng/mL",
           "reference_min": 30,
           "reference_max": 100,
           "status": "low",
           "flag": null,
-          "note": "Лёгкая недостаточность. До выраженного дефицита (< 20 нг/мл) не доходит"
+          "note": "Mild insufficiency; below the threshold for severe deficiency (< 20 ng/mL)"
         },
         {
-          "name": "Витамин B12",
+          "name": "Vitamin B12",
           "value": 412,
-          "unit": "пг/мл",
+          "unit": "pg/mL",
           "reference_min": 191,
           "reference_max": 663,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Ферритин",
+          "name": "Ferritin",
           "value": 74,
-          "unit": "мкг/л",
+          "unit": "µg/L",
           "reference_min": 30,
           "reference_max": 400,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Глюкоза",
+          "name": "Glucose",
           "value": 5.1,
-          "unit": "ммоль/л",
+          "unit": "mmol/L",
           "reference_min": 4.1,
           "reference_max": 5.9,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "Холестерин общий",
+          "name": "Total cholesterol",
           "value": 4.6,
-          "unit": "ммоль/л",
+          "unit": "mmol/L",
           "reference_min": 3.0,
           "reference_max": 5.2,
           "status": "normal",
           "flag": null
         },
         {
-          "name": "ТТГ",
+          "name": "TSH",
           "value": 1.85,
-          "unit": "мМЕ/л",
+          "unit": "mIU/L",
           "reference_min": 0.4,
           "reference_max": 4.0,
           "status": "normal",
           "flag": null
         }
       ],
-      "name": "Биохимия и витамины"
+      "name": "Chemistry and vitamins"
     }
   ],
   "deviations": [
-    "Витамин D (25-OH) 24 нг/мл при норме 30–100 — лёгкая недостаточность"
+    "Vitamin D (25-OH) 24 ng/mL against a reference interval of 30–100 — mild insufficiency"
   ],
   "recommendations": [
-    "Обсудить с врачом приём витамина D и контроль 25(OH)D через 3 месяца",
-    "Остальные маркеры в референсе — типичные причины усталости по этой панели не подтверждаются"
+    "Discuss vitamin D supplementation with a doctor and repeat 25(OH)D in three months",
+    "The other markers are within range — common causes of fatigue are not supported by this panel"
   ]
 }

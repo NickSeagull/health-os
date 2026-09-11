@@ -1,187 +1,187 @@
-# Отказ от ответственности и условия использования
+# Disclaimer and Terms of Use
 
-**Прочитайте до установки.** Устанавливая, копируя или используя это программное обеспечение, вы подтверждаете, что ознакомились с этим документом и принимаете изложенные в нём условия.
-
----
-
-## 1. Это не медицинское изделие
-
-Программа **не является медицинским изделием** в смысле законодательства какой бы то ни было юрисдикции. Она не проходила регистрацию, сертификацию, клинические испытания и оценку соответствия.
-
-Программа **не предназначена** для:
-
-- диагностики, профилактики, мониторинга, лечения или облегчения заболеваний
-- принятия клинических решений
-- замены консультации врача
-- использования в профессиональной медицинской практике
-- применения в ситуациях, где отказ или ошибка могут привести к вреду здоровью
-
-Это **инструмент управления личными записями** — такой же по правовой природе, как текстовый редактор или таблица, в которой вы ведёте заметки о своём самочувствии.
+**Read before installing.** By installing, copying, or using this software, you acknowledge that you have read this document and accept its terms.
 
 ---
 
-## 2. Это не медицинская рекомендация
+## 1. This is not a medical device
 
-Ничто из того, что выводит программа, не является медицинской рекомендацией, диагнозом или назначением.
+The software **is not a medical device** within the meaning of the laws of any jurisdiction. It has not undergone registration, certification, clinical trials, or conformity assessment.
 
-Программа построена на больших языковых моделях. Такие модели:
+The software **is not intended** for:
 
-- **допускают фактические ошибки** и уверенно излагают неверные утверждения
-- могут пропустить значимое отклонение и придать вес незначимому
-- не имеют доступа к вашему осмотру, анамнезу в полном объёме и клиническому контексту
-- не несут и не могут нести профессиональной ответственности
+- Diagnosing, preventing, monitoring, treating, or alleviating disease
+- Making clinical decisions
+- Replacing a doctor's consultation
+- Use in professional medical practice
+- Situations where a failure or error could harm health
 
-**Любое решение о диагностике, обследовании, приёме или отмене препаратов принимает квалифицированный врач.** Не откладывайте обращение за медицинской помощью и не игнорируйте рекомендации специалиста из-за того, что выдала эта программа.
-
-**При признаках неотложного состояния немедленно обращайтесь в скорую помощь.** Программа не является системой мониторинга и не способна вызвать помощь.
-
----
-
-## 3. Некоммерческий проект
-
-Проект **некоммерческий**. Он распространяется бесплатно по лицензии MIT, разрабатывается на добровольной основе и не связан с оказанием медицинских услуг.
-
-- Авторы не оказывают медицинских услуг и не ведут медицинскую деятельность
-- Проект не собирает плату, не содержит рекламы и не монетизируется
-- Авторы не связаны с производителями лекарств, лабораториями и клиниками, упоминаемыми в коде или документации
-- Упоминание конкретных лабораторий, руководств или организаций носит справочный характер и не является рекомендацией или партнёрством
+It is a **personal record management tool**, legally comparable to a text editor or spreadsheet in which you keep notes about your health.
 
 ---
 
-## 4. Использование на собственный риск
+## 2. This is not medical advice
 
-Программа предоставляется **«как есть» (AS IS)**, без каких-либо гарантий — явных или подразумеваемых, включая гарантии пригодности для конкретной цели, точности, полноты и бесперебойной работы.
+Nothing the software produces constitutes medical advice, a diagnosis, or a prescription.
 
-**Вы используете программу исключительно на собственный риск и под собственную ответственность.**
+The software is built on large language models. These models:
 
-Авторы, участники и правообладатели **не несут ответственности** за любой прямой, косвенный, случайный или последующий ущерб, включая, помимо прочего:
+- **Make factual errors** and confidently present false statements
+- May miss a significant abnormality or give undue weight to an insignificant one
+- Cannot examine you and do not have your complete medical history or clinical context
+- Do not and cannot bear professional responsibility
 
-- вред здоровью, наступивший вследствие действия или бездействия на основании вывода программы
-- ошибочные, неполные или устаревшие выводы
-- утрату, повреждение или разглашение ваших данных
-- последствия некорректной настройки, установки или эксплуатации
-- недоступность или сбой программы и её зависимостей
+**A qualified doctor must make every decision about diagnosis, examinations, and starting or stopping medication.** Do not delay seeking medical care or disregard a specialist's recommendations because of this software's output.
 
-Ответственность ограничена в максимальной степени, допустимой применимым правом.
-
----
-
-## 5. Данные
-
-### Проект не обрабатывает ваши данные
-
-Программа **не имеет серверной части**, не передаёт ваши медицинские записи авторам и не собирает телеметрию. Все файлы остаются на вашем устройстве.
-
-Авторы проекта **не имеют и не могут получить доступ** к вашим данным.
-
-### Вы отвечаете за свои данные
-
-Устанавливая программу и внося в неё сведения о здоровье, **вы становитесь единственным лицом, отвечающим за их обработку и защиту.** На вас лежит ответственность за:
-
-- шифрование диска и физическую безопасность устройства
-- резервное копирование
-- ограничение доступа третьих лиц
-- соблюдение применимого законодательства о персональных данных вашей юрисдикции
-- последствия публикации, шаринга или утечки ваших файлов
-
-Проект даёт технические средства изоляции (локальный git без удалённого репозитория, инвертированный `.gitignore`, привязка дашборда к localhost), но **не может гарантировать сохранность данных**. Ознакомьтесь с `docs/SECURITY.md` до внесения реальных сведений.
-
-### Данные третьих лиц и профили членов семьи
-
-Система поддерживает отдельные профили для нескольких человек: супруга, детей, пожилых родителей. Это делает обработку **чужих** медицинских данных штатной функцией, а не побочным случаем, — и переносит на вас соответствующую ответственность.
-
-**Второй человек условий этого документа не принимал.** Их принимаете вы, устанавливая программу. Соглашаясь за себя, вы не можете согласиться за него.
-
-Прежде чем завести профиль другого человека, учтите:
-
-- **Взрослый должен знать**, что его медицинские данные вносятся в эту систему, хранятся на вашем устройстве и передаются в API языковой модели при каждом обращении. Это его решение, а не ваше
-- **Профиль ребёнка** ведёт законный представитель. Как только ребёнок становится способен решать сам, вопрос возникает заново — и данные, внесённые за годы до этого, никуда не исчезают
-- **Пожилой родственник** мог согласиться формально, не понимая, что именно происходит с данными. Формальное согласие юридически и этически не равно осознанному
-- **Медицинские данные особая категория** почти во всех юрисдикциях, и обработка данных другого человека регулируется строже, чем собственных. Применимые требования зависят от вашей страны
-
-Поле `consent` в профиле — **не юридический документ и ничего не доказывает**. Оно существует затем, чтобы вопрос был задан осознанно, а не пропущен молча. Наличие заполненного поля не создаёт правового основания и не переносит ответственность на авторов проекта.
-
-Ответственность за законность обработки данных других людей — включая получение согласия, соблюдение требований вашей юрисдикции и последствия утечки — **целиком на вас**.
-
-Отдельно: сведения о врачах — фамилии, места работы, содержание консультаций — тоже персональные данные третьих лиц.
-
-### Поисковые запросы
-
-Специалисты могут обращаться к ограниченному списку доменов (Cochrane, PubMed, NICE, USPSTF, WHO и профильные общества), чтобы подтвердить цитируемый источник.
-
-Система устроена так, чтобы данные пациента в поисковые запросы **не попадали**: запрос формулируется как обезличенный вопрос о литературе, показывается вам до отправки и записывается в журнал `Cache/research-queries.jsonl`.
-
-Тем не менее это **дополнительный канал, по которому информация покидает устройство**. Запрос уходит поисковой системе и открываемому сайту, на которые условия этого проекта не распространяются. Ограничение реализовано инструкциями модели и списком доменов — механизм надёжный, но не абсолютный, как и всё поведение языковых моделей.
-
-Если такой канал для вас неприемлем, отключите его: уберите `WebSearch` и `WebFetch` из списка `tools` в файлах `.claude/agents/*.md`. Система продолжит работать, ссылки останутся в режиме «орган и тема, без конкретики».
-
-### Передача в языковую модель
-
-Программа работает поверх Claude Code. **Содержимое ваших файлов передаётся в API поставщика модели** при каждом обращении — иначе система не смогла бы их анализировать.
-
-Это основной канал, по которому данные покидают устройство. Условия обработки определяются поставщиком модели, а не этим проектом. Ознакомьтесь с ними отдельно и решите, приемлемо ли это для вас.
+**If you notice signs of a medical emergency, contact emergency services immediately.** The software is not a monitoring system and cannot call for help.
 
 ---
 
-## 6. Демонстрационные данные синтетические
+## 3. Noncommercial project
 
-Все данные, входящие в поставку, — **вымышленные**. Демо-набор описывает несуществующего человека, значения показателей сгенерированы для иллюстрации и не принадлежат никакому реальному лицу.
+This is a **noncommercial** project. It is distributed free of charge under the MIT license, developed voluntarily, and unrelated to the provision of medical services.
 
-Совпадения с реальными людьми, диагнозами или результатами исследований случайны.
-
-Демонстрационные значения **не являются медицинскими примерами** и не должны использоваться как ориентир для интерпретации собственных показателей.
-
----
-
-## 7. Медицинское содержание
-
-Клинические сведения в коде и документации — пороги, референсные интервалы, ссылки на руководства — приведены **справочно** и могут быть неточными, неполными или устаревшими.
-
-- Референсные интервалы зависят от лаборатории и метода. **Ориентируйтесь на интервалы своего бланка**, а не на значения из программы
-- Ссылки на клинические руководства даны без гарантии актуальности редакции
-- Пороги неотложных состояний приведены как ориентир и **не заменяют клиническую оценку**
-- Медицина меняется; проект может отставать от текущих представлений
+- The authors do not provide medical services or practice medicine
+- The project charges no fees, contains no advertising, and is not monetized
+- The authors are not affiliated with drug manufacturers, laboratories, or clinics mentioned in the code or documentation
+- References to specific laboratories, guidelines, or organizations are informational and do not constitute endorsements or partnerships
 
 ---
 
-## 8. Ограничения по применению
+## 4. Use at your own risk
 
-Программа **не предназначена** для:
+The software is provided **“AS IS”**, without warranties of any kind, express or implied, including fitness for a particular purpose, accuracy, completeness, or uninterrupted operation.
 
-- использования лицами младше 18 лет без участия законного представителя
-- применения медицинскими работниками в профессиональной деятельности
-- ведения записей о пациентах
-- принятия решений в неотложных состояниях
-- любого применения, где сбой может причинить вред
+**You use the software entirely at your own risk and under your own responsibility.**
 
----
+The authors, contributors, and copyright holders **are not liable** for any direct, indirect, incidental, or consequential damage, including but not limited to:
 
-## 9. Изменения
+- Harm to health resulting from action or inaction based on the software's output
+- Incorrect, incomplete, or outdated conclusions
+- Loss, corruption, or disclosure of your data
+- Consequences of incorrect configuration, installation, or operation
+- Unavailability or failure of the software or its dependencies
 
-Условия могут быть изменены в любой момент без индивидуального уведомления. Актуальная редакция — в репозитории. Продолжая использовать программу после изменений, вы принимаете новую редакцию.
-
----
-
-## 10. Если вы не согласны
-
-Если какое-либо из условий для вас неприемлемо — **не устанавливайте и не используйте программу**. Удалите её копии.
+Liability is limited to the maximum extent permitted by applicable law.
 
 ---
 
-## Коротко
+## 5. Data
 
-| Вопрос | Ответ |
-|--------|-------|
-| Это медицинское изделие? | Нет |
-| Это заменяет врача? | Нет |
-| Это коммерческий продукт? | Нет |
-| Есть ли гарантии? | Нет, программа предоставляется «как есть» |
-| Кто отвечает за последствия? | Пользователь |
-| Кто отвечает за сохранность данных? | Пользователь |
-| Авторы видят мои данные? | Нет, серверной части не существует |
-| Данные уходят с устройства? | Да — в API языковой модели при каждом обращении |
-| Демо-данные настоящие? | Нет, полностью вымышленные |
+### The project does not process your data
+
+The software **has no backend service**, does not transmit your medical records to its authors, and does not collect telemetry. All files remain on your device.
+
+The project's authors **do not have and cannot obtain access** to your data.
+
+### You are responsible for your data
+
+By installing the software and entering health information, **you become solely responsible for processing and protecting that information.** Your responsibilities include:
+
+- Disk encryption and physical device security
+- Backups
+- Restricting third-party access
+- Compliance with applicable personal-data laws in your jurisdiction
+- The consequences of publishing, sharing, or leaking your files
+
+The project provides technical isolation measures (local Git without a remote repository, an inverted `.gitignore`, and a dashboard bound to localhost), but **cannot guarantee data security**. Read `docs/SECURITY.md` before entering real information.
+
+### Third-party data and family profiles
+
+The system supports separate profiles for several people: spouses, children, and elderly parents. Processing **other people's** medical data is therefore a standard feature, not an edge case, and brings corresponding responsibilities for you.
+
+**The other person has not accepted this document's terms.** You accept them when installing the software. Accepting for yourself does not mean you can accept on their behalf.
+
+Before creating another person's profile, consider:
+
+- **An adult must know** that their medical data is entered into this system, stored on your device, and transmitted to a language model API with each interaction. That is their decision, not yours
+- **A child's profile** must be maintained by a legal representative. Once the child can decide for themselves, the question must be revisited; data entered years earlier does not disappear
+- **An elderly relative** may formally agree without understanding what happens to the data. Formal agreement is not legally or ethically equivalent to informed consent
+- **Medical data is a special category** in almost every jurisdiction, and processing another person's data is regulated more strictly than processing your own. The applicable requirements depend on your country
+
+The profile's `consent` field **is not a legal document and proves nothing**. Its purpose is to ensure that the question is asked deliberately rather than silently skipped. A completed field does not establish a legal basis or transfer responsibility to the project's authors.
+
+Responsibility for lawfully processing other people's data—including obtaining consent, meeting your jurisdiction's requirements, and handling the consequences of a leak—**rests entirely with you**.
+
+Information about doctors—their names, workplaces, and consultation content—is also third-party personal data.
+
+### Search queries
+
+Specialists may access a limited list of domains (Cochrane, PubMed, NICE, USPSTF, WHO, and specialty societies) to verify cited sources.
+
+The system is designed to **exclude patient data** from search queries: each query is framed as an anonymized literature question, shown to you before submission, and logged in `Cache/research-queries.jsonl`.
+
+Nevertheless, this is **another channel through which information leaves your device**. Queries reach the search engine and visited website, which are not covered by this project's terms. The restriction is implemented through model instructions and a domain list; the mechanism is reliable but not absolute, like all language model behavior.
+
+If this channel is unacceptable to you, disable it by removing `WebSearch` and `WebFetch` from the `tools` lists in `.claude/agents/*.md`. The system will continue working; references will remain at the “organization and topic, without specifics” level.
+
+### Transmission to the language model
+
+The software runs on top of Claude Code. **Your files' contents are transmitted to the model provider's API** with each interaction; otherwise, the system could not analyze them.
+
+This is the main channel through which data leaves your device. The model provider, not this project, determines the processing terms. Read those terms separately and decide whether they are acceptable to you.
 
 ---
 
-⚕️ **При признаках неотложного состояния немедленно обратитесь в скорую помощь.** Эта программа не является системой мониторинга и не способна вызвать помощь.
+## 6. Demonstration data is synthetic
+
+All bundled data is **fictional**. The demo dataset describes a nonexistent person; marker values were generated for illustration and do not belong to any real individual.
+
+Any resemblance to real people, diagnoses, or test results is coincidental.
+
+Demo values **are not clinical examples** and must not be used as a reference for interpreting your own results.
+
+---
+
+## 7. Medical content
+
+Clinical information in the code and documentation—thresholds, reference intervals, and guideline links—is provided **for reference only** and may be inaccurate, incomplete, or outdated.
+
+- Reference intervals depend on the laboratory and method. **Use the intervals on your own report**, not the software's values
+- References to clinical guidelines carry no guarantee that the edition is current
+- Emergency thresholds are indicative and **do not replace clinical assessment**
+- Medicine changes; the project may lag behind current knowledge
+
+---
+
+## 8. Limitations of use
+
+The software **is not intended** for:
+
+- Use by people under 18 without a legal representative's involvement
+- Use by healthcare professionals in their professional practice
+- Maintaining patient records in a clinical practice
+- Making decisions in emergencies
+- Any use where failure could cause harm
+
+---
+
+## 9. Changes
+
+These terms may change at any time without individual notification. The current version is in the repository. Continuing to use the software after changes constitutes acceptance of the new version.
+
+---
+
+## 10. If you disagree
+
+If any term is unacceptable to you, **do not install or use the software**. Delete your copies.
+
+---
+
+## At a glance
+
+| Question | Answer |
+|----------|--------|
+| Is this a medical device? | No |
+| Does it replace a doctor? | No |
+| Is this a commercial product? | No |
+| Are there any warranties? | No; the software is provided “as is” |
+| Who is responsible for the consequences? | The user |
+| Who is responsible for data security? | The user |
+| Can the authors see my data? | No; there is no backend service |
+| Does data leave the device? | Yes, through the language model API with each interaction |
+| Is the demo data real? | No, it is entirely fictional |
+
+---
+
+⚕️ **If you notice signs of a medical emergency, contact emergency services immediately.** This software is not a monitoring system and cannot call for help.

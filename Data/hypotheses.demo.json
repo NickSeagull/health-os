@@ -1,44 +1,44 @@
 {
   "version": 1,
   "updated": "2026-07-05",
-  "context": "Демо-набор. Жалоба на снижение энергии во второй половине дня, начало — зима 2026. Анализы от 2026-06-18 в целом в норме, кроме витамина D.",
-  "primary_complaint": "Снижение энергии во второй половине дня",
+  "context": "Demo dataset. Reduced energy in the afternoon began in winter 2026. Tests from 2026-06-18 are generally within range except for vitamin D.",
+  "primary_complaint": "Reduced energy in the afternoon",
   "hypotheses": [
     {
       "id": "H1",
-      "title": "Недостаточность витамина D → снижение энергии в тёмный сезон",
+      "title": "Vitamin D insufficiency → reduced energy in the dark season",
       "status": "moderate",
       "confidence": "medium",
       "evidence_for": [
-        "Витамин D 24 нг/мл при норме 30–100 (анализ 2026-06-18)",
-        "Начало жалоб зимой, к лету стало заметно легче",
-        "Утренний дневной свет — около 15 минут в день"
+        "Vitamin D 24 ng/mL against a reference interval of 30–100 (test 2026-06-18)",
+        "Symptoms began in winter and became noticeably milder by summer",
+        "Morning daylight — about 15 minutes per day"
       ],
       "evidence_against": [
-        "Отклонение лёгкое, до выраженного дефицита далеко",
-        "ОАК, ферритин, B12 и ТТГ в норме — типичные причины усталости не подтверждены"
+        "The abnormality is mild and far from severe deficiency",
+        "CBC, ferritin, B12, and TSH are within range — common causes of fatigue are not supported"
       ],
       "next_steps": [
-        "Контроль 25(OH)D через 3 месяца на фоне приёма",
-        "Добавить 20–30 минут дневного света утром, оценить динамику по mood-журналу"
+        "Repeat 25(OH)D in three months while taking the supplement",
+        "Add 20–30 minutes of morning daylight and assess the trend in the well-being journal"
       ],
       "related_kr": ["KR5.0"]
     },
     {
       "id": "H2",
-      "title": "Нерегулярный режим сна → дневная сонливость",
+      "title": "Irregular sleep schedule → daytime sleepiness",
       "status": "weak",
       "confidence": "low",
       "evidence_for": [
-        "Разброс времени отбоя между буднями и выходными около 1 ч 15 мин",
-        "Экранное время 9 часов в день, отбой после экрана"
+        "Bedtime varies by about 1 hour 15 minutes between weekdays and weekends",
+        "Nine hours of screen time per day; bedtime follows screen use"
       ],
       "evidence_against": [
-        "Длительность сна 7.5 часа — в пределах нормы",
-        "Оценка качества сна в журнале 6–8 из 10"
+        "Sleep duration is 7.5 hours — within the normal range",
+        "Sleep quality is rated 6–8 out of 10 in the journal"
       ],
       "next_steps": [
-        "Две недели фиксировать фактический отбой, сопоставить с энергией по журналу"
+        "Record actual bedtimes for two weeks and compare them with energy in the journal"
       ],
       "related_kr": ["KR5.0"]
     }

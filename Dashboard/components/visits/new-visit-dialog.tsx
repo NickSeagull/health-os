@@ -28,11 +28,11 @@ import { toast } from "sonner";
 import { mutate } from "swr";
 
 const schema = z.object({
-  date: z.string().min(1, "Укажите дату"),
-  specialty: z.string().min(1, "Укажите специальность"),
+  date: z.string().min(1, "Enter a date"),
+  specialty: z.string().min(1, "Enter a specialty"),
   doctor: z.string().optional(),
   clinic: z.string().optional(),
-  brief: z.string().min(1, "Краткое описание"),
+  brief: z.string().min(1, "Enter a brief description"),
   content: z.string().optional(),
 });
 
@@ -61,12 +61,12 @@ export function NewVisitDialog() {
         body: JSON.stringify({ ...data, format }),
       });
       if (!res.ok) throw new Error("Create failed");
-      toast.success("Визит создан");
+      toast.success("Visit created");
       mutate("/api/visits");
       reset();
       setOpen(false);
     } catch {
-      toast.error("Ошибка создания визита");
+      toast.error("Could not create visit");
     }
   }
 
@@ -75,17 +75,17 @@ export function NewVisitDialog() {
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Новый визит
+          New visit
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Новый визит</DialogTitle>
-          <DialogDescription>Создать запись о визите к врачу</DialogDescription>
+          <DialogTitle>New visit</DialogTitle>
+          <DialogDescription>Create a doctor visit record</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label>Формат</Label>
+            <Label>Format</Label>
             <Select
               value={format}
               onValueChange={(v) => setFormat(v as "md" | "json")}
@@ -94,14 +94,14 @@ export function NewVisitDialog() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="md">Markdown (свободная форма)</SelectItem>
-                <SelectItem value="json">JSON (структурированный)</SelectItem>
+                <SelectItem value="md">Markdown (free form)</SelectItem>
+                <SelectItem value="json">JSON (structured)</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <Label>Дата</Label>
+              <Label>Date</Label>
               <Input type="date" {...register("date")} />
               {errors.date && (
                 <p className="text-xs text-destructive mt-1">
@@ -110,10 +110,10 @@ export function NewVisitDialog() {
               )}
             </div>
             <div>
-              <Label>Специальность</Label>
+              <Label>Specialty</Label>
               <Input
                 {...register("specialty")}
-                placeholder="кардиология"
+                placeholder="cardiology"
               />
               {errors.specialty && (
                 <p className="text-xs text-destructive mt-1">
@@ -122,19 +122,19 @@ export function NewVisitDialog() {
               )}
             </div>
             <div>
-              <Label>Врач</Label>
-              <Input {...register("doctor")} placeholder="ФИО врача" />
+              <Label>Doctor</Label>
+              <Input {...register("doctor")} placeholder="Doctor's name" />
             </div>
             <div>
-              <Label>Клиника</Label>
-              <Input {...register("clinic")} placeholder="Название клиники" />
+              <Label>Clinic</Label>
+              <Input {...register("clinic")} placeholder="Clinic name" />
             </div>
           </div>
           <div>
-            <Label>Краткое описание</Label>
+            <Label>Brief description</Label>
             <Input
               {...register("brief")}
-              placeholder="Первичный приём, жалобы на..."
+              placeholder="Initial visit, complaints of..."
             />
             {errors.brief && (
               <p className="text-xs text-destructive mt-1">
@@ -144,16 +144,16 @@ export function NewVisitDialog() {
           </div>
           {format === "md" && (
             <div>
-              <Label>Содержание (Markdown)</Label>
+            <Label>Content (Markdown)</Label>
               <Textarea
                 {...register("content")}
                 rows={8}
-                placeholder={`# Визит к врачу\n\n- **Дата:** ${new Date().toISOString().slice(0, 10)}\n- **Врач:** \n- **Клиника:** \n\n## Жалобы\n\n## Осмотр\n\n## Диагноз\n\n## Рекомендации`}
+                placeholder={`# Doctor visit\n\n- **Date:** ${new Date().toISOString().slice(0, 10)}\n- **Doctor:** \n- **Clinic:** \n\n## Complaints\n\n## Examination\n\n## Diagnosis\n\n## Recommendations`}
               />
             </div>
           )}
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Создание..." : "Создать визит"}
+            {isSubmitting ? "Creating..." : "Create visit"}
           </Button>
         </form>
       </DialogContent>

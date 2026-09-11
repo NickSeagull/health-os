@@ -1,12 +1,12 @@
 import type { LabMarker, LabSummaryCounts } from "@/lib/types/lab";
 
 /**
- * Общие правила записи анализов — Блок 1 `data-schemas.md`.
- * Вынесено из роутов, чтобы POST (новый файл) и PUT (правка) считали
- * счётчики и флаги одинаково.
+ * Shared rules for writing laboratory results — Block 1 of `data-schemas.md`.
+ * Kept outside the routes so POST (new file) and PUT (edit) calculate
+ * counts and flags identically.
  */
 
-/** Enum статуса маркера. Иных значений не вводить */
+/** Marker-status enum. Do not introduce other values. */
 export const MARKER_STATUSES = [
   "normal",
   "low",
@@ -17,7 +17,7 @@ export const MARKER_STATUSES = [
   "deviation",
 ] as const;
 
-/** `summary` в v2 — объект счётчиков, а не связный текст */
+/** In v2, `summary` is a counter object rather than prose. */
 export function countMarkerStatuses(markers: LabMarker[]): LabSummaryCounts {
   return {
     total: markers.length,
@@ -29,8 +29,8 @@ export function countMarkerStatuses(markers: LabMarker[]): LabSummaryCounts {
 }
 
 /**
- * Флаги индекса — строки вида «Маркер status», только по отклонениям (Блок 2).
- * Роут писал «Маркер (status)» в скобках, расходясь со всеми 60 записями индекса.
+ * Index flags are strings of the form "Marker status", only for deviations (Block 2).
+ * The route used "Marker (status)", which differed from all 60 index records.
  */
 export function markerFlags(markers: LabMarker[]): string[] {
   return markers

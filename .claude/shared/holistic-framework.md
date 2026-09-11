@@ -1,223 +1,223 @@
-# Холистическая рамка анализа
+# Holistic Analysis Framework
 
-> Обязательный документ для всех AI-специалистов Health-OS. Читается перед началом любого анализа.
-
----
-
-## Зачем этот документ
-
-Медицинская специализация разрезает единый организм на зоны ответственности. Это удобно для врача и создаёт для пациента слепые зоны: когда причина симптома лежит вне органа, где симптом проявился, её некому увидеть.
-
-Чаще всего причина всё-таки там, где болит: зубная боль — от кариеса, изжога — от рефлюкса, боль при переломе — в месте перелома. Документ не отменяет этого и не требует искать экзотику вместо очевидного. Он запрещает **останавливаться** на границе специальности, когда очевидное объяснение не покрывает картину.
-
-Этот документ задаёт единый способ рассуждения, обязательный для каждого специалиста. Он не отменяет твою специальность — он запрещает останавливаться на её границе.
-
-**Методологическая основа:** биопсихосоциальная модель (Engel, 1977), концепция аллостатической нагрузки (McEwen), парадигма экспосома (Wild, 2005), социальные детерминанты здоровья (WHO). Это доказательные рамки системной медицины, а не альтернативная медицина. Холистичность здесь означает системность мышления, а не отказ от научного метода.
+> A mandatory document for all Health-OS AI specialists. Read before starting any analysis.
 
 ---
 
-## Блок 1. Базовый принцип
+## Why this document
 
-Организм — единая саморегулирующаяся система. Из этого следуют четыре правила:
+Medical specialization cuts a single organism into areas of responsibility. This is convenient for the doctor and creates blind spots for the patient: when the cause of the symptom lies outside the organ where the symptom appeared, there is no one to see it.
 
-1. **Маркер — это не диагноз, а сигнал системы.** Отклонение показателя говорит, что система на что-то отвечает. Задача — понять, на что.
-2. **Симптом ≠ место поломки.** Тахикардия проявляется в сердце, но причина может быть в носовой перегородке, надпочечниках, шейном отделе или в кофеине.
-3. **Норма показателя не означает отсутствие проблемы.** Компенсированное состояние выглядит нормальным ценой перегрузки другой системы. Ищи цену компенсации.
-4. **Связанные «мелкие» отклонения могут значить больше одного крупного** — но только когда они связаны механизмом, а не просто встретились в одном бланке.
+Most often, the cause is still where it hurts: toothache - from caries, heartburn - from reflux, pain during a fracture - at the site of the fracture. The document does not cancel this and does not require looking for the exotic instead of the obvious. It forbids **staying** at the boundary of a specialty when the obvious explanation does not cover the picture.
 
-   Здесь легко ошибиться в базовой частоте. Референсный интервал по определению охватывает центральные 95 % здоровой популяции: каждый пятый-двадцатый показатель выходит за границы **у здорового человека**. На панели из сорока маркеров в среднем два значения окажутся вне интервала, а вероятность хотя бы одного — около 87 %. Пограничных значений ещё больше.
+This document sets a unified reasoning framework, mandatory for every specialist. It does not replace your specialty; it forbids you from stopping at its boundary.
 
-   Поэтому «пять пограничных маркеров» сами по себе — **ожидаемый результат широкой панели**, а не признак системного процесса. Основанием для гипотезы общего механизма служит не количество отклонений, а то, что они лежат на **одной физиологической оси** и направлены согласованно. Если такой оси не находится — это разрозненные находки, и так их и следует назвать.
+**Methodological basis:** biopsychosocial model (Engel, 1977), allostatic load concept (McEwen), exposome paradigm (Wild, 2005), social determinants of health (WHO). This is an evidence-based systemic medicine framework, not alternative medicine. A holistic approach here means systematic thinking, not a rejection of the scientific method.
 
 ---
 
-## Блок 2. Каузальная лестница — пять уровней анализа
+## Block 1. Basic principle
 
-Каждая значимая находка проходит все пять уровней. Остановка на уровне 2 — незавершённый анализ.
+The body is a single self-regulating system. Four rules follow from this:
 
-| Уровень | Вопрос | Пример |
+1. **A marker is not a diagnosis, but a signal from the system.** A deviation in the indicator indicates that the system is responding to something. The task is to understand why.
+2. **Symptom ≠ location of breakdown.** Tachycardia occurs in the heart, but the cause may be in the nasal septum, adrenal glands, cervical spine or caffeine.
+3. **A normal indicator does not mean the absence of a problem.** A compensated state appears normal at the cost of overloading another system. Look for the price of compensation.
+4. **Connected “small” deviations can mean more than one major** - but only when they are connected by a mechanism, and not just found in one form.
+
+   It's easy to get the base frequency wrong here. The reference interval, by definition, covers the central 95% of a healthy population: every fifth to twentieth indicator goes beyond the limits **in a healthy person**. On a panel of forty markers, on average two values ​​will be outside the interval, and the probability of at least one is about 87%. There are even more borderline values.
+
+Therefore, the “five boundary markers” themselves are an **expected result of a broad panel**, and not a sign of a systemic process. The basis for the hypothesis of a general mechanism is not the number of deviations, but the fact that they lie on the **same physiological axis** and are directed in a consistent manner. If such an axis is not found, these are scattered finds, and that is what they should be called.
+
+---
+
+## Block 2. Causal ladder - five levels of analysis
+
+Each significant find goes through all five levels. Stop at level 2 - incomplete analysis.
+
+| Level | Question | Example |
 |---------|--------|--------|
-| **L1. Сигнал** | Что мы наблюдаем? | Стойкая тахикардия в покое |
-| **L2. Орган/система** | Где проявляется? | Сердце, синусовый узел |
-| **L3. Регуляция** | Какая управляющая система за это отвечает? | Симпатическая ВНС, катехоламины |
-| **L4. Первопричина** | Почему эта регуляция сбита? | Ночная гипоксия из-за нарушенного носового дыхания → хроническая симпатическая активация |
-| **L5. Контекст** | Что поддерживает это состояние сейчас? | Никотин, кофеин, гиподинамия, дефицит калорий, хронический стресс |
+| **L1. Signal** | What are we observing? | Persistent tachycardia at rest |
+| **L2. Organ/system** | Where does it appear? | Heart, sinus node |
+| **L3. Regulation** | What control system is responsible for this? | Sympathetic ANS, catecholamines |
+| **L4. Root cause** | Why is this regulation disrupted? | Nocturnal hypoxia due to impaired nasal breathing → chronic sympathetic activation |
+| **L5. Context** | What is maintaining this state now? | Nicotine, caffeine, physical inactivity, calorie deficit, chronic stress |
 
-> Пример условный и приведён для иллюстрации метода. Фактов о конкретном пациенте в этом документе нет — они берутся только из `Data/`.
+> The example is conditional and is given to illustrate the method. There are no facts about a specific patient in this document - they are taken only from `Data/`.
 
-**Правило:** в заключении обязана быть указана гипотеза уровня L4 и вклад уровня L5. Если данных для L4 не хватает — так и напиши: «L4 не определён, требуется [исследование]».
+**Rule:** the conclusion must indicate the L4 level hypothesis and the L5 level contribution. If there is not enough data for L4, then write: “L4 is not determined, [research] is required.”
 
 ---
 
-## Блок 3. Сквозные физиологические оси
+## Block 3. Through physiological axes
 
-Оси проходят через несколько специальностей. Для каждой значимой находки определи, какие оси затронуты, и проверь остальные проявления этой оси в данных.
+The axes pass through several specialties. For each significant finding, determine which axis is affected and examine the remaining manifestations of that axis in the data.
 
-| Ось | Сигналы и маркеры | Пересекает специальности |
+| Axis | Signals and markers | Crosses Specialties |
 |-----|-------------------|--------------------------|
-| **Вегетативная нервная система** | ЧСС, HRV, АД, потливость, ЖКТ-моторика, терморегуляция | кардио, невро, гастро, психиатрия |
-| **Ось ГГН (стресс)** | АКТГ, кортизол, ДГЭА, суточный ритм, толерантность к нагрузке | эндокрино, психиатрия, гемато |
-| **Тиреоидная ось** | ТТГ, Т3, Т4, анти-ТПО, температура, вес, энергия | эндокрино, кардио, психиатрия, дерма |
-| **Системное воспаление** | CRP, СОЭ, ферритин, лейкоформула, фибриноген | все специальности |
-| **Аутоиммунитет** | Аутоантитела, лимфоцитоз, семейный анамнез | эндокрино, гемато, дерма, гастро |
-| **Ось кишечник–мозг** | Микробиом, барьерная функция, ГЭРБ, вздутие, настроение | гастро, психиатрия, невро, дерма |
-| **Энергетический метаболизм** | Глюкоза, инсулин, HOMA-IR, лактат, B12, железо, карнитин | эндокрино, гемато, психиатрия |
-| **Циркадные ритмы** | Время сна, регулярность, свет, мелатонин, кортизол утром | психиатрия, эндокрино, невро |
-| **Оксигенация и дыхание** | Hb, Ht, SpO₂, носовое дыхание, апноэ, эритропоэз | ЛОР, гемато, кардио, невро |
-| **Нутриентный статус** | D, B12, фолат, железо/ферритин, магний, цинк, селен | все специальности |
-| **Биомеханика и соединительная ткань** | Осанка, сколиоз, шейный отдел, стопы, гипермобильность | ортопед, невро, ЛОР |
-| **Барьеры и элиминация** | Печень (АЛТ/АСТ/ГГТ), почки (СКФ, креатинин), кожа, слизистые | гастро, уро, дерма |
-| **Половые гормоны** | Тестостерон, эстрадиол, пролактин, ГСПГ | эндокрино, уро, психиатрия, дерма |
+| **Autonomic Nervous System** | Heart rate, HRV, blood pressure, sweating, gastrointestinal motility, thermoregulation | cardio, neuro, gastro, psychiatry |
+| **HPA axis (stress)** | ACTH, cortisol, DHEA, circadian rhythm, exercise tolerance | endocrine, psychiatry, hemato |
+| **Thyroid axis** | TSH, T3, T4, anti-TPO, temperature, weight, energy | endocrine, cardio, psychiatry, derma |
+| **Systemic inflammation** | CRP, ESR, ferritin, leukocyte differential, fibrinogen | all specialties |
+| **Autoimmunity** | Autoantibodies, lymphocytosis, family history | endocrine, hemato, dermatology, gastro |
+| **Gut-Brain Axis** | Microbiome, barrier function, GERD, bloating, mood | gastro, psychiatry, neuro, derma |
+| **Energy Metabolism** | Glucose, insulin, HOMA-IR, lactate, B12, iron, carnitine | endocrine, hemato, psychiatry |
+| **Circadian rhythms** | Sleep time, regularity, light, melatonin, morning cortisol | psychiatry, endocrine, neuro |
+| **Oxygenation and respiration** | Hb, Ht, SpO₂, nasal breathing, apnea, erythropoiesis | ENT, hemato, cardio, neuro |
+| **Nutrient Status** | D, B12, folate, iron/ferritin, magnesium, zinc, selenium | all specialties |
+| **Biomechanics and connective tissue** | Posture, scoliosis, cervical spine, feet, hypermobility | orthopedist, neurologist, ENT |
+| **Barriers and Elimination** | Liver (ALT/AST/GGT), kidneys (GFR, creatinine), skin, mucous membranes | gastro, uro, derma |
+| **Sex hormones** | Testosterone, estradiol, prolactin, SHBG | endocrine, uro, psychiatry, derma |
 
-**Правило пересечения:** если находка затрагивает ось, проверь как минимум ещё одно её проявление в данных пациента. Изолированное отклонение и отклонение в составе оси — это разные по значимости вещи.
+**Intersection Rule:** If a finding involves an axis, check for at least one other occurrence of it in the patient's data. Isolated deviation and deviation as part of an axis are things of different importance.
 
 ---
 
-## Блок 4. Матрица контекста жизни
+## Block 4. Life context matrix
 
-Обязательна к учёту. Игнорирование этого блока — главная причина ложных выводов, потому что модифицируемые бытовые факторы часто объясняют больше, чем патология.
+Required to be registered. Ignoring this block is the main reason for false conclusions, because modifiable household factors often explain more than pathology.
 
-| Домен | Что смотреть | Почему это меняет интерпретацию |
+| Domain | What to watch | Why does this change interpretation |
 |-------|--------------|--------------------------------|
-| **География и климат** | Широта, инсоляция, сезон, температура, влажность, отопительный сезон | Широта >50° = дефицит витамина D с октября по март независимо от питания. Сухой воздух зимой — слизистые, кожа, нос |
-| **Экология** | Качество воздуха, PM2.5, вода, шум | Городской воздух — фактор системного воспаления и респираторных симптомов |
-| **Жильё** | Влажность, плесень, аллергены, освещённость, шум ночью | Аллергические и респираторные проявления, качество сна |
-| **Работа** | Сидячая/подвижная, экранное время, когнитивная нагрузка, график, дедлайны | Сидячая работа — биомеханика, метаболизм, венозный отток. Экран вечером — циркадные ритмы |
-| **Питание** | Калораж, фаза (дефицит/профицит), белок, клетчатка, микронутриенты, время приёмов, вес и его динамика | Дефицит калорий сам по себе даёт усталость, снижение Т3, рост кортизола, снижение тестостерона. Циклирование веса — метаболический стресс |
-| **Сон** | Длительность, время отхода, регулярность, качество, WHOOP-метрики | Нерегулярность вреднее короткой длительности. Норма по часам не означает норму по качеству |
-| **Движение** | Тип, частота, объём, интенсивность, восстановление | Как недостаток, так и избыток без восстановления дают одинаковую усталость. Проверь баланс нагрузки и recovery |
-| **Вещества** | Кофеин, алкоголь, никотин, кальян, лекарства, БАДы | Кальян — CO, никотин, тахикардия. Кофеин — тахикардия, тревога, качество сна. Проверять ВСЕГДА перед поиском патологии |
-| **Стресс и соцсреда** | Отношения, поддержка, одиночество, финансы, статус | Хронический психосоциальный стресс — доказанный вход в ось ГГН и системное воспаление |
-| **Свет и циркадный контекст** | Утренний свет, вечерние экраны, время бодрствования | Определяет всю гормональную суточную архитектуру |
+| **Geography and climate** | Latitude, insolation, season, temperature, humidity, heating season | Latitude >50° = vitamin D deficiency from October to March, regardless of diet. Dry air in winter - mucous membranes, skin, nose |
+| **Ecology** | Air quality, PM2.5, water, noise | Urban air is a factor of systemic inflammation and respiratory symptoms |
+| **Housing** | Humidity, mold, allergens, lighting, noise at night | Allergic and respiratory manifestations, sleep quality |
+| **Work** | Sedentary/mobile, screen time, cognitive load, schedule, deadlines | Sedentary work - biomechanics, metabolism, venous outflow. Screen use in the evening - circadian rhythms |
+| **Nutrition** | Calorie intake, phase (deficit/surplus), protein, fiber, micronutrients, meal times, weight and its dynamics | A calorie deficit in itself causes fatigue, a decrease in T3, an increase in cortisol, and a decrease in testosterone. Weight cycling - metabolic stress |
+| **Sleep** | Duration, bedtime, regularity, quality, WHOOP metrics | Irregularity is more harmful than short duration. Hourly standards do not mean quality standards |
+| **Physical activity** | Type, frequency, volume, intensity, recovery | Both deficiency and excess without restoration give the same fatigue. Check load balance and recovery |
+| **Substances** | Caffeine, alcohol, nicotine, hookah, medications, dietary supplements | Hookah - CO, nicotine, tachycardia. Caffeine - tachycardia, anxiety, sleep quality. ALWAYS check before searching for pathology |
+| **Stress and social environment** | Relationships, support, loneliness, finances, status | Chronic psychosocial stress - proven input into the HPA axis and systemic inflammation |
+| **Light and Circadian Context** | Morning light, evening screens, waking time | Determines the entire hormonal circadian architecture |
 
-**Правило приоритета:** если модифицируемый бытовой фактор способен объяснить находку, он обязан быть назван раньше, чем редкая патология. Это не значит, что патологию можно не искать — это значит, что порядок изложения отражает вероятность.
-
----
-
-## Блок 5. Хронологический якорь
-
-У каждого хронического состояния есть точка старта. Найди её и спроси, что происходило в этот период.
-
-Обязательные вопросы:
-- Когда симптом появился впервые? Что изменилось в жизни в этот момент?
-- Что предшествовало: инфекция, травма, стресс, переезд, смена режима, пубертат, начало учёбы или работы?
-- Как менялась выраженность? Что её усиливает и что ослабляет?
-- Совпадают ли по времени старты разных симптомов? Совпадение по времени — повод проверить общую причину, а не доказательство её наличия.
-
-**Правило:** совпадение стартов по времени **порождает** гипотезу общей причины, но не устанавливает её.
-
-Проверь гипотезу, а не принимай по умолчанию: есть ли механизм, связывающий эти состояния, или совпало только время. В одном месяце у человека начинается многое — смена сезона, работы, режима, случайная инфекция. Хронологический якорь ценен тем, что показывает, **где искать**, а не тем, что отвечает.
-
-Обратная формулировка — «считать единым процессом, пока не доказано обратное» — перекладывает бремя доказательства на опровержение и приводит к тому, что независимые события сшиваются в несуществующую историю.
+**Priority rule:** if a modifiable household factor can explain the finding, it must be named before the rare pathology. This does not mean that pathology cannot be looked for - it means that the order of presentation reflects probability.
 
 ---
 
-## Блок 6. Правила рассуждения
+## Block 5. Chronological anchor
 
-1. **Правило трёх «почему».** Для каждой ключевой находки задай «почему» минимум трижды, пока не дойдёшь до уровня, на который можно повлиять.
-2. **Минимум две конкурирующие гипотезы.** Одна гипотеза — это не анализ, а догадка. Всегда формулируй альтернативу и укажи, что их различает.
-3. **Критерий опровержения.** Для каждой гипотезы назови, какой результат её опровергнет. Гипотеза, которую нельзя опровергнуть, бесполезна.
-4. **Разделяй корреляцию и причинность.** Совпадение по времени — основание для проверки, а не доказательство.
-5. **Отсутствие данных — это находка.** Прямо называй, чего не хватает, и что именно это не позволяет исключить.
-6. **Проверь ятрогенный вклад.** Лекарства и БАДы пациента могут быть причиной находки. Проверяй это до поиска новой патологии.
-7. **Проверь достоверность источника.** В данных есть заведомо недостоверные исследования — они помечены. Не строй выводы на них.
-8. **Не подгоняй под существующие гипотезы.** Прочитай `hypotheses.json`, но если данные противоречат гипотезе — скажи об этом прямо. Опровержение гипотезы так же ценно, как подтверждение.
+Every chronic condition has a starting point. Find her and ask her what happened during this period.
 
----
+Mandatory questions:
+- When did the symptom first appear? What changed in your life at this moment?
+- What preceded it: infection, injury, stress, moving, change of regime, puberty, starting school or work?
+- How did the severity change? What strengthens it and what weakens it?
+- Do the onsets of different symptoms coincide in time? A coincidence in time is a reason to check the common cause, and not proof of its presence.
 
-## Блок 7. Терапевтический порядок
+**Rule:** coincidence of starts in time **gives** the hypothesis of a common cause, but does not establish it.
 
-Рекомендации выстраиваются по возрастанию инвазивности. Это порядок изложения, а не запрет на медикаменты.
+Test the hypothesis, and do not accept by default: is there a mechanism connecting these states, or is it just a coincidence of time. A person experiences a lot in one month—a change of season, work, routine, an occasional infection. A chronological anchor is valuable because it shows **where to look**, not because it answers.
 
-1. **Устранить причину и триггер** — то, что поддерживает состояние прямо сейчас (вещества, режим, нагрузка, среда)
-2. **Восстановить базу** — сон, питание, движение, свет, стресс
-3. **Восполнить дефициты** — доказанные лабораторно, с контролем
-4. **Медикаментозная терапия** — по показаниям, только через реального врача
-5. **Инвазивные вмешательства** — операции, процедуры
-
-**Важно:** при критических находках этот порядок не применяется — срочное направление к врачу всегда идёт первым пунктом.
+The opposite formulation - “consider it a single process until proven otherwise” - shifts the burden of proof to refutation and leads to the fact that independent events are stitched into a non-existent story.
 
 ---
 
-## Блок 8. Обязательные источники данных
+## Block 6. Reasoning rules
 
-Прочитать перед анализом. Файлы, помеченные как обязательные, читаются всегда, даже если кажутся нерелевантными твоей специальности.
+1. **Rule of Three Whys** For each key finding, ask whys at least three times until you reach a level that you can influence.
+2. **At least two competing hypotheses.** One hypothesis is not an analysis, but a guess. Always state the alternative and indicate what differentiates them.
+3. **Refutation criterion.** For each hypothesis, name what result will refute it. A hypothesis that cannot be refuted is useless.
+4. **Differentiate between correlation and causation.** Time coincidence is a basis for verification, not proof.
+5. **Missing data is a godsend.** State directly what is missing and what exactly it cannot exclude.
+6. **Check for iatrogenic contribution.** The patient's medications and dietary supplements may be the cause of the finding. Check this before looking for a new pathology.
+7. **Check the credibility of the source.** There are obviously unreliable studies in the data - they are flagged. Don't draw conclusions from them.
+8. **Do not fit existing hypotheses.** Read `hypotheses.json`, but if the data contradicts the hypothesis, say so directly. Refuting a hypothesis is just as valuable as confirming it.
 
-| Файл | Обязателен | Что оттуда брать |
+---
+
+## Block 7. Therapeutic order
+
+Recommendations are arranged in order of increasing invasiveness. This is an order of presentation, not a ban on medications.
+
+1. **Eliminate the cause and trigger** - what supports the state right now (substances, regime, load, environment)
+2. **Restore the base** - sleep, nutrition, movement, light, stress
+3. **Replenish deficiencies** - laboratory proven, with control
+4. **Drug therapy** - according to indications, only through a real doctor
+5. **Invasive interventions** - operations, procedures
+
+**Important:** For critical findings, this procedure does not apply - urgent referral to a doctor is always the first step.
+
+---
+
+## Block 8. Mandatory data sources
+
+Read before analysis. Files marked as required are always read, even if they seem irrelevant to your specialty.
+
+| File | Required | What to take from there |
 |------|-----------|------------------|
-| `Data/profile.json` | да | Хронические, аллергии, семейный анамнез, **блок `lifestyle`** |
-| `Data/context/environment.json` | да | География, климат, жильё, работа, стресс, соцсреда |
-| `Data/hypotheses.json` | да | Текущие гипотезы о первопричинах, их доказательная база |
-| `Data/specialists/cross-specialty-map.json` | да | Известные перекрёстные паттерны |
-| `Data/labs/_index.json` | да | Индекс анализов, отбор релевантных |
-| `Data/medications/current.json` | да | Ятрогенный вклад, взаимодействия |
-| `Data/history.json` | да | Хронологический якорь, операции, госпитализации |
-| `Data/body-metrics.csv` | по релевантности | Вес и его динамика, АД, состав тела |
-| `Data/mental/journal.jsonl` | по релевантности | Настроение, стресс, корреляции |
-| `Cache/` (WHOOP) | по релевантности | Сон, recovery, HRV, strain |
-| `Data/doctors/visits/*` | да | Инструментальные исследования по твоей теме |
+| `Data/profile.json` | yes | Chronic, allergies, family history, **block `lifestyle`** |
+| `Data/context/environment.json` | yes | Geography, climate, housing, work, stress, social environment |
+| `Data/hypotheses.json` | yes | Current hypotheses about root causes, their evidence base |
+| `Data/specialists/cross-specialty-map.json` | yes | Known Cross Patterns |
+| `Data/labs/_index.json` | yes | Index of analyses, selection of relevant ones |
+| `Data/medications/current.json` | yes | Iatrogenic contribution, interactions |
+| `Data/history.json` | yes | Chronological anchor, operations, hospitalizations |
+| `Data/body-metrics.csv` | by relevance | Weight and its dynamics, blood pressure, body composition |
+| `Data/mental/journal.jsonl` | by relevance | Mood, stress, correlations |
+| `Cache/` (WHOOP) | by relevance | Sleep, recovery, HRV, strain |
+| `Data/doctors/visits/*` | yes | Instrumental research on your topic |
 
 ---
 
-## Блок 9. Обязательные секции в заключении
+## Block 9. Mandatory sections in the conclusion
 
-Добавляются в каждое заключение специалиста, помимо его собственного формата.
+They are added to each specialist’s report, in addition to its own format.
 
 ```markdown
-### Системная картина
-- Затронутые оси: [из Блока 3]
-- Связь находок между собой: [как отдельные отклонения складываются в один процесс]
-- Что это объясняет за пределами моей специальности: [...]
+### System picture
+- Affected axes: [from Block 3]
+- Relationship between finds: [how individual deviations add up to one process]
+- What does this explain outside of my specialty: [...]
 
-### Гипотеза первопричины
-- **Ближайшая причина (L3):** [...]
-- **Глубинная причина (L4):** [...]
-- **Конкурирующее объяснение:** [...]
-- **Что различит гипотезы:** [конкретное исследование или наблюдение]
-- **Что опровергнет основную гипотезу:** [...]
+### Root Cause Hypothesis
+- **Proximal cause (L3):** [...]
+- **Root cause (L4):** [...]
+- **Competing explanation:** [...]
+- **What differentiates hypotheses:** [specific study or observation]
+- **What will refute the main hypothesis:** [...]
 
-### Вклад образа жизни и среды
-| Фактор | Текущее значение | Влияние на находки | Модифицируем |
+### Contribution of lifestyle and environment
+| Factor | Current value | Impact on findings | Modify |
 |--------|------------------|--------------------|--------------|
-| [...]  | [...]            | [...]              | да / нет / частично |
+| [...] | [...] | [...] | yes / no / partially |
 
-### Хронология
-- Точка старта: [когда и что совпало]
-- Совпадающие по времени состояния: [...]
+### Timeline
+- Starting point: [when and what coincided]
+- Coinciding states: [...]
 ```
 
 ---
 
-## Блок 10. Антипаттерны
+## Block 10. Antipatterns
 
-Прямые запреты. Наличие любого из них в заключении означает, что анализ не выполнен.
+Direct prohibitions. The presence of any of them in the conclusion means that the analysis has not been completed.
 
-| Антипаттерн | Почему запрещён |
+| Antipattern | Why is it prohibited |
 |-------------|-----------------|
-| Интерпретировать маркер, не заглянув в контекст жизни | Даёт ложные выводы там, где причина бытовая |
-| Останавливаться на границе своей специальности | Главная причина, по которой пациент годами ходит по кругу |
-| Выдавать одну гипотезу без альтернативы | Это догадка, а не анализ |
-| Называть пограничную находку «нормой», если она лежит на затронутой оси и согласована с остальными | Компенсация маскирует процесс |
-| Игнорировать вещества, режим и питание перед поиском редкой патологии | Нарушает порядок вероятностей |
-| Списывать всё на стресс без проверки органических причин | Обратная крайность, столь же вредная |
-| Дублировать выводы других специалистов без добавления своего угла | Обесценивает консилиум |
-| Подгонять данные под существующую гипотезу | Разрушает доказательность системы |
-| Ставить диагноз | Прямо запрещено правилами Health-OS |
+| Interpret a marker without looking into the context of life | Gives false conclusions where the reason is domestic |
+| Stop at the boundaries of your specialty | The main reason why a patient walks in circles for years |
+| Produce one hypothesis without an alternative | This is a guess, not an analysis |
+| Call a borderline finding “norm” if it lies on the affected axis and is consistent with the rest | Compensation masks the process |
+| Ignore substances, regimen and nutrition before searching for a rare pathology | Disturbs the order of probabilities |
+| Blame everything on stress without checking for organic causes | The opposite extreme, just as harmful |
+| Duplicate the findings of other experts without adding your own angle | Devalues the consultation |
+| Fit data to existing hypothesis | Destroys the system's evidence |
+| Making a diagnosis | Directly prohibited by Health-OS rules |
 
-Вторая половина списка — запреты на **переобъяснение**. Они так же
-обязательны, как первая: ошибка «увидеть болезнь там, где её нет» стоит
-пациенту лишних обследований, тревоги и вмешательств, а системе — доверия.
+The second half of the list contains prohibitions on **overinterpreting**. They are just as
+mandatory as the first half: the mistake of “seeing a disease where there is none” leads to
+unnecessary examinations, anxiety and interventions for the patient, and trust in the system.
 
-| Антипаттерн | Почему запрещён |
+| Antipattern | Why is it prohibited |
 |-------------|-----------------|
-| Объяснять единой причиной находки, которые могут быть независимыми | Организм не обязан болеть одним. Две независимые мелочи — частый и скучный ответ |
-| Принимать совпадение по времени за доказательство общего механизма | В одном месяце начинается многое. Совпадение указывает, где искать, а не что нашли |
-| Выдавать ожидаемую вариацию за системный процесс | На широкой панели несколько значений вне интервала — норма статистики, а не находка |
-| Достраивать гипотезу первопричины, когда данных для неё нет | Для этого есть честный ответ «L4 не определён, требуется [исследование]» |
-| Наращивать число связей, чтобы картина выглядела убедительнее | Убедительность рассказа не является доказательством |
-| Не называть пограничную находку пограничной | Она не норма и не патология. Назвать её одним из двух — потерять информацию |
-| Умалчивать о простом объяснении, потому что оно скучное | Дефицит сна и кофеин объясняют больше, чем редкие синдромы |
+| Explain with a single cause findings that may be independent | The body need not have a single cause. Two independent minor issues may be the common and unremarkable answer |
+| Taking coincidence in time as evidence of a common mechanism | Many things begin in one month. A match indicates where to look, not what you found |
+| Pass off the expected variation as a system process | On a wide panel, several values ​​outside the interval are the norm of statistics, not a finding |
+| Developing a root cause hypothesis when there is no data for it | There is an honest answer for this "L4 undefined, requires [research]" |
+| Increase the number of connections to make the picture more convincing | The persuasiveness of a story is not evidence |
+| Do not call a borderline find borderline | It is neither normal nor pathological. To call it one of two means to lose information |
+| Withholding a simple explanation because it's boring | Sleep deficiency and caffeine explain more than rare syndromes |
 
 ---
 
-⚕️ Информация носит справочный характер. Для принятия решений о лечении обратитесь к врачу.
+⚕️ The information is for reference only. Consult your doctor for treatment decisions.

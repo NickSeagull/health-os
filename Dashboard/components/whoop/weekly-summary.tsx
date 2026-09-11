@@ -46,7 +46,7 @@ export function WeeklySummary() {
       <Card className="sm:col-span-2 lg:col-span-4">
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground text-center">
-            WHOOP данные недоступны
+            WHOOP data unavailable
           </p>
         </CardContent>
       </Card>
@@ -70,7 +70,7 @@ export function WeeklySummary() {
 
   const cards = [
     { title: "Avg Recovery", value: `${avgRecovery}%`, color: avgRecovery >= 67 ? "text-emerald-500" : avgRecovery >= 34 ? "text-amber-500" : "text-red-500" },
-    { title: "Avg Sleep", value: `${avgSleep}ч`, color: parseFloat(avgSleep) >= 7 ? "text-emerald-500" : "text-amber-500" },
+    { title: "Avg Sleep", value: `${avgSleep}h`, color: parseFloat(avgSleep) >= 7 ? "text-emerald-500" : "text-amber-500" },
     { title: "Total Strain", value: totalStrain, color: "text-blue-500" },
     { title: "Total Calories", value: totalCalories.toLocaleString(), color: "text-orange-500" },
   ];
@@ -87,7 +87,7 @@ export function WeeklySummary() {
           <CardContent>
             <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
             <p className="text-xs text-muted-foreground">
-              {withData.length} дней
+              {withData.length} days
             </p>
           </CardContent>
         </Card>

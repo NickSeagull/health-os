@@ -33,15 +33,15 @@ export function BmiZoneChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>BMI зоны</CardTitle>
-        <CardDescription>Индекс массы тела по зонам</CardDescription>
+        <CardTitle>BMI ranges</CardTitle>
+        <CardDescription>Body mass index by range</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : !filtered?.length ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных
+            No data
           </p>
         ) : (
           <div className="h-[300px]">
@@ -64,12 +64,12 @@ export function BmiZoneChart() {
                     const bmi = d.bmi!;
                     const zone =
                       bmi < 18.5
-                        ? "Недовес"
+                        ? "Underweight"
                         : bmi < 25
-                          ? "Норма"
+                          ? "Normal"
                           : bmi < 30
-                            ? "Избыток"
-                            : "Ожирение";
+                            ? "Overweight"
+                            : "Obesity";
                     return (
                       <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                         <p className="font-medium">{formatDateShort(d.date)}</p>

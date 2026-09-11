@@ -30,17 +30,17 @@ import type { LabIndex } from "@/lib/types/lab";
 import type { MedsFile } from "@/lib/types/medication";
 
 const pages = [
-  { name: "Обзор", href: "/", icon: LayoutDashboard },
-  { name: "Анализы", href: "/labs", icon: TestTubes },
-  { name: "Тело", href: "/body", icon: Activity },
-  { name: "Визиты", href: "/visits", icon: Calendar },
-  { name: "Лекарства", href: "/meds", icon: Pill },
-  { name: "Зубы", href: "/dental", icon: Smile },
-  { name: "Ментальное", href: "/mental", icon: Brain },
-  { name: "Цели", href: "/goals", icon: Target },
-  { name: "Задачи", href: "/tasks", icon: CheckSquare },
+  { name: "Overview", href: "/", icon: LayoutDashboard },
+  { name: "Labs", href: "/labs", icon: TestTubes },
+  { name: "Body", href: "/body", icon: Activity },
+  { name: "Visits", href: "/visits", icon: Calendar },
+  { name: "Medications", href: "/meds", icon: Pill },
+  { name: "Dental", href: "/dental", icon: Smile },
+  { name: "Mental health", href: "/mental", icon: Brain },
+  { name: "Goals", href: "/goals", icon: Target },
+  { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "WHOOP", href: "/whoop", icon: Heart },
-  { name: "Профиль", href: "/profile", icon: User },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
 export function CommandSearch() {
@@ -86,17 +86,17 @@ export function CommandSearch() {
         className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
       >
         <Search className="h-3.5 w-3.5" />
-        <span className="hidden sm:inline">Поиск</span>
+        <span className="hidden sm:inline">Search</span>
         <kbd className="hidden sm:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Поиск страниц, визитов, анализов, лекарств..." />
+        <CommandInput placeholder="Search pages, visits, labs, medications..." />
         <CommandList>
-          <CommandEmpty>Ничего не найдено</CommandEmpty>
+          <CommandEmpty>No results found</CommandEmpty>
 
-          <CommandGroup heading="Страницы">
+          <CommandGroup heading="Pages">
             {pages.map((p) => (
               <CommandItem key={p.href} onSelect={() => go(p.href)}>
                 <p.icon className="mr-2 h-4 w-4" />
@@ -108,7 +108,7 @@ export function CommandSearch() {
           {markers.length > 0 && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="Маркеры анализов">
+              <CommandGroup heading="Lab markers">
                 {markers.slice(0, 20).map((m) => (
                   <CommandItem key={m} onSelect={() => go("/labs")}>
                     <TestTubes className="mr-2 h-4 w-4" />
@@ -122,7 +122,7 @@ export function CommandSearch() {
           {visits?.visits && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="Визиты">
+              <CommandGroup heading="Visits">
                 {visits.visits.slice(-15).reverse().map((v) => (
                   <CommandItem key={v.file} onSelect={() => go("/visits")}>
                     <Calendar className="mr-2 h-4 w-4" />
@@ -136,7 +136,7 @@ export function CommandSearch() {
           {meds && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="Лекарства">
+              <CommandGroup heading="Medications">
                 {[...meds.medications, ...meds.supplements].map((m) => (
                   <CommandItem key={m.id} onSelect={() => go("/meds")}>
                     <Pill className="mr-2 h-4 w-4" />

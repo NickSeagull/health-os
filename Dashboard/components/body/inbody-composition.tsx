@@ -46,9 +46,9 @@ export function InBodyComposition() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Состав тела (InBody)</CardTitle>
+        <CardTitle>Body composition (InBody)</CardTitle>
         <CardDescription>
-          {chartData.length} измерений · Stacked composition
+          {chartData.length} measurements · Stacked composition
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -56,7 +56,7 @@ export function InBodyComposition() {
           <Skeleton className="h-[300px] w-full" />
         ) : chartData.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Нет данных InBody
+            No InBody data
           </p>
         ) : (
           <div className="h-[300px]">
@@ -76,11 +76,11 @@ export function InBodyComposition() {
                     return (
                       <div className="rounded-lg border bg-popover p-3 text-sm shadow-md">
                         <p className="font-medium">{formatDateShort(d.date)}</p>
-                        <p>Вес: {d.weight} кг</p>
-                        <p>Вода: {d.water} л</p>
-                        <p>Белок: {d.protein} кг</p>
-                        <p>Минералы: {d.minerals} кг</p>
-                        <p>Жир: {d.fat} кг</p>
+                        <p>Weight: {d.weight} kg</p>
+                        <p>Water: {d.water} L</p>
+                        <p>Protein: {d.protein} kg</p>
+                        <p>Minerals: {d.minerals} kg</p>
+                        <p>Fat: {d.fat} kg</p>
                       </div>
                     );
                   }}
@@ -92,7 +92,7 @@ export function InBodyComposition() {
                   stroke="#3b82f6"
                   fill="#3b82f6"
                   fillOpacity={0.6}
-                  name="Вода"
+                  name="Water"
                 />
                 <Area
                   type="monotone"
@@ -101,7 +101,7 @@ export function InBodyComposition() {
                   stroke="#22c55e"
                   fill="#22c55e"
                   fillOpacity={0.6}
-                  name="Белок"
+                  name="Protein"
                 />
                 <Area
                   type="monotone"
@@ -110,7 +110,7 @@ export function InBodyComposition() {
                   stroke="#8b5cf6"
                   fill="#8b5cf6"
                   fillOpacity={0.6}
-                  name="Минералы"
+                  name="Minerals"
                 />
                 <Area
                   type="monotone"
@@ -119,7 +119,7 @@ export function InBodyComposition() {
                   stroke="#f97316"
                   fill="#f97316"
                   fillOpacity={0.6}
-                  name="Жир"
+                  name="Fat"
                 />
               </AreaChart>
             </ResponsiveContainer>

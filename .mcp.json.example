@@ -1,35 +1,35 @@
 {
   "_comment": [
-    "Шаблон конфигурации MCP-серверов. Скопируйте в .mcp.json и впишите свои значения.",
-    "Файл .mcp.json исключён из git — в нём живут ключи и локальные пути.",
-    "Все интеграции опциональны: система полностью работоспособна без единой из них.",
-    "Ключи храните с правами 600 и никогда не вставляйте их в промпты или задачи."
+    "MCP server configuration template. Copy to .mcp.json and enter your own values.",
+    ".mcp.json is excluded from Git because it contains keys and local paths.",
+    "All integrations are optional: the system works fully without any of them.",
+    "Store keys with permissions 600 and never paste them into prompts or tasks."
   ],
 
   "mcpServers": {
     "_whoop": {
-      "_note": "Метрики сна, восстановления и нагрузки. Убрать подчёркивание в имени, чтобы включить.",
-      "_setup": "Нужен локально установленный MCP-сервер WHOOP. Укажите путь к его точке входа.",
+      "_note": "Sleep, recovery, and strain metrics. Remove the leading underscore from the name to enable.",
+      "_setup": "Requires a locally installed WHOOP MCP server. Specify the path to its entry point.",
       "command": "npx",
-      "args": ["tsx", "/АБСОЛЮТНЫЙ/ПУТЬ/К/whoop-mcp/index.ts"],
+      "args": ["tsx", "/ABSOLUTE/PATH/TO/whoop-mcp/index.ts"],
       "env": {}
     },
 
     "_google-calendar": {
-      "_note": "Визиты и напоминания о ревакцинации. Убрать подчёркивание, чтобы включить.",
-      "_setup": "При первом запуске откроется браузер для OAuth-авторизации.",
+      "_note": "Appointments and booster vaccination reminders. Remove the leading underscore to enable.",
+      "_setup": "On first launch, a browser opens for OAuth authorization.",
       "command": "npx",
       "args": ["-y", "@cocal/google-calendar-mcp"],
       "env": {}
     },
 
     "_todoist": {
-      "_note": "Задачи по здоровью: follow-up визиты, контроль анализов. Убрать подчёркивание, чтобы включить.",
-      "_setup": "Токен берётся в настройках Todoist: Settings → Integrations → Developer.",
+      "_note": "Health tasks: follow-up appointments and repeat lab tests. Remove the leading underscore to enable.",
+      "_setup": "Get the token from Todoist settings: Settings → Integrations → Developer.",
       "command": "npx",
       "args": ["-y", "@doist/todoist-mcp"],
       "env": {
-        "TODOIST_API_KEY": "<ВАШ_ТОКЕН>"
+        "TODOIST_API_KEY": "<YOUR_TOKEN>"
       }
     }
   }

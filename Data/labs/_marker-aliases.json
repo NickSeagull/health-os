@@ -1,221 +1,465 @@
 {
   "version": 1,
   "updated": "2026-07-31",
-  "purpose": "Словарь канонических имён маркеров, синонимов и единиц измерения. Обязателен при построении трендов и сравнении значений между анализами. Создан после обнаружения, что один и тот же маркер приходит из разных лабораторий в разных единицах, из-за чего наивный тренд даёт числовую бессмыслицу",
+  "purpose": "Dictionary of canonical marker names, synonyms, and measurement units. Required when building trends and comparing lab results. Different laboratories may report the same marker in different units; comparing raw values without checking units produces misleading trends.",
   "rules": [
-    "Перед сравнением двух значений одного маркера обязательно сверить единицы измерения",
-    "При несовпадении единиц — пересчитать по коэффициенту и пометить пересчитанную точку явно, либо сравнивать не абсолютные значения, а положение внутри референсного интервала",
-    "Значения из разных лабораторий напрямую не сравниваются: референсы зависят от метода. Корректное сравнение — по позиции в референсе",
-    "Маркеры из списка not_synonyms — это РАЗНЫЕ аналиты, объединять их в один тренд запрещено",
-    "Коэффициенты с признаком assay_dependent зависят от тест-системы и являются ориентировочными: при расхождении доверять референсу лаборатории, а не пересчёту",
-    "Если маркер отсутствует в словаре — не строить тренд между разными написаниями имени без явного подтверждения, что это один аналит"
+    "Always verify measurement units before comparing two values for the same marker.",
+    "If units differ, convert using the specified factor and clearly label the converted point, or compare positions within the reference intervals instead of absolute values.",
+    "Do not directly compare values from different laboratories: reference intervals depend on the method. Compare each value relative to its reference interval.",
+    "Markers listed in not_synonyms are different analytes and must never be merged into one trend.",
+    "Conversion factors marked assay_dependent are approximate and depend on the test system. If results conflict, use the laboratory reference interval rather than the conversion.",
+    "If a marker is absent from this dictionary, do not merge differently named markers into a trend without explicitly confirming that they are the same analyte."
   ],
   "markers": [
     {
-      "canonical": "Тестостерон общий",
-      "synonyms": ["Тестостерон"],
-      "not_synonyms": ["Свободный тестостерон", "Индекс свободных андрогенов"],
-      "canonical_unit": "нмоль/л",
-      "units_seen": ["нг/мл", "нмоль/л"],
-      "conversions": { "нг/мл→нмоль/л": 3.467, "нмоль/л→нг/мл": 0.2884 },
+      "canonical": "Total testosterone",
+      "synonyms": [
+        "Testosterone"
+      ],
+      "not_synonyms": [
+        "Free testosterone",
+        "Free androgen index"
+      ],
+      "canonical_unit": "nmol/L",
+      "units_seen": [
+        "ng/mL",
+        "nmol/L"
+      ],
+      "conversions": {
+        "ng/mL→nmol/L": 3.467,
+        "nmol/L→ng/mL": 0.2884
+      },
       "risk": "high",
-      "note": "Наиболее опасный случай в базе. 6.5 нг/мл ≈ 22.5 нмоль/л. Без пересчёта тренд 17.33 нмоль/л → 6.5 нг/мл читается как обвал втрое, тогда как на деле это рост. Свободный тестостерон — отдельный аналит, в общий тренд не включать"
+      "note": "Highest-risk unit mismatch in the dataset: 6.5 ng/mL is approximately 22.5 nmol/L. Without conversion, 17.33 nmol/L to 6.5 ng/mL appears to be a threefold fall, but is actually an increase. Free testosterone is a separate analyte and must not be included in the total testosterone trend."
     },
     {
-      "canonical": "Кортизол",
+      "canonical": "Cortisol",
       "synonyms": [],
-      "not_synonyms": ["Кортизол в слюне (образец 1, 08:57)", "Кортизол в слюне (образец 2, 08:59)"],
-      "canonical_unit": "нмоль/л",
-      "units_seen": ["мкг/дл", "нмоль/л"],
-      "conversions": { "мкг/дл→нмоль/л": 27.59, "нмоль/л→мкг/дл": 0.03625 },
+      "not_synonyms": [
+        "Salivary cortisol (sample 1, 08:57)",
+        "Salivary cortisol (sample 2, 08:59)"
+      ],
+      "canonical_unit": "nmol/L",
+      "units_seen": [
+        "µg/dL",
+        "nmol/L"
+      ],
+      "conversions": {
+        "µg/dL→nmol/L": 27.59,
+        "nmol/L→µg/dL": 0.03625
+      },
       "risk": "high",
-      "note": "Кортизол крови и кортизол слюны — разные аналиты с разными референсами, объединять запрещено. У слюны значим суточный ритм, а не единичная точка"
+      "note": "Blood and salivary cortisol are different analytes with different reference intervals and must not be merged. For salivary cortisol, the daily rhythm matters more than a single point."
     },
     {
-      "canonical": "Тироксин свободный (св. Т4)",
-      "synonyms": ["Т4 свободный"],
-      "not_synonyms": ["Т4 общий", "Т3 свободный"],
-      "canonical_unit": "пмоль/л",
-      "units_seen": ["нг/дл", "пмоль/л"],
-      "conversions": { "нг/дл→пмоль/л": 12.87, "пмоль/л→нг/дл": 0.0777 },
+      "canonical": "Free T4",
+      "synonyms": [
+        "Free thyroxine",
+        "T4 free"
+      ],
+      "not_synonyms": [
+        "Total T4",
+        "Free T3"
+      ],
+      "canonical_unit": "pmol/L",
+      "units_seen": [
+        "ng/dL",
+        "pmol/L"
+      ],
+      "conversions": {
+        "ng/dL→pmol/L": 12.87,
+        "pmol/L→ng/dL": 0.0777
+      },
       "risk": "high",
-      "note": "12.6 пмоль/л ≈ 0.98 нг/дл. Сравнение значения в пмоль/л с интервалом в нг/дл даёт семикратное мнимое превышение и ложный тиреотоксикоз"
+      "note": "12.6 pmol/L is approximately 0.98 ng/dL. Comparing a value in pmol/L against a reference interval in ng/dL creates an apparent sevenfold elevation and a false impression of thyrotoxicosis."
     },
     {
-      "canonical": "Пролактин",
+      "canonical": "Prolactin",
       "synonyms": [],
-      "not_synonyms": ["Макропролактин"],
-      "canonical_unit": "мкМЕ/мл",
-      "units_seen": ["мкМЕ/мл", "нг/мл"],
-      "conversions": { "нг/мл→мкМЕ/мл": 21.2, "мкМЕ/мл→нг/мл": 0.0472 },
+      "not_synonyms": [
+        "Macroprolactin"
+      ],
+      "canonical_unit": "µIU/mL",
+      "units_seen": [
+        "µIU/mL",
+        "ng/mL"
+      ],
+      "conversions": {
+        "ng/mL→µIU/mL": 21.2,
+        "µIU/mL→ng/mL": 0.0472
+      },
       "assay_dependent": true,
       "risk": "high",
-      "note": "Коэффициент зависит от тест-системы и стандарта калибровки. Использовать как ориентир, окончательная оценка — по референсу лаборатории"
+      "note": "The factor depends on the assay and calibration standard. Use it as a guide; base the final assessment on the laboratory reference interval."
     },
     {
-      "canonical": "ТТГ (тиреотропный гормон)",
-      "synonyms": ["ТТГ"],
+      "canonical": "TSH",
+      "synonyms": [
+        "Thyroid-stimulating hormone",
+        "TSH (thyroid-stimulating hormone)"
+      ],
       "not_synonyms": [],
-      "canonical_unit": "мЕд/л",
-      "units_seen": ["мМЕ/л", "мкМЕ/мл"],
-      "conversions": { "мкМЕ/мл→мМЕ/л": 1.0 },
+      "canonical_unit": "mIU/L",
+      "units_seen": [
+        "mIU/L",
+        "µIU/mL"
+      ],
+      "conversions": {
+        "µIU/mL→mIU/L": 1.0
+      },
       "risk": "low",
-      "note": "мМЕ/л и мкМЕ/мл численно тождественны — пересчёт не требуется, но имена надо нормализовать, чтобы точки попали в один тренд"
+      "note": "mIU/L and µIU/mL are numerically equivalent. No numerical conversion is needed, but normalize unit names so the points appear in the same trend."
     },
     {
-      "canonical": "Ферритин",
+      "canonical": "Ferritin",
       "synonyms": [],
-      "not_synonyms": ["Железо сывороточное", "Трансферрин", "ОЖСС"],
-      "canonical_unit": "мкг/л",
-      "units_seen": ["мкг/л", "нг/мл"],
-      "conversions": { "нг/мл→мкг/л": 1.0 },
+      "not_synonyms": [
+        "Iron",
+        "Transferrin",
+        "Total iron-binding capacity"
+      ],
+      "canonical_unit": "µg/L",
+      "units_seen": [
+        "µg/L",
+        "ng/mL"
+      ],
+      "conversions": {
+        "ng/mL→µg/L": 1.0
+      },
       "risk": "low",
-      "note": "мкг/л и нг/мл численно тождественны"
+      "note": "µg/L and ng/mL are numerically equivalent."
     },
     {
-      "canonical": "Витамин D суммарный (25-OH D2 и D3)",
-      "synonyms": ["Витамин D, 25-гидрокси (кальциферол)"],
-      "not_synonyms": ["Витамин D 1,25-дигидрокси"],
-      "canonical_unit": "нг/мл",
-      "units_seen": ["нг/мл"],
-      "conversions": { "нг/мл→нмоль/л": 2.496, "нмоль/л→нг/мл": 0.4006 },
+      "canonical": "Vitamin D",
+      "synonyms": [
+        "25-OH Vitamin D",
+        "25(OH)D",
+        "Vitamin D (25-OH)",
+        "Total vitamin D (25-OH D2 and D3)",
+        "Vitamin D, 25-hydroxy (calciferol)"
+      ],
+      "not_synonyms": [
+        "Vitamin D, 1,25-dihydroxy"
+      ],
+      "canonical_unit": "ng/mL",
+      "units_seen": [
+        "ng/mL"
+      ],
+      "conversions": {
+        "ng/mL→nmol/L": 2.496,
+        "nmol/L→ng/mL": 0.4006
+      },
       "risk": "medium",
-      "note": "Единица в базе пока одна, но международные источники чаще используют нмоль/л — коэффициент нужен при сверке с руководствами. Значения выше референса указывают на передозировку, а не на дефицит"
+      "note": "The dataset currently uses one unit, but international sources often use nmol/L, so a conversion factor is needed when comparing with guidelines. Values above the reference interval suggest excessive intake, not deficiency."
     },
     {
-      "canonical": "Витамин B12",
-      "synonyms": ["Витамин B12 (цианокобаламин)"],
-      "not_synonyms": ["Голотранскобаламин", "Метилмалоновая кислота"],
-      "canonical_unit": "пг/мл",
-      "units_seen": ["пг/мл"],
-      "conversions": { "пг/мл→пмоль/л": 0.738, "пмоль/л→пг/мл": 1.355 },
+      "canonical": "Vitamin B12",
+      "synonyms": [
+        "Vitamin B12 (cyanocobalamin)"
+      ],
+      "not_synonyms": [
+        "Holotranscobalamin",
+        "Methylmalonic acid"
+      ],
+      "canonical_unit": "pg/mL",
+      "units_seen": [
+        "pg/mL"
+      ],
+      "conversions": {
+        "pg/mL→pmol/L": 0.738,
+        "pmol/L→pg/mL": 1.355
+      },
       "risk": "low",
-      "note": "Синонимы различаются только написанием"
+      "note": "The synonyms differ only in spelling."
     },
     {
-      "canonical": "Глюкоза",
-      "synonyms": ["Глюкоза (плазма)"],
-      "not_synonyms": ["Гликированный гемоглобин", "Инсулин"],
-      "canonical_unit": "ммоль/л",
-      "units_seen": ["ммоль/л", "—"],
-      "conversions": { "ммоль/л→мг/дл": 18.016, "мг/дл→ммоль/л": 0.0555 },
+      "canonical": "Glucose",
+      "synonyms": [
+        "Plasma glucose",
+        "Venous glucose"
+      ],
+      "not_synonyms": [
+        "Glycated hemoglobin",
+        "Insulin"
+      ],
+      "canonical_unit": "mmol/L",
+      "units_seen": [
+        "mmol/L",
+        "—"
+      ],
+      "conversions": {
+        "mmol/L→mg/dL": 18.016,
+        "mg/dL→mmol/L": 0.0555
+      },
       "risk": "medium",
-      "note": "Часть записей без единицы. Значение без единицы трактовать как ммоль/л только если оно в диапазоне 2–30, иначе запросить уточнение"
+      "note": "Some records lack a unit. Treat a unitless value as mmol/L only if it is within 2–30; otherwise request clarification."
     },
     {
-      "canonical": "Железо сывороточное",
-      "synonyms": ["Железо", "Сывороточное железо"],
-      "not_synonyms": ["Железо (кровь)", "Ферритин", "ОЖСС", "Трансферрин"],
-      "canonical_unit": "мкмоль/л",
-      "units_seen": ["мкмоль/л"],
-      "conversions": { "мкмоль/л→мкг/дл": 5.585, "мкг/дл→мкмоль/л": 0.179 },
+      "canonical": "Iron",
+      "synonyms": [
+        "Serum iron"
+      ],
+      "not_synonyms": [
+        "Whole-blood iron",
+        "Ferritin",
+        "Total iron-binding capacity",
+        "Transferrin"
+      ],
+      "canonical_unit": "µmol/L",
+      "units_seen": [
+        "µmol/L"
+      ],
+      "conversions": {
+        "µmol/L→µg/dL": 5.585,
+        "µg/dL→µmol/L": 0.179
+      },
       "risk": "medium",
-      "note": "«Железо (кровь)» в мкг/л — ОТДЕЛЬНЫЙ аналит (железо цельной крови), в тренд сывороточного железа не включать"
+      "note": "Whole-blood iron reported in µg/L is a separate analyte and must not be included in the serum iron trend."
     },
     {
-      "canonical": "Лейкоциты",
-      "synonyms": ["Лейкоциты (WBC)"],
+      "canonical": "White blood cells",
+      "synonyms": [
+        "WBC",
+        "White blood cells (WBC)"
+      ],
       "not_synonyms": [],
-      "canonical_unit": "×10⁹/л",
-      "units_seen": ["10^9/л", "x10^9/л", "кл/мкл", "—"],
-      "conversions": { "кл/мкл→×10⁹/л": 0.001, "×10⁹/л→кл/мкл": 1000 },
+      "canonical_unit": "×10⁹/L",
+      "units_seen": [
+        "10^9/L",
+        "x10^9/L",
+        "cells/µL",
+        "—"
+      ],
+      "conversions": {
+        "cells/µL→×10⁹/L": 0.001,
+        "×10⁹/L→cells/µL": 1000
+      },
       "risk": "medium",
-      "note": "Записи «10^9/л» и «x10^9/л» — одна и та же единица, различается только написание. «кл/мкл» требует пересчёта: 6500 кл/мкл = 6.5 ×10⁹/л"
+      "note": "10^9/L and x10^9/L are equivalent spellings. cells/µL requires conversion: 6500 cells/µL = 6.5 ×10⁹/L."
     },
     {
-      "canonical": "Эритроциты",
-      "synonyms": ["Эритроциты (RBC)"],
-      "not_synonyms": ["Ретикулоциты"],
-      "canonical_unit": "×10¹²/л",
-      "units_seen": ["10^12/л", "x10^12/л", "кл/мкл", "—"],
-      "conversions": { "кл/мкл→×10¹²/л": 0.000001 },
+      "canonical": "Red blood cells",
+      "synonyms": [
+        "RBC",
+        "Red blood cells (RBC)"
+      ],
+      "not_synonyms": [
+        "Reticulocytes"
+      ],
+      "canonical_unit": "×10¹²/L",
+      "units_seen": [
+        "10^12/L",
+        "x10^12/L",
+        "cells/µL",
+        "—"
+      ],
+      "conversions": {
+        "cells/µL→×10¹²/L": 1e-06
+      },
       "risk": "medium",
-      "note": "Написания «10^12/л» и «x10^12/л» тождественны"
+      "note": "10^12/L and x10^12/L are equivalent spellings."
     },
     {
-      "canonical": "Тромбоциты",
-      "synonyms": ["Тромбоциты (PLT)"],
+      "canonical": "Platelets",
+      "synonyms": [
+        "PLT",
+        "Platelets (PLT)"
+      ],
       "not_synonyms": [],
-      "canonical_unit": "×10⁹/л",
-      "units_seen": ["10^9/л", "x10^9/л"],
+      "canonical_unit": "×10⁹/L",
+      "units_seen": [
+        "10^9/L",
+        "x10^9/L"
+      ],
       "conversions": {},
       "risk": "low",
-      "note": "Различается только написание единицы"
+      "note": "The unit spellings differ, but the units are equivalent."
     },
     {
-      "canonical": "Лимфоциты абсолютные",
-      "synonyms": ["Лимфоциты", "Лимфоциты абс.", "Лимфоциты абс (LYM#)"],
-      "not_synonyms": ["Лимфоциты %", "Лимфоциты % (LYM%)"],
-      "canonical_unit": "×10⁹/л",
-      "units_seen": ["10^9/л", "x10^9/л"],
+      "canonical": "Absolute lymphocytes",
+      "synonyms": [
+        "Lymphocytes",
+        "Lymphocytes abs.",
+        "Lymphocytes abs (LYM#)"
+      ],
+      "not_synonyms": [
+        "Lymphocytes %",
+        "Lymphocytes % (LYM%)"
+      ],
+      "canonical_unit": "×10⁹/L",
+      "units_seen": [
+        "10^9/L",
+        "x10^9/L"
+      ],
       "conversions": {},
       "risk": "high",
-      "note": "КРИТИЧНО: процент и абсолютное значение — разные показатели. Процент может расти при падающем абсолютном значении и наоборот. Смешивание их в одном тренде даёт ложную картину лимфоцитоза. Клинически значимо абсолютное значение"
+      "note": "CRITICAL: percentages and absolute counts are different measurements. The percentage can rise while the absolute count falls, and vice versa. Mixing them in one trend creates a false impression of lymphocytosis. The absolute count is clinically significant."
     },
     {
-      "canonical": "Лимфоциты %",
-      "synonyms": ["Лимфоциты % (LYM%)"],
-      "not_synonyms": ["Лимфоциты абсолютные", "Лимфоциты абс.", "Лимфоциты абс (LYM#)"],
+      "canonical": "Lymphocytes %",
+      "synonyms": [
+        "Lymphocytes % (LYM%)"
+      ],
+      "not_synonyms": [
+        "Absolute lymphocytes",
+        "Lymphocytes abs.",
+        "Lymphocytes abs (LYM#)"
+      ],
       "canonical_unit": "%",
-      "units_seen": ["%"],
+      "units_seen": [
+        "%"
+      ],
       "conversions": {},
       "risk": "high",
-      "note": "См. примечание к абсолютным лимфоцитам"
+      "note": "See the note for absolute lymphocytes."
     },
     {
-      "canonical": "Моноциты абсолютные",
-      "synonyms": ["Моноциты", "Моноциты абс.", "Моноциты абс (MON#)"],
-      "not_synonyms": ["Моноциты %", "Моноциты % (MON%)"],
-      "canonical_unit": "×10⁹/л",
-      "units_seen": ["10^9/л", "x10^9/л"],
+      "canonical": "Absolute monocytes",
+      "synonyms": [
+        "Monocytes",
+        "Monocytes abs.",
+        "Monocytes abs (MON#)"
+      ],
+      "not_synonyms": [
+        "Monocytes %",
+        "Monocytes % (MON%)"
+      ],
+      "canonical_unit": "×10⁹/L",
+      "units_seen": [
+        "10^9/L",
+        "x10^9/L"
+      ],
       "conversions": {},
       "risk": "medium",
-      "note": "Процент и абсолютное значение не смешивать"
+      "note": "Do not mix percentages with absolute counts."
     },
     {
-      "canonical": "Моноциты %",
-      "synonyms": ["Моноциты % (MON%)"],
-      "not_synonyms": ["Моноциты абсолютные", "Моноциты абс.", "Моноциты абс (MON#)"],
+      "canonical": "Monocytes %",
+      "synonyms": [
+        "Monocytes % (MON%)"
+      ],
+      "not_synonyms": [
+        "Absolute monocytes",
+        "Monocytes abs.",
+        "Monocytes abs (MON#)"
+      ],
       "canonical_unit": "%",
-      "units_seen": ["%"],
+      "units_seen": [
+        "%"
+      ],
       "conversions": {},
       "risk": "medium",
-      "note": "См. примечание к абсолютным моноцитам"
+      "note": "See the note for absolute monocytes."
     },
     {
-      "canonical": "Нейтрофилы абсолютные",
-      "synonyms": ["Нейтрофилы абс."],
-      "not_synonyms": ["Нейтрофилы %", "Нейтрофилы сегментоядерные", "Нейтрофилы сегментоядерные %", "Нейтрофилы палочкоядерные"],
-      "canonical_unit": "×10⁹/л",
-      "units_seen": ["10^9/л", "x10^9/л"],
+      "canonical": "Absolute neutrophils",
+      "synonyms": [
+        "Neutrophils abs."
+      ],
+      "not_synonyms": [
+        "Neutrophils %",
+        "Segmented neutrophils",
+        "Segmented neutrophils %",
+        "Band neutrophils"
+      ],
+      "canonical_unit": "×10⁹/L",
+      "units_seen": [
+        "10^9/L",
+        "x10^9/L"
+      ],
       "conversions": {},
       "risk": "high",
-      "note": "Сегментоядерные нейтрофилы — подмножество общих нейтрофилов, это разные показатели. Абсолютное число нейтрофилов ниже 0.5 ×10⁹/л — критическое значение (агранулоцитоз), см. critical-values.md"
+      "note": "Segmented neutrophils are a subset of total neutrophils; these are different measurements. An absolute neutrophil count below 0.5 ×10⁹/L is a critical value (agranulocytosis); see critical-values.md."
     },
     {
-      "canonical": "СОЭ",
-      "synonyms": ["Скорость оседания эритроцитов"],
+      "canonical": "ESR",
+      "synonyms": [
+        "Erythrocyte sedimentation rate"
+      ],
       "not_synonyms": [],
-      "canonical_unit": "мм/ч",
-      "units_seen": ["мм/ч", "мм/час"],
+      "canonical_unit": "mm/hr",
+      "units_seen": [
+        "mm/hr",
+        "mm/hour"
+      ],
       "conversions": {},
       "risk": "low",
-      "note": "Различается только написание"
+      "note": "The unit spellings differ, but the units are equivalent."
     },
     {
-      "canonical": "Протромбиновое время",
+      "canonical": "Prothrombin time",
       "synonyms": [],
-      "not_synonyms": ["МНО", "Протромбиновый индекс"],
-      "canonical_unit": "с",
-      "units_seen": ["сек", "сек."],
+      "not_synonyms": [
+        "INR",
+        "Prothrombin index"
+      ],
+      "canonical_unit": "s",
+      "units_seen": [
+        "s",
+        "sec",
+        "sec."
+      ],
       "conversions": {},
       "risk": "low",
-      "note": "Различается только написание"
+      "note": "The unit spellings differ, but the units are equivalent."
+    },
+    {
+      "canonical": "Hemoglobin",
+      "synonyms": [
+        "HGB",
+        "Hb",
+        "Hemoglobin (Hb)",
+        "Hemoglobin (HGB)"
+      ],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "Creatinine",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "ALT",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "AST",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "Total cholesterol",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "LDL",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "HDL",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
+    },
+    {
+      "canonical": "Triglycerides",
+      "synonyms": [],
+      "not_synonyms": [],
+      "note": "Identity mapping for a dashboard key marker. Unit metadata is not specified here; preserve the source laboratory units and verify them before comparing results."
     }
   ],
   "_maintenance": {
     "total_marker_names_in_data": 258,
     "markers_with_conflicting_units": 12,
-    "note": "При добавлении новых анализов проверять, не появились ли новые написания имён или новые единицы. Словарь пополняется, а не переписывается"
+    "note": "When adding lab results, check for new marker names or units. Extend the dictionary rather than replacing it."
   }
 }
